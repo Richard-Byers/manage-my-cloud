@@ -1,0 +1,29 @@
+.navbar {
+    background-color: #ffffff;
+    height: 20px;
+    position: relative;
+    top: 150px;
+}
+
+.navbar-nav {
+    display: flex;
+    justify-content: space-between;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.nav-item {
+    margin: 0 10px;
+}
+
+.nav-link {
+    color: #000000;
+    text-decoration: none;
+    padding: 10px;
+}
+
+.nav-link:hover {
+    border-bottom: 4px solid #4682A9;
+    transition: all 0.2s ease-out;
+}
