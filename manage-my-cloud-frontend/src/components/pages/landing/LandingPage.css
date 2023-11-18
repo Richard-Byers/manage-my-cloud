@@ -1,6 +1,6 @@
 
 .landing-page-main {
-    background: url(../../images/landing/pexels-donald-tong-133953.jpg) lightgray 50% / cover no-repeat;
+    background: url("../../images/landing/LandingPageBackground.jpg") lightgray 50% / cover no-repeat;
     display: flex;
     flex-direction: column;
     height: 100vh;
