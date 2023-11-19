@@ -78,23 +78,5 @@
     margin: 5px 5px;
 }
 
-.landing-page-login-button {
-    color: black;
-    width: 200px;
-    height: 55px;
-    border-radius: 40px;
-    background: #f6c82c;
-    font-size: 17px;
-    font-family: MontserratBold, serif;
-    box-shadow: 0 4px 25px 0 #05919f;
-    border: none;
-
-    transition: transform .2s;
-}
-
-.landing-page-login-button:hover {
-    transform: translateY(-3px);
-}
-
 
 

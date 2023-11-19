@@ -1,6 +1,7 @@
+import manageMyCloudLogo from "../../images/managemycloudlogo.svg";
 import React from "react";
 import "./LandingPage.css";
-import manageMyCloudLogo from "../../images/managemycloudlogo.svg";
+import LoginModal from "../../modals/login/LoginModal";
 
 const LandingPage: React.FC = () => {
     return (
@@ -19,7 +20,7 @@ const LandingPage: React.FC = () => {
                 and reduce the cloud storage carbon footprint.
             </div>
             <div className={"landing-page-login-button-div"}>
-                <button className={"landing-page-login-button"}>Login</button>
+                <LoginModal/>
             </div>
         </div>
     )
