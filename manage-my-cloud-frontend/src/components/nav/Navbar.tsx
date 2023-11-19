@@ -19,7 +19,7 @@ const Navbar: React.FC = () => {
                 </li>
                 <li className="nav-item">
                     <Link to="/manage-connections" className="nav-link">
-                        Add/Manage Connections
+                        Manage Connections
                     </Link>
                 </li>
                 <li className="nav-item">
@@ -35,11 +35,6 @@ const Navbar: React.FC = () => {
                 <li className="nav-item">
                     <Link to="/settings" className="nav-link">
                         Settings
-                    </Link>
-                </li>
-                <li className="nav-item">
-                    <Link to="/sign-out" className="nav-link">
-                        Sign Out
                     </Link>
                 </li>
             </ul>
