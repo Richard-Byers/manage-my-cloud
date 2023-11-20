@@ -7,7 +7,6 @@ import Navbar from "./components/nav/Navbar";
 function App() {
     return (
         <Router>
-            <Navbar/>
             <AppRouting/>
         </Router>
     );

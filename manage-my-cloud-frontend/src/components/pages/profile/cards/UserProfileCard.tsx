@@ -1,47 +1,35 @@
 import React from 'react';
-import './UserProfileCard.css';
+import { Card, CardHeader, CardContent, CardActions, Avatar, Typography } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
-import Avatar from '@mui/material/Avatar';
 
 const UserProfileCard = () => {
     return (
-        <div className='upc'>
-            <div className='gradient'> </div>
-                <div className="title">
-                    Personal Details
-                </div>
-            <div className="profile-avatar">
-                <Avatar sx={{ width: '20vw', height: '20vh' }}></Avatar>
+        <Card sx={{ maxWidth: '46vw', maxHeight: '60vh', marginTop: 10, minHeight: '60vh', display: 'flex', flexDirection: 'column', marginLeft: '2.5vw'}}>
+            <div style={{ display: 'flex', justifyContent: 'center' }}>
+                <CardHeader
+                    avatar={
+                        <Avatar sx={{ height: '10vw', width: '10vw', position:'relative', display:'flex'}} aria-label="recipe">
+                        </Avatar>
+                    }
+                />
             </div>
-                    <div className="email">
-                        Email
-                    </div>
-                    <div className="profile-email">
-                        remy.sharp@gmail.com
-                        <EditIcon></EditIcon>
-                    </div>
-                    <div className="password">
-                        Password
-                    </div>
-                    <div className="profile-password">
-                        ********
-                        <EditIcon></EditIcon>
-                    </div>
-                    <div className="forename">
-                        First Name
-                    </div>
-                    <div className="profile-forename">
-                        Remy
-                        <EditIcon></EditIcon>
-                    </div>
-                    <div className="surname">
-                        Last Name
-                    </div>
-                    <div className="profile-surname">
-                        Sharp
-                        <EditIcon></EditIcon>
-                    </div>
-            </div>
+            <CardContent>
+                <Typography variant="h5" component="div" sx={{ mb: 5 }}>
+                    Email Address: user@example.com
+                </Typography>
+                <Typography variant="h5" component="div" sx={{ mb: 5 }}>
+                    Password: ******
+                </Typography>
+                <Typography variant="h5" component="div" sx={{ mb: 5 }}>
+                    First Name: John
+                </Typography>
+                <Typography variant="h5" component="div" sx={{ mb: 5 }}>
+                    Last Name: Doe
+                </Typography>
+            </CardContent>
+            <CardActions disableSpacing>
+            </CardActions>
+        </Card>
     );
 }
 

@@ -1,0 +1,16 @@
+body {
+    background: linear-gradient(180deg, #16969E 0%, #04D3E0 50%, #4382AB 100%);
+    height: 100%;
+    margin: 0;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+}
+
+.profile-title{
+    color:white;
+    position: relative;
+    display: flex;
+    left: 55px;
+    top: 40px;
+    font-family: MontserratBold, serif;
+}

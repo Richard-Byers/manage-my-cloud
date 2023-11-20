@@ -1,0 +1,19 @@
+.btn {
+    display: flex;
+    width: 412px;
+    height: 42px;
+    padding: 7px 133px 8px 132px;
+    justify-content: center;
+    align-items: center;
+    flex-shrink: 0;
+    border-radius: 40px;
+    background: #CB4242;
+    color: #FFF;
+
+    font-family: Montserrat;
+    font-size: 18px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: 150%; /* 27px */
+    letter-spacing: -0.396px;
+}
