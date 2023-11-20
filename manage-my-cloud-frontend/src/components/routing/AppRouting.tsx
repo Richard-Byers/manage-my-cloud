@@ -5,10 +5,12 @@ import ManageConnectionsPage from "../pages/manage_connections/ManageConnections
 import PreferencesPage from "../pages/preferences/PreferencesPage";
 import ProfilePage from "../pages/profile/ProfilePage";
 import {ROUTES} from "../../constants/RouteConstants"
+import LandingPage from "../pages/landing/LandingPage";
 
 const AppRouting = () => {
     return (
         <Routes>
+            <Route path={ROUTES.LANDING} element={<LandingPage/>}/>
             <Route path={ROUTES.DASHBOARD} element={<DashboardPage/>}/>
             <Route path={ROUTES.MANAGE_CONNECTIONS} element={<ManageConnectionsPage/>}/>
             <Route path={ROUTES.PREFERENCES} element={<PreferencesPage/>}/>
