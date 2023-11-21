@@ -6,8 +6,8 @@ const DownloadTermsOfServiceCard = () => {
     return (
         <Card sx={{ maxWidth: '46vw', maxHeight: '60vh', marginTop: 5, minHeight: '5vh', display: 'flex', flexDirection: 'column', marginLeft: '51vw'}}>
             <CardContent sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', fontFamily: 'Montserrat', fontSize: '18px' }}>
-                <Typography variant="h4" component="div" sx={{ mb: 5, textAlign: 'center' }}>
-                    Terms of Service
+                <Typography>
+                <div className='download-terms-service-title'>Terms of Service</div>
                 </Typography>
                 <button className="button1">
                     View Online

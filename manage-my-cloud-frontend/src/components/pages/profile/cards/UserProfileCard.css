@@ -1,0 +1,50 @@
+.user-profile-card-email{
+    margin-bottom: 40px;
+    font-family: 'MontserratLight';
+    font-size: 24px;
+}
+
+.user-profile-card-password{
+    margin-bottom: 40px;
+    font-family: 'MontserratLight';
+    font-size: 24px;
+}
+
+.user-profile-card-fname{
+    margin-bottom: 40px;
+    font-family: 'MontserratLight';
+    font-size: 24px;
+}
+
+.user-profile-card-lname{
+    margin-bottom: 40px;
+    font-family: 'MontserratLight';
+    font-size: 24px;
+}
+
+.button4{display: inline-flex;
+padding: 7px 41px 8px 41px;
+border-radius: 40px;
+background: #01D8D8;
+color: #FFF;
+font-family: MontserratBold;
+font-size: 18px;
+font-style: normal;
+font-weight: 700;
+line-height: 150%;
+letter-spacing: -0.396px;
+margin-left:950px;
+margin-top:-1300px;
+}
+
+@font-face {
+    font-family: 'MontserratLight';
+    src: local('MontserratLight'),
+      url('../../../fonts/Montserrat-Light.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'MontserratBold';
+    src: local('MontserratBold'),
+      url('../../../fonts/Montserrat-Bold.ttf') format('truetype');
+}

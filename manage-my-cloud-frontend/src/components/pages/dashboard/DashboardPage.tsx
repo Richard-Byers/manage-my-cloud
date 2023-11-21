@@ -5,7 +5,7 @@ const ManageConnectionsPage = () => {
     return (
         <div>
             <Navbar/>
-            <h1>Manage Connections Page</h1>
+            <h1>Dashboard Page</h1>
         </div>
     )
 };

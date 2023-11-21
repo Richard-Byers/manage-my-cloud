@@ -23,7 +23,9 @@
     color: #fff;
     display: flex;
     text-decoration: none;
-    padding: 0.5rem 0.1rem; /* Adjust this */
+    padding: 0.5rem 0.1rem;
+    font-family: MontserratBold;
+    
 }
 
 .nav-link:hover {
@@ -36,4 +38,10 @@
     justify-content: flex-start;
     align-self: flex-start;
     color: #fff;
+}
+
+@font-face {
+    font-family: 'MontserratBold';
+    src: local('MontserratBold'),
+      url('../fonts/Montserrat-Bold.ttf') format('truetype');
 }

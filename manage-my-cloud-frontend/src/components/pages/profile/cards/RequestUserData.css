@@ -6,10 +6,28 @@
     border-radius: 40px;
     background: #FFB800;
     color: #FFF;
-    font-family: Montserrat;
+    font-family: MontserratBold;
     font-size: 18px;
     ont-style: normal;
     ont-weight: 700;
     line-height: 150%; /* 27px */
     letter-spacing: -0.396px;
+}
+
+.request-user-data-title{
+    mb: 5;
+    textAlign: center;
+    color: #000;
+    font-family: MontserratBold;
+    font-size: 30px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: normal;
+
+}
+
+@font-face {
+    font-family: 'MontserratBold';
+    src: local('MontserratBold'),
+      url('../../../fonts/Montserrat-Bold.ttf') format('truetype');
 }

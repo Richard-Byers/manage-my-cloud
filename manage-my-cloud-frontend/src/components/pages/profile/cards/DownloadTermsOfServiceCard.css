@@ -6,7 +6,7 @@
     border-radius: 40px;
     background: #4682A9;
     color: #FFF;
-    font-family: Montserrat;
+    font-family: MontserratBold;
     font-size: 18px;
     font-style: normal;
     font-weight: 700;
@@ -24,7 +24,7 @@
     border-radius: 40px;
     background: #4682A9;
     color: #FFF;
-    font-family: Montserrat;
+    font-family: MontserratBold;
     font-size: 18px;
     font-style: normal;
     font-weight: 700;
@@ -33,4 +33,22 @@
     margin-left:200px;
     margin-top:-47px
     
+}
+
+.download-terms-service-title{
+    mb: 5;
+    textAlign: center;
+    color: #000;
+    font-family: MontserratBold;
+    font-size: 30px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: normal;
+
+}
+
+@font-face {
+    font-family: 'MontserratBold';
+    src: local('MontserratBold'),
+      url('../../../fonts/Montserrat-Bold.ttf') format('truetype');
 }
