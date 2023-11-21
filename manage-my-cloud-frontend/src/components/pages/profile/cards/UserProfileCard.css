@@ -22,7 +22,15 @@
     font-size: 24px;
 }
 
-.button4{display: inline-flex;
+.content-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+}
+
+.button4{
+display: inline-flex;
 padding: 7px 41px 8px 41px;
 border-radius: 40px;
 background: #01D8D8;
@@ -30,12 +38,28 @@ color: #FFF;
 font-family: MontserratBold;
 font-size: 18px;
 font-style: normal;
-font-weight: 700;
 line-height: 150%;
-letter-spacing: -0.396px;
-margin-left:950px;
-margin-top:-1300px;
+width: 25%;
+margin-left: 33vw;
+margin-top: -9vh;
+justify-content: center;
 }
+
+.button5{
+    display: inline-flex;
+    padding: 7px 41px 8px 41px;
+    border-radius: 40px;
+    background: #28AE6E;
+    color: #FFF;
+    font-family: MontserratBold;
+    font-size: 18px;
+    font-style: normal;
+    line-height: 150%;
+    width: 25%;
+    margin-left: 16.7vw;
+    margin-top: 14vh;
+    justify-content: center;
+    }
 
 @font-face {
     font-family: 'MontserratLight';

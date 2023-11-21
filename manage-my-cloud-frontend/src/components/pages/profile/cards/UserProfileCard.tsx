@@ -5,7 +5,7 @@ import EditIcon from '@mui/icons-material/Edit';
 
 const UserProfileCard = () => {
     return (
-        <Card sx={{ maxWidth: '46vw', maxHeight: '60vh', marginTop: 10, minHeight: '60vh', display: 'flex', flexDirection: 'column', marginLeft: '2.5vw'}}>
+        <Card sx={{ maxWidth: '46vw', maxHeight: '60vh', marginTop: 10, minHeight: '61.8vh', display: 'flex', flexDirection: 'column', marginLeft: '2.5vw'}}>
             <div style={{ display: 'flex', justifyContent: 'center' }}>
                 <CardHeader
                     avatar={
@@ -15,6 +15,7 @@ const UserProfileCard = () => {
                 />
             </div>
             <CardContent>
+                <div className='content-container'>
                 <Typography>
                     <div className='user-profile-card-email'>Email Address: johndoe@gmail.com</div>
                 </Typography>
@@ -32,6 +33,10 @@ const UserProfileCard = () => {
                 <button className="button4">
                     Update
                 </button>
+                <button className="button5">
+                    Save Changes
+                </button>
+                </div>
             </CardContent>
             <CardActions disableSpacing>
             </CardActions>

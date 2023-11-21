@@ -2,6 +2,8 @@ import React from 'react';
 import RequestUserDataCard from './RequestUserDataCard';
 import DownloadTermsOfServiceCard from './DownloadTermsOfServiceCard';
 import DeleteAccountCard from './DeleteAccountCard';
+import PreferencesCard from './PreferencesCard';
+import MemberSinceCard from './MemberSinceCard';
 import './CardsContainer.css';
 
 const CardsContainer = () => {
@@ -10,6 +12,8 @@ const CardsContainer = () => {
             <DownloadTermsOfServiceCard />
             <RequestUserDataCard />
             <DeleteAccountCard />
+            <PreferencesCard />
+            <MemberSinceCard />
         </div>
     );
 }
