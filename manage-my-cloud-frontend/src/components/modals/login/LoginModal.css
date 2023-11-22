@@ -54,6 +54,10 @@
     box-sizing: border-box;
 }
 
+.login-label:focus-within {
+    border: 2px solid black;
+}
+
 .login-input {
     display: flex;
     width: 100pc;
@@ -152,10 +156,17 @@
 }
 
 .modal-login-forgot-signup {
+    font-size: 16px;
+    border: none;
+    background: none;
     font-family: MontserratBold, serif;
     color: black;
 }
 
+.modal-login-forgot-signup:hover {
+    cursor: pointer;
+    border-bottom: 1px black solid;
+}
 
 .separator {
     height: 1px;

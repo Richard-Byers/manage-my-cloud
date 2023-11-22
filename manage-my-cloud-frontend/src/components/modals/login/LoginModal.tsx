@@ -1,24 +1,44 @@
 import React, {useState} from "react";
+import { useNavigate } from "react-router-dom";
 import "./LoginModal.css";
 import logo from "../../images/managemycloudlogo.png";
 import googleLogo from "../../images/login/google.png";
 import EmailIcon from '@mui/icons-material/Email';
 import LockIcon from '@mui/icons-material/Lock';
-import CloseIcon from '@mui/icons-material/Close';
+import {SignUpModal} from "../signUp/SignUpModal";
+import {ForgotPasswordModal} from "../forgotPassword/ForgotPassword";
 
 const LoginModal: React.FC = () => {
+    const navigate = useNavigate();
     const [showModal, setShowModal] = useState(false);
+    const [showSignUpModal, setShowSignUpModal] = useState(false);
+    const [showForgotPasswordModal, setShowForgotPasswordModal] = useState(false);
 
     const toggleModal = () => {
         setShowModal(!showModal);
     };
 
+    const toggleSignUpModal = () => {
+        closeModal();
+        setShowSignUpModal(!showSignUpModal);
+    };
+
+    const toggleForgotPasswordModal = () => {
+        closeModal();
+        setShowForgotPasswordModal(!showForgotPasswordModal);
+    };
+
     const closeModal = () => {
+        setShowSignUpModal(false);
         setShowModal(false);
     };
 
     const stopPropagation = (e: React.MouseEvent<HTMLDivElement>) => {
         e.stopPropagation();
+    };
+
+    const handleLoginClick = () => {
+        navigate('/dashboard');
     };
 
     return (
@@ -67,19 +87,30 @@ const LoginModal: React.FC = () => {
                                            onClick={stopPropagation}/>
                                     <LockIcon/>
                                 </label>
-                                <button className={"login-button"} type="submit">Login</button>
+                                <button className={"login-button"} type="submit" onClick={handleLoginClick}>Login</button>
                             </form>
 
                             <div className={"separator"}></div>
 
                             <div className={"sign-up-login-container"}>
-                                <a className={"modal-login-forgot-signup"} href={"#"}>Forgot Password</a>
-                                <a className={"modal-login-forgot-signup"} href={"#"}>Sign Up</a>
+                                <button className={"modal-login-forgot-signup"} onClick={toggleForgotPasswordModal}>
+                                    Forgot Password
+                                </button>
+                                <button className={"modal-login-forgot-signup"} onClick={toggleSignUpModal}>Sign
+                                    Up
+                                </button>
                             </div>
-
                         </div>
                     </div>
                 </div>
+            )}
+            {showSignUpModal && (<SignUpModal
+                    setShowSignUpModal={setShowSignUpModal}/>
+            )}
+
+            {showForgotPasswordModal && (
+                <ForgotPasswordModal
+                    setForgotPasswordModal={setShowForgotPasswordModal}/>
             )}
         </>
     );

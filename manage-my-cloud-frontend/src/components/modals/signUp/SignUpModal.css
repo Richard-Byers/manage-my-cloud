@@ -1,0 +1,55 @@
+
+.modal-logo-signup {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #0f8f9e;
+    padding: 30px 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    text-align: center;
+}
+
+.modal-signup-form-container {
+    display: flex;
+    flex-direction: column;
+    padding: 0 20px 0 20px;
+    margin: 0;
+}
+
+.modal-signup-title {
+    font-family: MontserratBold, serif;
+    font-size: 24px;
+    margin-bottom: 25px;
+}
+
+.modal-signup-form {
+    display: flex;
+    justify-content: space-evenly;
+    flex-direction: column;
+    margin: 15px 0 0 0;
+}
+
+.sign-up-login-container {
+    padding-top: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.confirmation-container {
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.modal-confirmation-email {
+    display: flex;
+    flex-direction: column;
+    padding: 18px;
+    border-radius: 8px;
+    text-align: center;
+    animation: fadeInPopUp 0.3s ease-in-out;
+}
