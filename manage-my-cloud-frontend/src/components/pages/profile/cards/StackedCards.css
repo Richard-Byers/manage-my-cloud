@@ -1,0 +1,166 @@
+.card-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+}
+
+.small-card {
+    min-width: 24vw;
+    height: 70vh;
+    margin-top:-70.8vh;
+    margin-left:65vw;
+    border-radius: 10px;
+    background: #FFF;
+    box-shadow: 3px 3px 50px 0px rgba(0, 0, 0, 0.10);
+}
+
+h1 {
+    margin-top: -17vh;
+    line-height: 40vh;
+    text-align: center;
+    font-family: 'MontserratBold';
+}
+
+.small-card:first-child {
+    margin-left:114vw;
+}
+
+
+.user-info {
+    margin-top: 7vh;
+}
+
+.user-profile-card-email{
+    margin-bottom: 40px;
+    font-family: 'MontserratLight';
+    font-size: 24px;
+}
+
+.user-profile-card-password{
+    margin-bottom: 40px;
+    font-family: 'MontserratLight';
+    font-size: 24px;
+}
+
+.user-profile-card-fname{
+    margin-bottom: 40px;
+    font-family: 'MontserratLight';
+    font-size: 24px;
+}
+
+.user-profile-card-lname{
+    margin-bottom: 40px;
+    font-family: 'MontserratLight';
+    font-size: 24px;
+}
+
+.update-password-btn {
+    display: flex;
+    padding: 7px 41px 8px 41px;
+    border-radius: 40px;
+    background: #4682A9;
+    color: #FFF;
+    font-family: MontserratBold;
+    font-size: 18px;
+    font-style: normal;
+    line-height: 150%;
+    width: 25%;
+    margin-left: 33vw;
+    margin-top: -10vh;
+    justify-content: center;
+}
+
+.button-container{
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    flex-direction: column;
+    margin-top:-67vh;
+}
+
+.delete-account-btn {
+    display: flex;
+    padding: 7px 41px 8px 41px;
+    border-radius: 40px;
+    background: #4682A9;
+    color: #FFF;
+    font-family: MontserratBold;
+    font-size: 18px;
+    font-style: normal;
+    line-height: 150%;
+    width: 50%;
+    justify-content: center;
+    margin-bottom: 22vh;
+}
+
+.request-data-btn {
+    display: flex;
+    padding: 7px 41px 8px 41px;
+    border-radius: 40px;
+    background: #4682A9;
+    color: #FFF;
+    font-family: MontserratBold;
+    font-size: 18px;
+    font-style: normal;
+    line-height: 150%;
+    width: 50%;
+    justify-content: center;
+    margin-bottom: 21vh;
+}
+
+.terms-of-service-view-btn {
+    display: flex;
+    padding: 7px 41px 8px 41px;
+    border-radius: 40px;
+    background: #4682A9;
+    color: #FFF;
+    font-family: MontserratBold;
+    font-size: 18px;
+    font-style: normal;
+    line-height: 150%;
+    width: 50%;
+    justify-content: center;
+    margin-bottom: 1vh;
+}
+
+.terms-of-service-download-btn {
+    display: flex;
+    padding: 7px 41px 8px 41px;
+    border-radius: 40px;
+    background: #4682A9;
+    color: #FFF;
+    font-family: MontserratBold;
+    font-size: 18px;
+    font-style: normal;
+    line-height: 150%;
+    width: 50%;
+    justify-content: center;
+}
+
+.save-changes-btn {
+    display: flex;
+    padding: 7px 41px 8px 41px;
+    border-radius: 40px;
+    background: #28AE6E;
+    color: #FFF;
+    font-family: MontserratBold;
+    font-size: 18px;
+    font-style: normal;
+    line-height: 150%;
+    width: 25%;
+    margin-left: 16.7vw;
+    margin-top: 35vh;
+    justify-content: center;
+}
+
+@font-face {
+    font-family: 'MontserratLight';
+    src: local('MontserratLight'),
+    url('../../../fonts/Montserrat-Light.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'MontserratBold';
+    src: local('MontserratBold'),
+    url('../../../fonts/Montserrat-Bold.ttf') format('truetype');
+}

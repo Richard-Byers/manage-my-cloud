@@ -1,46 +1,28 @@
-import React from 'react';
-import { Card, CardHeader, CardContent, CardActions, Avatar, Typography } from '@mui/material';
+import React, { useEffect } from "react";
 import './UserProfileCard.css';
+import {Avatar} from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 
-const UserProfileCard = () => {
+function UserProfileCard() {
     return (
-        <Card sx={{ maxWidth: '46vw', maxHeight: '60vh', marginTop: 10, minHeight: '61.8vh', display: 'flex', flexDirection: 'column', marginLeft: '2.5vw'}}>
-            <div style={{ display: 'flex', justifyContent: 'center' }}>
-                <CardHeader
-                    avatar={
-                        <Avatar sx={{ height: '10vw', width: '10vw', position:'relative', display:'flex'}} aria-label="recipe">
+        <div className="card-container">
+            <div className="card">
+                    <div className="card-content">
+                        <Avatar sx={{ height: '5vw', width: '5vw', display:'flex', marginLeft:'21vw'}} aria-label="recipe">
                         </Avatar>
-                    }
-                />
+                        <div className='user-info'>
+                        <div className='user-profile-card-email'>Email Address: johndoe@gmail.com</div>
+                        <div className='user-profile-card-password'>Password: ********</div>
+                        <div className='user-profile-card-fname'>First Name: John</div>
+                        <div className='user-profile-card-lname'>Last Name: Doe</div>
+                        </div>
+                        <EditIcon sx={{display: 'flex', marginLeft:23.5, marginTop:-8}}></EditIcon>
+                        <EditIcon sx={{display: 'flex', marginLeft:25.5, marginTop:-12}}></EditIcon>
+                        <button className='update-password-btn'>Update Password</button>
+                        <button className='save-changes-btn'>Save Changes</button>
+                    </div>
             </div>
-            <CardContent>
-                <div className='content-container'>
-                <Typography>
-                    <div className='user-profile-card-email'>Email Address: johndoe@gmail.com</div>
-                </Typography>
-                <Typography>
-                    <div className='user-profile-card-password'>Password: ********</div>
-                </Typography>
-                <Typography>
-                    <div className='user-profile-card-fname'>First Name: John</div>
-                </Typography>
-                <Typography>
-                    <div className='user-profile-card-lname'>Last Name: Doe</div>
-                </Typography>
-                <EditIcon sx={{display: 'flex', marginLeft:23.5, marginTop:-8}}></EditIcon>
-                <EditIcon sx={{display: 'flex', marginLeft:25.5, marginTop:-13}}></EditIcon>
-                <button className="button4">
-                    Update
-                </button>
-                <button className="button5">
-                    Save Changes
-                </button>
-                </div>
-            </CardContent>
-            <CardActions disableSpacing>
-            </CardActions>
-        </Card>
+        </div>
     );
 }
 

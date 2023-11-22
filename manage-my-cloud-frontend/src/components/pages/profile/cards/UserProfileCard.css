@@ -1,3 +1,25 @@
+.card-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    margin-right: 40vw;
+}
+
+.card {
+    width: 50vw;
+    height: 70vh;
+    margin: 10px;
+    margin-right:10vw;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+    border-radius: 10px;
+    background: #FFF;
+    box-shadow: 3px 3px 50px 0px rgba(0, 0, 0, 0.10);
+}
+
+.user-info {
+    margin-top: 7vh;
+}
+
 .user-profile-card-email{
     margin-bottom: 40px;
     font-family: 'MontserratLight';
@@ -22,31 +44,24 @@
     font-size: 24px;
 }
 
-.content-container {
+.update-password-btn {
     display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    height: 100%;
+    padding: 7px 41px 8px 41px;
+    border-radius: 40px;
+    background: #4682A9;
+    color: #FFF;
+    font-family: MontserratBold;
+    font-size: 18px;
+    font-style: normal;
+    line-height: 150%;
+    width: 25%;
+    margin-left: 33vw;
+    margin-top: -10vh;
+    justify-content: center;
 }
 
-.button4{
-display: inline-flex;
-padding: 7px 41px 8px 41px;
-border-radius: 40px;
-background: #01D8D8;
-color: #FFF;
-font-family: MontserratBold;
-font-size: 18px;
-font-style: normal;
-line-height: 150%;
-width: 25%;
-margin-left: 33vw;
-margin-top: -9vh;
-justify-content: center;
-}
-
-.button5{
-    display: inline-flex;
+.save-changes-btn {
+    display: flex;
     padding: 7px 41px 8px 41px;
     border-radius: 40px;
     background: #28AE6E;
@@ -57,18 +72,12 @@ justify-content: center;
     line-height: 150%;
     width: 25%;
     margin-left: 16.7vw;
-    margin-top: 14vh;
+    margin-top: 35vh;
     justify-content: center;
-    }
+}
 
 @font-face {
     font-family: 'MontserratLight';
     src: local('MontserratLight'),
-      url('../../../fonts/Montserrat-Light.ttf') format('truetype');
-}
-
-@font-face {
-    font-family: 'MontserratBold';
-    src: local('MontserratBold'),
-      url('../../../fonts/Montserrat-Bold.ttf') format('truetype');
+    url('../../../fonts/Montserrat-Light.ttf') format('truetype');
 }

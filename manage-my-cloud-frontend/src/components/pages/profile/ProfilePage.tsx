@@ -1,8 +1,9 @@
 import React, { useEffect } from "react";
-import UserProfileCard from './cards/UserProfileCard';
-import CardsContainer from './cards/CardsContainer';
 import './ProfilePage.css';
 import Navbar from '../../nav/Navbar';
+import {Avatar} from '@mui/material';
+import Card from './cards/UserProfileCard';
+import StackedCards from './cards/StackedCards';
 
 const ProfilePage = () => {
     useEffect(() => {
@@ -12,11 +13,8 @@ const ProfilePage = () => {
     return (
         <div >
             <Navbar/>
-            <div className="profile-title">
-                <h1>Profile</h1>
-                </div>
-            <UserProfileCard/>
-            <CardsContainer/>
+            <Card/>
+            <StackedCards/>
         </div>
     )
 };
