@@ -130,3 +130,10 @@
     color: black;
     padding: 0 0 0 100px;
 }
+
+.separator {
+    display: flex;
+    height: 1px;
+    background-color: #000000;
+    border: none;
+}

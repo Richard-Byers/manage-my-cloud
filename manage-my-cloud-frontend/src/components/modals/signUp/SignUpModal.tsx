@@ -1,6 +1,7 @@
 import logo from "../../images/managemycloudlogo.png";
 import EmailIcon from "@mui/icons-material/Email";
 import LockIcon from "@mui/icons-material/Lock";
+import BadgeIcon from '@mui/icons-material/Badge';
 import "./SignUpModal.css";
 import "../Modal.css";
 import React, {useState} from "react";
@@ -51,6 +52,20 @@ export const SignUpModal: React.FC<SignUpProps> = ({
                                 <label className={"modal-form-label"}>
                                     <input className={"modal-form-input"}
                                            type="text"
+                                           placeholder={"Enter your First Name"}
+                                           onClick={stopPropagation}/>
+                                    <BadgeIcon/>
+                                </label>
+                                <label className={"modal-form-label"}>
+                                    <input className={"modal-form-input"}
+                                           type="text"
+                                           placeholder={"Enter your Last Name"}
+                                           onClick={stopPropagation}/>
+                                    <BadgeIcon/>
+                                </label>
+                                <label className={"modal-form-label"}>
+                                    <input className={"modal-form-input"}
+                                           type="text"
                                            placeholder={"Enter your email Address"}
                                            onClick={stopPropagation}/>
                                     <EmailIcon/>
@@ -62,6 +77,7 @@ export const SignUpModal: React.FC<SignUpProps> = ({
                                            onClick={stopPropagation}/>
                                     <LockIcon/>
                                 </label>
+
                                 <button className={"modal-form-submit-button"} type="submit"
                                         onClick={showConfirmationEmail}>Sign Up
                                 </button>

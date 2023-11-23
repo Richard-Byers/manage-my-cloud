@@ -73,12 +73,6 @@
     border-bottom: 1px black solid;
 }
 
-.separator {
-    height: 1px;
-    background-color: #000000;
-    border: none;
-}
-
 .or-separator {
     display: flex;
     align-items: center;
@@ -90,8 +84,8 @@
     content: "";
     flex: 1;
     height: 1px;
-    background-color: #000; /* Set the color to black */
-    margin: 0 10px; /* Adjust as needed for spacing around lines */
+    background-color: #000;
+    margin: 0 10px;
 }
 
 /*Animations*/
