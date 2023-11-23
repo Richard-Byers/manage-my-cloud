@@ -1,6 +1,7 @@
 import logo from "../../images/managemycloudlogo.png";
 import EmailIcon from "@mui/icons-material/Email";
 import "./ResetPasswordModal.css";
+import "../Modal.css";
 import React, {useState} from "react";
 
 interface ForgotPasswordModalProps {

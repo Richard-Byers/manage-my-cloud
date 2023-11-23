@@ -1,8 +1,8 @@
 import logo from "../../images/managemycloudlogo.png";
 import EmailIcon from "@mui/icons-material/Email";
 import LockIcon from "@mui/icons-material/Lock";
-import CloseIcon from "@mui/icons-material/Close";
 import "./SignUpModal.css";
+import "../Modal.css";
 import React, {useState} from "react";
 
 interface SignUpProps {
