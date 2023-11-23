@@ -1,8 +1,8 @@
 import logo from "../../images/managemycloudlogo.png";
 import EmailIcon from "@mui/icons-material/Email";
 import LockIcon from "@mui/icons-material/Lock";
+import CloseIcon from "@mui/icons-material/Close";
 import "./SignUpModal.css";
-import "../login/LoginModal.css";
 import React, {useState} from "react";
 
 interface SignUpProps {
@@ -35,42 +35,52 @@ export const SignUpModal: React.FC<SignUpProps> = ({
                         <img src={logo} alt={"Manage My Cloud Logo"}/>
                     </div>
                     {!showConfirmation && (
-                        <div className={"modal-signup-form-container"}>
+                        <div className={"modal-form-container"}>
 
-                            <div className={"modal-signup-title"}>
+                            <div className={"modal-title"}>
                                 Sign up
                             </div>
 
-                            <div className={"modal-login-description"}>
+                            <div className={"modal-description"}>
                                 Are you ready to start saving money
                                 <br/>
                                 and help the environment?
                             </div>
 
-                            <form className={"modal-signup-form"}>
-                                <label className={"login-label"}>
-                                    <input className={"login-input"}
+                            <form className={"modal-form"}>
+                                <label className={"modal-form-label"}>
+                                    <input className={"modal-form-input"}
                                            type="text"
                                            placeholder={"Enter your email Address"}
                                            onClick={stopPropagation}/>
                                     <EmailIcon/>
                                 </label>
-                                <label className={"login-label"}>
-                                    <input className={"login-input"}
+                                <label className={"modal-form-label"}>
+                                    <input className={"modal-form-input"}
                                            type="password"
                                            placeholder={"Enter your password"}
                                            onClick={stopPropagation}/>
                                     <LockIcon/>
                                 </label>
-                                <button className={"login-button"} type="submit" onClick={showConfirmationEmail}>Sign Up
+                                <button className={"modal-form-submit-button"} type="submit"
+                                        onClick={showConfirmationEmail}>Sign Up
                                 </button>
                             </form>
                         </div>
                     )}
                     {showConfirmation && (
-                        <div className={"modal-confirmation-email"}>
-                            Confirmation email has been sent to:
-                        </div>
+                        <>
+                            <div className={"confirmation-container"}>
+                                <div className={"modal-title"}>
+                                    Confirmation Sent
+                                </div>
+                                <div className={"modal-confirmation-email"}>
+                                    Confirmation email has been sent to:
+                                    <br/>
+                                    Johndoe@gmail.com
+                                </div>
+                            </div>
+                        </>
                     )}
                 </div>
             </div>
