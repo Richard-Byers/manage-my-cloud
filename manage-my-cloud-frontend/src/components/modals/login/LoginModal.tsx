@@ -1,5 +1,5 @@
 import React, {useState} from "react";
-import {useNavigate} from "react-router-dom";
+import {useNavigate, Link} from "react-router-dom";
 import "./LoginModal.css";
 import "../Modal.css";
 import logo from "../../images/managemycloudlogo.png";
@@ -65,10 +65,12 @@ const LoginModal: React.FC = () => {
                                 and help the environment?
                             </div>
 
+                            <a href="http://localhost:8080/oauth2/authorization/google" style={{ textDecoration: 'none' }}>
                             <button className={"modal-login-google-button"}>
                                 <img className={"modal-login-google-logo"} src={googleLogo} alt={"Google Logo"}/>
                                 Log in using Google
                             </button>
+                            </a>
 
                             <div className={"or-separator"}>
                                 <span>Or</span>
