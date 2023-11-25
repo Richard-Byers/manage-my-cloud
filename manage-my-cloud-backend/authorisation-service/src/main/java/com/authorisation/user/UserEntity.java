@@ -15,11 +15,11 @@ import org.hibernate.annotations.NaturalId;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-public class User {
+public class UserEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long Id;
+    private Long id;
     private String firstName;
     private String lastName;
     @NaturalId(mutable = true)
