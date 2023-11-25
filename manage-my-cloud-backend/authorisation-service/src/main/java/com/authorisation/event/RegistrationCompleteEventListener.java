@@ -1,8 +1,7 @@
-package com.authorisation.event.listener;
+package com.authorisation.event;
 
-import com.authorisation.event.RegistrationCompleteEvent;
-import com.authorisation.user.UserEntity;
-import com.authorisation.user.UserService;
+import com.authorisation.entities.UserEntity;
+import com.authorisation.services.UserService;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;

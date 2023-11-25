@@ -1,5 +1,6 @@
-package com.authorisation.user;
+package com.authorisation.repositories;
 
+import com.authorisation.entities.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

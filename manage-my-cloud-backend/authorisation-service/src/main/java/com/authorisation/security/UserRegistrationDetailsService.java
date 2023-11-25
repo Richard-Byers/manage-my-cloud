@@ -1,6 +1,6 @@
 package com.authorisation.security;
 
-import com.authorisation.user.UserEntityRepository;
+import com.authorisation.repositories.UserEntityRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

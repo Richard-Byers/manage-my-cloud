@@ -1,12 +1,18 @@
-package com.authorisation.user;
+package com.authorisation.services;
 
+import com.authorisation.dto.CredentialsDto;
+import com.authorisation.dto.UserDto;
+import com.authorisation.entities.UserEntity;
+import com.authorisation.entities.VerificationToken;
+import com.authorisation.exception.InvalidPasswordException;
 import com.authorisation.exception.UserAlreadyExistsException;
 import com.authorisation.exception.UserNotFoundException;
+import com.authorisation.mappers.UserMapper;
 import com.authorisation.registration.RegistrationRequest;
-import com.authorisation.registration.password.PasswordResetTokenService;
-import com.authorisation.registration.token.VerificationToken;
-import com.authorisation.registration.token.VerificationTokenRepository;
+import com.authorisation.repositories.VerificationTokenRepository;
+import com.authorisation.repositories.UserEntityRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +29,7 @@ public class UserService implements IUserService {
     private final VerificationTokenRepository verificationTokenRepository;
     private final PasswordEncoder passwordEncoder;
     private final PasswordResetTokenService passwordResetTokenService;
+    private final UserMapper userMapper;
 
     @Override
     public List<UserEntity> getUsers() {
@@ -49,9 +56,30 @@ public class UserService implements IUserService {
         return userEntityRepository.save(newUser);
     }
 
+
+    public UserDto login(CredentialsDto credentialsDto) {
+        UserEntity user = userEntityRepository.findByEmail(credentialsDto.getEmail())
+                .orElseThrow(() -> new UserNotFoundException("Unknown user", HttpStatus.NOT_FOUND));
+
+        if (!user.isEnabled()) {
+            throw new UserNotFoundException("User not verified", HttpStatus.BAD_REQUEST);
+        }
+
+        if (passwordEncoder.matches(credentialsDto.getPassword(), user.getPassword())) {
+            return userMapper.toUserDto(user);
+        }
+        throw new InvalidPasswordException("Invalid password", HttpStatus.BAD_REQUEST);
+    }
+
     @Override
     public Optional<UserEntity> findUserByEmail(String email) {
         return userEntityRepository.findByEmail(email);
+    }
+
+    @Override
+    public UserDto findUserByEmailDto(String email) {
+        UserEntity userEntity = userEntityRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException("User not found"));
+        return userMapper.toUserDto(userEntity);
     }
 
     @Override
@@ -84,6 +112,7 @@ public class UserService implements IUserService {
         verificationTokenRepository.delete(token);
         return "valid";
     }
+
 
     @Override
     public VerificationToken generateNewVerificationToken(String oldToken) {

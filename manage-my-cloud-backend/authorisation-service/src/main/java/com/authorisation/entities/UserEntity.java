@@ -1,4 +1,4 @@
-package com.authorisation.user;
+package com.authorisation.entities;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

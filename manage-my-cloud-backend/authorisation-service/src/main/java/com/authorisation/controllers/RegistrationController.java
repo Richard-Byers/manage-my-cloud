@@ -1,12 +1,13 @@
-package com.authorisation.registration;
+package com.authorisation.controllers;
 
 import com.authorisation.event.RegistrationCompleteEvent;
-import com.authorisation.event.listener.RegistrationCompleteEventListener;
+import com.authorisation.event.RegistrationCompleteEventListener;
+import com.authorisation.registration.RegistrationRequest;
 import com.authorisation.registration.password.PasswordResetRequest;
-import com.authorisation.registration.token.VerificationToken;
-import com.authorisation.registration.token.VerificationTokenRepository;
-import com.authorisation.user.UserEntity;
-import com.authorisation.user.UserService;
+import com.authorisation.entities.VerificationToken;
+import com.authorisation.repositories.VerificationTokenRepository;
+import com.authorisation.entities.UserEntity;
+import com.authorisation.services.UserService;
 import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;

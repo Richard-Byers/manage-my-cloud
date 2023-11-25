@@ -1,6 +1,8 @@
-package com.authorisation.registration.password;
+package com.authorisation.services;
 
-import com.authorisation.user.UserEntity;
+import com.authorisation.entities.UserEntity;
+import com.authorisation.registration.password.PasswordResetToken;
+import com.authorisation.repositories.PasswordResetTokenRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

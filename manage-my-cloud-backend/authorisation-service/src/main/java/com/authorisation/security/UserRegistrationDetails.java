@@ -1,6 +1,6 @@
 package com.authorisation.security;
 
-import com.authorisation.user.UserEntity;
+import com.authorisation.entities.UserEntity;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
