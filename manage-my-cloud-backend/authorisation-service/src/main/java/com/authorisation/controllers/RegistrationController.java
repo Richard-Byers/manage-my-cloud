@@ -1,10 +1,12 @@
 package com.authorisation.controllers;
 
+import com.authorisation.entities.PasswordResetToken;
 import com.authorisation.event.RegistrationCompleteEvent;
 import com.authorisation.event.RegistrationCompleteEventListener;
 import com.authorisation.registration.RegistrationRequest;
 import com.authorisation.registration.password.PasswordResetRequest;
 import com.authorisation.entities.VerificationToken;
+import com.authorisation.repositories.PasswordResetTokenRepository;
 import com.authorisation.repositories.VerificationTokenRepository;
 import com.authorisation.entities.UserEntity;
 import com.authorisation.services.UserService;
@@ -32,6 +34,8 @@ public class RegistrationController {
     private final VerificationTokenRepository verificationTokenRepository;
 
     private final RegistrationCompleteEventListener eventListener;
+
+    private final PasswordResetTokenRepository passwordResetTokenRepository;
 
     private final HttpServletRequest request;
 
@@ -84,7 +88,7 @@ public class RegistrationController {
 
         if (userEntity.isPresent()) {
             String passwordResetToken = UUID.randomUUID().toString();
-            userService.createPasswordResetToken(userEntity.get(), passwordResetToken);
+            userService.createPasswordResetToken(userEntity.get(), passwordResetToken, passwordResetRequest);
             sendPasswordResetEmailLink(userEntity.get(), applicationUrl(request), passwordResetToken);
             return String.format("A new password reset link has been sent to %s. Please check your email", userEntity.get().getEmail());
         } else {
@@ -92,17 +96,18 @@ public class RegistrationController {
         }
     }
 
-    @PostMapping("/resetPassword")
-    public String resetPassword(@RequestBody PasswordResetRequest passwordResetRequest, @RequestParam("passwordResetToken") String passwordResetToken) {
+    @GetMapping("/resetPassword")
+    public String resetPassword(@RequestParam("token") String passwordResetToken) {
         String tokenValidationResult = userService.validatePasswordResetToken(passwordResetToken);
 
         if (!tokenValidationResult.equals("valid")) {
             return "Invalid password reset token";
         } else {
             UserEntity userEntity = userService.findUserByPasswordToken(passwordResetToken);
-
+            PasswordResetToken passwordResetTokenEntity = passwordResetTokenRepository.findByToken(passwordResetToken);
             if (userEntity != null) {
-                userService.resetUserPassword(userEntity, passwordResetRequest.getNewPassword());
+                userService.resetUserPassword(userEntity, passwordResetTokenEntity.getNewPassword());
+                passwordResetTokenRepository.delete(passwordResetTokenEntity);
                 return "Password reset successfully";
             } else {
                 return "Invalid password reset token";

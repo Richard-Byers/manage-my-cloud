@@ -7,7 +7,7 @@ import googleLogo from "../../images/login/google.png";
 import EmailIcon from '@mui/icons-material/Email';
 import LockIcon from '@mui/icons-material/Lock';
 import {SignUpModal} from "../signUp/SignUpModal";
-import {ResetPasswordModal} from "../forgotPassword/ResetPasswordModal";
+import {ResetPasswordModal} from "../resetPassword/ResetPasswordModal";
 import {AuthData} from "../../routing/AuthWrapper";
 
 interface LoginProps {

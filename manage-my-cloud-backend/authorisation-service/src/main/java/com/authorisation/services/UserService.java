@@ -9,6 +9,7 @@ import com.authorisation.exception.UserAlreadyExistsException;
 import com.authorisation.exception.UserNotFoundException;
 import com.authorisation.mappers.UserMapper;
 import com.authorisation.registration.RegistrationRequest;
+import com.authorisation.registration.password.PasswordResetRequest;
 import com.authorisation.repositories.VerificationTokenRepository;
 import com.authorisation.repositories.UserEntityRepository;
 import lombok.RequiredArgsConstructor;
@@ -126,8 +127,8 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void createPasswordResetToken(UserEntity userEntity, String passwordToken) {
-        passwordResetTokenService.createPasswordResetTokenForUser(userEntity, passwordToken);
+    public void createPasswordResetToken(UserEntity userEntity, String passwordToken, PasswordResetRequest passwordResetRequest) {
+        passwordResetTokenService.createPasswordResetTokenForUser(userEntity, passwordToken, passwordResetRequest);
     }
 
     @Override

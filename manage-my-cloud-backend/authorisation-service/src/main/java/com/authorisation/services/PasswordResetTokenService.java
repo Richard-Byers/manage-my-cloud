@@ -2,6 +2,7 @@ package com.authorisation.services;
 
 import com.authorisation.entities.UserEntity;
 import com.authorisation.entities.PasswordResetToken;
+import com.authorisation.registration.password.PasswordResetRequest;
 import com.authorisation.repositories.PasswordResetTokenRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,9 +16,9 @@ public class PasswordResetTokenService {
 
     private final PasswordResetTokenRepository passwordResetTokenRepository;
 
-    public void createPasswordResetTokenForUser(UserEntity userEntity, String passwordToken) {
+    public void createPasswordResetTokenForUser(UserEntity userEntity, String passwordToken, PasswordResetRequest passwordResetRequest) {
 
-        PasswordResetToken passwordResetToken = new PasswordResetToken(passwordToken, userEntity);
+        PasswordResetToken passwordResetToken = new PasswordResetToken(passwordToken, userEntity, passwordResetRequest.getNewPassword());
         passwordResetTokenRepository.save(passwordResetToken);
     }
 

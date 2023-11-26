@@ -19,6 +19,7 @@ public class PasswordResetToken {
     private Long Id;
     private String token;
     private Date expiryTime;
+    private String newPassword;
 
     private static final int EXPIRATION_TIME_MINUTES = 10;
 
@@ -26,11 +27,12 @@ public class PasswordResetToken {
     @JoinColumn(name = "user_entity_id")
     private UserEntity userEntity;
 
-    public PasswordResetToken(String token, UserEntity userEntity) {
+    public PasswordResetToken(String token, UserEntity userEntity, String newPassword) {
         super();
         this.token = token;
         this.userEntity = userEntity;
         this.expiryTime = calculateExpiryTime();
+        this.newPassword = newPassword;
     }
 
     public PasswordResetToken(String token) {

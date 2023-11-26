@@ -5,6 +5,7 @@ import com.authorisation.dto.UserDto;
 import com.authorisation.entities.UserEntity;
 import com.authorisation.entities.VerificationToken;
 import com.authorisation.registration.RegistrationRequest;
+import com.authorisation.registration.password.PasswordResetRequest;
 
 import java.util.List;
 import java.util.Optional;
@@ -25,7 +26,7 @@ public interface IUserService {
 
     VerificationToken generateNewVerificationToken(String oldToken);
 
-    void createPasswordResetToken(UserEntity userEntity, String passwordToken);
+    void createPasswordResetToken(UserEntity userEntity, String passwordToken, PasswordResetRequest passwordResetRequest);
 
     String validatePasswordResetToken(String passwordToken);
 
