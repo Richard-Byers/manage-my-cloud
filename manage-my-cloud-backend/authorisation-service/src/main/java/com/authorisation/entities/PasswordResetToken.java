@@ -1,6 +1,5 @@
-package com.authorisation.registration.password;
+package com.authorisation.entities;
 
-import com.authorisation.entities.UserEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

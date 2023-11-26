@@ -1,24 +1,82 @@
 import React, {useState} from "react";
+import {useNavigate} from "react-router-dom";
 import "./LoginModal.css";
+import "../Modal.css";
 import logo from "../../images/managemycloudlogo.png";
 import googleLogo from "../../images/login/google.png";
 import EmailIcon from '@mui/icons-material/Email';
 import LockIcon from '@mui/icons-material/Lock';
-import CloseIcon from '@mui/icons-material/Close';
+import {SignUpModal} from "../signUp/SignUpModal";
+import {ResetPasswordModal} from "../forgotPassword/ResetPasswordModal";
+import {AuthData} from "../../routing/AuthWrapper";
+
+interface LoginProps {
+    email: string;
+    password: string;
+}
 
 const LoginModal: React.FC = () => {
+    const {login} = AuthData();
+    const navigate = useNavigate();
     const [showModal, setShowModal] = useState(false);
+    const [showSignUpModal, setShowSignUpModal] = useState(false);
+    const [showForgotPasswordModal, setShowForgotPasswordModal] = useState(false);
+    const [showError, setShowError] = useState(false);
+
+    const [loginInput, setLoginInput] = useState<LoginProps>({
+        email: "",
+        password: "",
+    });
+
+    const modalFormInputLabel = showError ? "modal-form-label-error" : "modal-form-label"
+
+    const handleEmailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setShowError(false)
+        const email = event.target.value;
+        setLoginInput((prevState) => ({...prevState, email}));
+    };
+
+    const handlePasswordChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setShowError(false)
+        const password = event.target.value;
+        setLoginInput((prevState) => ({...prevState, password}));
+    };
 
     const toggleModal = () => {
         setShowModal(!showModal);
     };
 
+    const toggleSignUpModal = () => {
+        closeModal();
+        setShowSignUpModal(!showSignUpModal);
+    };
+
+    const toggleForgotPasswordModal = () => {
+        closeModal();
+        setShowForgotPasswordModal(!showForgotPasswordModal);
+    };
+
     const closeModal = () => {
+        setShowSignUpModal(false);
         setShowModal(false);
     };
 
     const stopPropagation = (e: React.MouseEvent<HTMLDivElement>) => {
         e.stopPropagation();
+    };
+
+    const handleLoginSubmission = (e: React.FormEvent) => {
+        e.preventDefault();
+
+        // Use the login function from the context
+        login(loginInput.email, loginInput.password)
+            .then(() => {
+
+                navigate('/profile');
+            })
+            .catch((error) => {
+                setShowError(true);
+            });
     };
 
     return (
@@ -35,9 +93,9 @@ const LoginModal: React.FC = () => {
                             <img src={logo} alt={"Manage My Cloud Logo"}/>
                         </div>
 
-                        <div className={"modal-login-form-container"}>
+                        <div className={"modal-form-container"}>
 
-                            <div className={"modal-login-description"}>
+                            <div className={"modal-description"}>
                                 Are you ready to start saving money
                                 <br/>
                                 and help the environment?
@@ -52,34 +110,54 @@ const LoginModal: React.FC = () => {
                                 <span>Or</span>
                             </div>
 
-                            <form className={"modal-login-form"}>
-                                <label className={"login-label"}>
-                                    <input className={"login-input"}
-                                           type="text"
+                            <form className={"modal-form"} onSubmit={handleLoginSubmission}>
+                                <label className={modalFormInputLabel}>
+                                    <input className={"modal-form-input"}
+                                           type="email"
                                            placeholder={"Enter your email Address"}
-                                           onClick={stopPropagation}/>
+                                           onClick={stopPropagation}
+                                           onChange={handleEmailChange}/>
                                     <EmailIcon/>
                                 </label>
-                                <label className={"login-label"}>
-                                    <input className={"login-input"}
+                                <label className={modalFormInputLabel}>
+                                    <input className={"modal-form-input"}
                                            type="password"
                                            placeholder={"Enter your password"}
-                                           onClick={stopPropagation}/>
+                                           onClick={stopPropagation}
+                                           onChange={handlePasswordChange}/>
                                     <LockIcon/>
                                 </label>
-                                <button className={"login-button"} type="submit">Login</button>
+                                {showError && (
+                                    <div className={"modal-form-error"}>
+                                        Invalid email or password
+                                    </div>
+                                )}
+                                <button className={"modal-form-submit-button"} type="submit">
+                                    Login
+                                </button>
                             </form>
 
                             <div className={"separator"}></div>
 
                             <div className={"sign-up-login-container"}>
-                                <a className={"modal-login-forgot-signup"} href={"#"}>Forgot Password</a>
-                                <a className={"modal-login-forgot-signup"} href={"#"}>Sign Up</a>
+                                <button className={"modal-login-reset-signup"} onClick={toggleForgotPasswordModal}>
+                                    Reset Password
+                                </button>
+                                <button className={"modal-login-reset-signup"} onClick={toggleSignUpModal}>Sign
+                                    Up
+                                </button>
                             </div>
-
                         </div>
                     </div>
                 </div>
+            )}
+            {showSignUpModal && (<SignUpModal
+                    setShowSignUpModal={setShowSignUpModal}/>
+            )}
+
+            {showForgotPasswordModal && (
+                <ResetPasswordModal
+                    setForgotPasswordModal={setShowForgotPasswordModal}/>
             )}
         </>
     );

@@ -1,55 +1,47 @@
-.navbar::before {
-    content: "";
-    display: block;
-    position: absolute;
-    top: -150px;
-    left: 0;
-    width: 100%;
-    height: 160px;
-    background-color: #4682A9;
-    z-index: -1;
-}
-
 .navbar {
-    background-color: #ffffff;
-    height: 30px;
-    position: relative;
-    top: 150px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 1.2rem;
+    position: sticky;
+    top: 0;
+    z-index: 999;
 }
 
 .navbar-nav {
     display: flex;
-    justify-content: space-between;
-    list-style: none;
-    margin: 0;
-    padding: 0;
+    justify-content: space-evenly;
+    width: 100%;
 }
 
 .nav-item {
-    margin: 0 10px;
-    margin-top: 5px;
+    display:flex;
+    align-items: center;
+    text-align: center;
 }
 
 .nav-link {
-    color: #000000;
+    color: #fff;
+    display: flex;
     text-decoration: none;
-    padding: 10px;
-    font-size:19px;
+    padding: 0.5rem 0.1rem;
+    font-family: MontserratBold;
+    
 }
 
-.nav-item:hover {
-    border-bottom: 4px solid #4682A9;
+.nav-link:hover {
+    border-bottom: 2px solid #ffffff;
     transition: all 0.2s ease-out;
 }
 
 .logo {
+    display:flex;
+    justify-content: flex-start;
+    align-self: flex-start;
     color: #fff;
-    justify-self: start;
-    cursor: pointer;
-    text-decoration: none;
-    font-size: 2rem;
-    position: fixed;
-    top: 80px;
-    left: 50%;
-    transform: translate(-50%, -50%);
+}
+
+@font-face {
+    font-family: 'MontserratBold';
+    src: local('MontserratBold'),
+      url('../fonts/Montserrat-Bold.ttf') format('truetype');
 }

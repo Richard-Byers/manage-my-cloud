@@ -56,7 +56,6 @@ public class UserService implements IUserService {
         return userEntityRepository.save(newUser);
     }
 
-
     public UserDto login(CredentialsDto credentialsDto) {
         UserEntity user = userEntityRepository.findByEmail(credentialsDto.getEmail())
                 .orElseThrow(() -> new UserNotFoundException("Unknown user", HttpStatus.NOT_FOUND));
