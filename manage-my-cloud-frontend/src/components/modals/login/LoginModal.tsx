@@ -65,7 +65,7 @@ const LoginModal: React.FC = () => {
                                 and help the environment?
                             </div>
 
-                            <a href="http://localhost:8080/oauth2/authorization/google" style={{ textDecoration: 'none' }}>
+                            <a href="http://localhost:8080/oauth2/authorize/google" style={{ textDecoration: 'none' }}>
                             <button className={"modal-login-google-button"}>
                                 <img className={"modal-login-google-logo"} src={googleLogo} alt={"Google Logo"}/>
                                 Log in using Google
