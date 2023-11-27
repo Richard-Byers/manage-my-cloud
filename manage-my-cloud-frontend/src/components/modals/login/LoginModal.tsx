@@ -7,7 +7,7 @@ import googleLogo from "../../images/login/google.png";
 import EmailIcon from '@mui/icons-material/Email';
 import LockIcon from '@mui/icons-material/Lock';
 import {SignUpModal} from "../signUp/SignUpModal";
-import {ResetPasswordModal} from "../forgotPassword/ResetPasswordModal";
+import {ResetPasswordModal} from "../resetPassword/ResetPasswordModal";
 import { useGoogleLogin } from '@react-oauth/google';
 import {AuthData} from "../../routing/AuthWrapper";
 
@@ -80,7 +80,7 @@ const LoginModal: React.FC = () => {
             });
     };
 
-    const login = useGoogleLogin({
+    const googleLogin = useGoogleLogin({
         onSuccess: codeResponse => {
             console.log(codeResponse);
             const authCode = codeResponse.code; // or codeResponse.authCode, depending on the structure of codeResponse
@@ -134,7 +134,7 @@ const LoginModal: React.FC = () => {
                                 and help the environment?
                             </div>
 
-                            <button className={"modal-login-google-button"}>
+                            <button className={"modal-login-google-button"} onClick={() => googleLogin()}>
                                 <img className={"modal-login-google-logo"} src={googleLogo} alt={"Google Logo"}/>
                                 Log in using Google
                             </button>
