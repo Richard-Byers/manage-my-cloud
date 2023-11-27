@@ -1,26 +1,32 @@
-import React, { useEffect } from "react";
+import React, {useEffect} from "react";
 import './UserProfileCard.css';
 import {Avatar} from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
+import {AuthData} from "../../../routing/AuthWrapper";
 
 function UserProfileCard() {
+    const {user, logout} = AuthData();
+
     return (
         <div className="card-container">
             <div className="card">
-                    <div className="card-content">
-                        <Avatar sx={{ height: '5vw', width: '5vw', display:'flex', marginLeft:'21vw'}} aria-label="recipe">
-                        </Avatar>
-                        <div className='user-info'>
-                        <div className='user-profile-card-email'>Email Address: johndoe@gmail.com</div>
-                        <div className='user-profile-card-password'>Password: ********</div>
-                        <div className='user-profile-card-fname'>First Name: John</div>
-                        <div className='user-profile-card-lname'>Last Name: Doe</div>
+                <div className="card-content">
+                    <Avatar sx={{height: '5vw', width: '5vw', display: 'flex', marginLeft: '21vw'}} aria-label="recipe">
+                    </Avatar>
+                    <div className='user-info'>
+                        <div className='user-profile-card-email'>Email Address: {user?.email}</div>
+                        <div className='user-profile-card-password'>
+                            Password: ********
+                            <button className='update-password-btn'>
+                                Update Password
+                            </button>
                         </div>
-                        <EditIcon sx={{display: 'flex', marginLeft:23.5, marginTop:-8}}></EditIcon>
-                        <EditIcon sx={{display: 'flex', marginLeft:25.5, marginTop:-12}}></EditIcon>
-                        <button className='update-password-btn'>Update Password</button>
-                        <button className='save-changes-btn'>Save Changes</button>
+                        <div className='user-profile-card-fname'>First Name: {user?.firstName}<EditIcon/></div>
+                        <div className='user-profile-card-lname'>Last Name: {user?.lastName} <EditIcon/></div>
                     </div>
+                    <button className='save-changes-btn'>Save Changes</button>
+                    <button className='save-changes-btn' onClick={logout}>Log Out</button>
+                </div>
             </div>
         </div>
     );
