@@ -50,7 +50,7 @@ const LoginModal: React.FC = () => {
             const authCode = codeResponse.code; // or codeResponse.authCode, depending on the structure of codeResponse
     
             // Send the code to the server
-            fetch('http://localhost:8080/storeauthcode', {
+            fetch('http://localhost:8080/storetoken', {
                 method: 'POST',
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest',
@@ -62,8 +62,9 @@ const LoginModal: React.FC = () => {
             .then(data => {
                 // Handle or verify the server response
                 console.log(data);
-                // Navigate to the dashboard
-                navigate('/dashboard');
+                if (data.message === 'Logged In') {
+                    navigate('/dashboard');
+                }
             })
             .catch(error => {
                 // Handle the error
@@ -71,6 +72,8 @@ const LoginModal: React.FC = () => {
             });
         },
         flow: 'auth-code',
+        scope: 'https://www.googleapis.com/auth/drive',
+        
     });
 
     return (
