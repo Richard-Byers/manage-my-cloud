@@ -1,7 +1,5 @@
 package com.authorisationservice.controller;
 
-import com.authorisationservice.model.DriveQuickStart;
-
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeTokenRequest;
 import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
@@ -9,7 +7,6 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleTokenResponse;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.services.drive.Drive;
-import com.google.api.services.drive.DriveScopes;
 import com.google.api.services.drive.model.About;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
@@ -17,29 +14,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.security.GeneralSecurityException;
 import java.util.*;
 
-
-import static org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames.REDIRECT_URI;
-
-
-
-
 @CrossOrigin(origins = "*")
 @RestController
 public class OAuthAuthorisationController {
-
-    private static final Logger logger = LoggerFactory.getLogger(OAuthAuthorisationController.class);
-
-
-    private static final List<String> SCOPES =
-            Collections.singletonList(DriveScopes.DRIVE_METADATA_READONLY);
     private static final String CREDENTIALS_FILE_PATH = "/credentials.json";
 
     @GetMapping("/csrf-token-endpoint")
@@ -89,7 +72,7 @@ public class OAuthAuthorisationController {
     }
 
     @GetMapping("/getDetails")
-    public Map<String, Object> getAbout(GoogleCredential credential) throws IOException, GeneralSecurityException {
+    public Map<String, Object> getAbout(GoogleCredential credential) {
         Map<String, Object> response = new HashMap<>();
         try {
             Drive drive =
