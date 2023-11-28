@@ -3,34 +3,31 @@
     justify-content: space-between;
     font-size: 1.2rem;
     position: sticky;
-    top: 0;
-    z-index: 999;
 }
 
 .navbar-nav {
     display: flex;
-    justify-content: space-evenly;
+    justify-content: center;
     width: 100%;
 }
 
 .nav-item {
     display:flex;
     align-items: center;
-    text-align: center;
 }
 
 .nav-link {
     color: #fff;
     display: flex;
     text-decoration: none;
-    padding: 0.5rem 0.1rem;
-    font-family: MontserratBold;
+    margin: 0 5pc;
+    font-family: MontserratRegular, serif;
     
 }
 
 .nav-link:hover {
     border-bottom: 2px solid #ffffff;
-    transition: all 0.2s ease-out;
+    transition: 0.1s ease-in-out;
 }
 
 .logo {

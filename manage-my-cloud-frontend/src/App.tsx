@@ -1,14 +1,14 @@
 import React from 'react';
 import './App.css';
-import {BrowserRouter as Router} from 'react-router-dom';
+import {BrowserRouter} from 'react-router-dom';
 import AppRouting from "./components/routing/AppRouting";
-import Navbar from "./components/nav/Navbar";
+import {AuthWrapper} from "./components/routing/AuthWrapper";
 
 function App() {
     return (
-        <Router>
-            <AppRouting/>
-        </Router>
+        <BrowserRouter>
+            <AuthWrapper/>
+        </BrowserRouter>
     );
 }
 
