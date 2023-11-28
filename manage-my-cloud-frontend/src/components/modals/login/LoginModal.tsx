@@ -7,13 +7,40 @@ import googleLogo from "../../images/login/google.png";
 import EmailIcon from '@mui/icons-material/Email';
 import LockIcon from '@mui/icons-material/Lock';
 import {SignUpModal} from "../signUp/SignUpModal";
-import {ResetPasswordModal} from "../forgotPassword/ResetPasswordModal";
+import {ResetPasswordModal} from "../resetPassword/ResetPasswordModal";
+import {AuthData} from "../../routing/AuthWrapper";
+
+interface LoginProps {
+    email: string;
+    password: string;
+}
 
 const LoginModal: React.FC = () => {
+    const {login} = AuthData();
     const navigate = useNavigate();
     const [showModal, setShowModal] = useState(false);
     const [showSignUpModal, setShowSignUpModal] = useState(false);
     const [showForgotPasswordModal, setShowForgotPasswordModal] = useState(false);
+    const [showError, setShowError] = useState(false);
+
+    const [loginInput, setLoginInput] = useState<LoginProps>({
+        email: "",
+        password: "",
+    });
+
+    const modalFormInputLabel = showError ? "modal-form-label-error" : "modal-form-label"
+
+    const handleEmailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setShowError(false)
+        const email = event.target.value;
+        setLoginInput((prevState) => ({...prevState, email}));
+    };
+
+    const handlePasswordChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setShowError(false)
+        const password = event.target.value;
+        setLoginInput((prevState) => ({...prevState, password}));
+    };
 
     const toggleModal = () => {
         setShowModal(!showModal);
@@ -38,9 +65,18 @@ const LoginModal: React.FC = () => {
         e.stopPropagation();
     };
 
-    // TODO: Implement login functionality
-    const handleLoginClick = () => {
-        navigate('/dashboard');
+    const handleLoginSubmission = (e: React.FormEvent) => {
+        e.preventDefault();
+
+        // Use the login function from the context
+        login(loginInput.email, loginInput.password)
+            .then(() => {
+
+                navigate('/profile');
+            })
+            .catch((error) => {
+                setShowError(true);
+            });
     };
 
     return (
@@ -74,23 +110,30 @@ const LoginModal: React.FC = () => {
                                 <span>Or</span>
                             </div>
 
-                            <form className={"modal-form"}>
-                                <label className={"modal-form-label"}>
+                            <form className={"modal-form"} onSubmit={handleLoginSubmission}>
+                                <label className={modalFormInputLabel}>
                                     <input className={"modal-form-input"}
-                                           type="text"
+                                           type="email"
                                            placeholder={"Enter your email Address"}
-                                           onClick={stopPropagation}/>
+                                           onClick={stopPropagation}
+                                           onChange={handleEmailChange}/>
                                     <EmailIcon/>
                                 </label>
-                                <label className={"modal-form-label"}>
+                                <label className={modalFormInputLabel}>
                                     <input className={"modal-form-input"}
                                            type="password"
                                            placeholder={"Enter your password"}
-                                           onClick={stopPropagation}/>
+                                           onClick={stopPropagation}
+                                           onChange={handlePasswordChange}/>
                                     <LockIcon/>
                                 </label>
-                                <button className={"modal-form-submit-button"} type="submit"
-                                        onClick={handleLoginClick}>Login
+                                {showError && (
+                                    <div className={"modal-form-error"}>
+                                        Invalid email or password
+                                    </div>
+                                )}
+                                <button className={"modal-form-submit-button"} type="submit">
+                                    Login
                                 </button>
                             </form>
 

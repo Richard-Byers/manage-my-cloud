@@ -4,8 +4,10 @@ import Navbar from '../../nav/Navbar';
 import {Avatar} from '@mui/material';
 import Card from './cards/UserProfileCard';
 import StackedCards from './cards/StackedCards';
+import {AuthData} from "../../routing/AuthWrapper";
 
 const ProfilePage = () => {
+
     useEffect(() => {
         document.body.style.overflow = "hidden";
       }, []);

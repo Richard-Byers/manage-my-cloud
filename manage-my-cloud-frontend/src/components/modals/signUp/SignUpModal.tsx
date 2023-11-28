@@ -5,18 +5,56 @@ import BadgeIcon from '@mui/icons-material/Badge';
 import "./SignUpModal.css";
 import "../Modal.css";
 import React, {useState} from "react";
+import {buildAxiosRequest} from "../../helpers/AxiosHelper";
 
 interface SignUpProps {
     setShowSignUpModal: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
+interface ConfirmationProps {
+    confirmationMessage: string | null;
+}
+
+
+interface SignupProps {
+    firstName: string;
+    lastName: string;
+    email: string;
+    password: string;
+    role: string;
+}
+
 export const SignUpModal: React.FC<SignUpProps> = ({
                                                        setShowSignUpModal,
                                                    }) => {
-    const [showConfirmation, setShowConfirmation] = useState(false);
+    const [confirmationEmailMessage, setConfirmationEmailMessage] = useState<ConfirmationProps>({confirmationMessage: null});
 
-    const showConfirmationEmail = () => {
-        setShowConfirmation(true);
+    const [signupInput, setSignupInput] = useState<SignupProps>({
+        firstName: "",
+        lastName: "",
+        email: "",
+        password: "",
+        role: "USER",
+    });
+
+    const handleFirstNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const firstName = event.target.value;
+        setSignupInput((prevState) => ({...prevState, firstName}));
+    };
+
+    const handleLastNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const lastName = event.target.value;
+        setSignupInput((prevState) => ({...prevState, lastName}));
+    };
+
+    const handleEmailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const email = event.target.value;
+        setSignupInput((prevState) => ({...prevState, email}));
+    };
+
+    const handlePasswordChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const password = event.target.value;
+        setSignupInput((prevState) => ({...prevState, password}));
     };
 
     const closeSignUpModal = () => {
@@ -27,6 +65,23 @@ export const SignUpModal: React.FC<SignUpProps> = ({
         e.stopPropagation();
     };
 
+    const handleSignupSubmission = (e: React.FormEvent) => {
+        const {firstName, lastName, email, password} = signupInput;
+        e.preventDefault();
+
+        if (firstName && lastName && email && password) {
+
+            buildAxiosRequest("POST", "/register", signupInput).then((response) => {
+                console.log(response);
+                setConfirmationEmailMessage((prevState) => ({...prevState, confirmationMessage: response.data}));
+            }).catch((error) => {
+                console.log(error);
+            });
+        } else {
+            console.error("Please fill in all the fields");
+        }
+    };
+
     return (
         <>
             <div className="modal-overlay" onClick={closeSignUpModal}>
@@ -35,7 +90,7 @@ export const SignUpModal: React.FC<SignUpProps> = ({
                     <div className={"modal-logo-signup"}>
                         <img src={logo} alt={"Manage My Cloud Logo"}/>
                     </div>
-                    {!showConfirmation && (
+                    {confirmationEmailMessage.confirmationMessage == null && (
                         <div className={"modal-form-container"}>
 
                             <div className={"modal-title"}>
@@ -53,51 +108,51 @@ export const SignUpModal: React.FC<SignUpProps> = ({
                                     <input className={"modal-form-input"}
                                            type="text"
                                            placeholder={"Enter your First Name"}
-                                           onClick={stopPropagation}/>
+                                           onClick={stopPropagation}
+                                           onChange={handleFirstNameChange}/>
                                     <BadgeIcon/>
                                 </label>
                                 <label className={"modal-form-label"}>
                                     <input className={"modal-form-input"}
                                            type="text"
                                            placeholder={"Enter your Last Name"}
-                                           onClick={stopPropagation}/>
+                                           onClick={stopPropagation}
+                                           onChange={handleLastNameChange}/>
                                     <BadgeIcon/>
                                 </label>
                                 <label className={"modal-form-label"}>
                                     <input className={"modal-form-input"}
-                                           type="text"
+                                           type="email"
                                            placeholder={"Enter your email Address"}
-                                           onClick={stopPropagation}/>
+                                           onClick={stopPropagation}
+                                           onChange={handleEmailChange}/>
                                     <EmailIcon/>
                                 </label>
                                 <label className={"modal-form-label"}>
                                     <input className={"modal-form-input"}
                                            type="password"
                                            placeholder={"Enter your password"}
-                                           onClick={stopPropagation}/>
+                                           onClick={stopPropagation}
+                                           onChange={handlePasswordChange}/>
                                     <LockIcon/>
                                 </label>
 
                                 <button className={"modal-form-submit-button"} type="submit"
-                                        onClick={showConfirmationEmail}>Sign Up
+                                        onClick={handleSignupSubmission}>Sign Up
                                 </button>
                             </form>
                         </div>
                     )}
-                    {showConfirmation && (
-                        <>
-                            <div className={"confirmation-container"}>
-                                <div className={"modal-title"}>
-                                    Confirmation Sent
-                                </div>
-                                <div className={"modal-confirmation-email"}>
-                                    Confirmation email has been sent to:
-                                    <br/>
-                                    Johndoe@gmail.com
-                                </div>
+                    {confirmationEmailMessage.confirmationMessage !== null ? (
+                        <div className={"confirmation-container"}>
+                            <div className={"modal-title"}>
+                                Confirmation Sent
                             </div>
-                        </>
-                    )}
+                            <div className={"modal-confirmation-email"}>
+                                {confirmationEmailMessage.confirmationMessage}
+                            </div>
+                        </div>
+                    ) : null}
                 </div>
             </div>
         </>
