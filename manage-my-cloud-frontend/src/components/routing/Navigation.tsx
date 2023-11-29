@@ -7,7 +7,7 @@ import DashboardPage from "../pages/dashboard/DashboardPage";
 
 export const nav = [
     {path: ROUTES.LANDING, name: "landing", element: <LandingPage/>, isPrivate: false},
-    {path: ROUTES.DASHBOARD, name: "dashboard", element: <DashboardPage/>, isPrivate: false},
-    {path: ROUTES.MANAGE_CONNECTIONS, name: "manageConnections", element: <ManageConnectionsPage/>, isPrivate: false},
-    {path: ROUTES.PROFILE, name: "profile", element: <ProfilePage/>, isPrivate: false},
+    {path: ROUTES.DASHBOARD, name: "dashboard", element: <DashboardPage/>, isPrivate: true},
+    {path: ROUTES.MANAGE_CONNECTIONS, name: "manageConnections", element: <ManageConnectionsPage/>, isPrivate: true},
+    {path: ROUTES.PROFILE, name: "profile", element: <ProfilePage/>, isPrivate: true},
 ]
