@@ -1,81 +1,140 @@
-.card-container {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: flex-start;
-    margin-right: 40vw;
-}
 
 .card {
-    width: 50vw;
-    height: 70vh;
-    margin: 10px;
-    margin-right:10vw;
-    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
-    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    width: 60pc;
+    height: inherit;
+    border-radius: 20px;
     background: #FFF;
     box-shadow: 3px 3px 50px 0px rgba(0, 0, 0, 0.10);
 }
 
+.user-profile-card-content{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.user-profile-picture{
+    height: fit-content;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin : 1% 0;
+}
+
+.profile-picture{
+    width: 200px;
+    height: 200px;
+}
+
 .user-info {
-    margin-top: 7vh;
+    display: flex;
+    flex-direction: column;
+    margin: 0 2%;
 }
 
 .user-profile-card-email{
-    margin-bottom: 40px;
+    margin-bottom: 5%;
     font-family: 'MontserratLight';
-    font-size: 24px;
+    font-size: 22px;
 }
 
 .user-profile-card-password{
     display: flex;
+    margin-bottom: 5%;
     justify-content: space-between;
-
-    margin-bottom: 40px;
-    font-family: 'MontserratLight';
-    font-size: 24px;
+    font-family: 'MontserratLight', serif;
+    font-size: 22px;
 }
 
 .user-profile-card-fname{
-    margin-bottom: 40px;
+    margin-bottom: 5%;
     font-family: 'MontserratLight';
-    font-size: 24px;
+    font-size: 22px;
 }
 
 .user-profile-card-lname{
-    margin-bottom: 40px;
+    margin-bottom: 5%;
     font-family: 'MontserratLight';
-    font-size: 24px;
+    font-size: 22px;
 }
 
 .update-password-btn {
     display: flex;
-    border-radius: 20px;
-    background: #4682A9;
-    color: #FFF;
-    font-family: MontserratBold, serif;
-    font-size: 18px;
-    font-style: normal;
     justify-content: center;
+    align-items: center;
+    border: none;
+    border-radius: 20px;
+    background: #218b97;
+    color: #FFF;
+    font-family: MontserratRegular, serif;
+    font-size: 18px;
     margin-right: 10px;
+    height: 40px;
+    padding: 15px;
 }
 
 .save-changes-btn {
     display: flex;
-    padding: 7px 41px 8px 41px;
+    border: none;
+    align-items: center;
     border-radius: 40px;
     background: #28AE6E;
     color: #FFF;
-    font-family: MontserratBold;
+    font-family: MontserratBold, serif;
     font-size: 18px;
     font-style: normal;
-    line-height: 150%;
-    width: 25%;
-    margin-left: 16.7vw;
+    width: 35%;
+    height: 40px;
     justify-content: center;
 }
 
-@font-face {
-    font-family: 'MontserratLight';
-    src: local('MontserratLight'),
-    url('../../../fonts/Montserrat-Light.ttf') format('truetype');
+.save-changes-btn:hover {
+    cursor: pointer;
 }
+
+.logout-btn {
+    display: flex;
+    background: none;
+    align-items: center;
+    border-radius: 40px;
+    border: 2px solid #28AE6E;
+    color: #28ad6d;
+    font-family: MontserratBold, serif;
+    font-size: 18px;
+    font-style: normal;
+    width: 35%;
+    height: 40px;
+    justify-content: center;
+}
+
+.logout-btn:hover {
+    cursor: pointer;
+}
+
+.profile-wrapper {
+    display: flex;
+    height: inherit;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.profile-card-buttons {
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    margin-top: 1%;
+}
+
+.separator {
+    display: flex;
+    margin: 0.2% 0 1%;
+    height: 2px;
+    background-color: #000000;
+    border: none;
+}
+
+
+

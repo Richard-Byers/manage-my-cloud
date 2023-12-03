@@ -132,6 +132,7 @@
                                 <exclude>com/authorisation/security/**</exclude>
                                 <exclude>com/authorisation/registration/**</exclude>
                                 <exclude>com/authorisation/dto/**</exclude>
+                                <exclude>com/authorisation/entities/**</exclude>
                             </excludes>
                         </configuration>
                     </execution>

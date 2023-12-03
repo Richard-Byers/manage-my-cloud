@@ -1,6 +1,7 @@
 package com.authorisation.config;
 
 
+import org.slf4j.Logger;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,6 +20,11 @@ public class WebConfig {
 
     private static final Long MAX_AGE = 3600L;
     private static final int CORS_FILTER_ORDER = -102;
+
+    @Bean
+    public Logger logger() {
+        return org.slf4j.LoggerFactory.getLogger("com.authorisation");
+    }
 
     @Bean
     public FilterRegistrationBean corsFilter() {
