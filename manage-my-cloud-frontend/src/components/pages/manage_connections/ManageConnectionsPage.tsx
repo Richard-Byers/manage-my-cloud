@@ -1,11 +1,16 @@
 import Navbar from "../../nav/Navbar";
 import React from "react";
+import './ManageConnectionsPage.css';
 
 const ManageConnectionsPage = () => {
     return (
         <div>
             <Navbar/>
-            <h1>Manage Connections Page</h1>
+            <div className={"manage-connections-page-content-grid"}>
+                <div className="manage-connections-page-title-container">
+                    Manage Connections
+                </div>
+            </div>
         </div>
     )
 };

@@ -1,64 +1,59 @@
-.dashboard-page-title {
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  font-family: MontserratBold, serif;
-  font-size: 1vw;
-  color: #FFFFFF;
-  margin-left: 5.5vw;
-  top:8vh;
+.dashboard-page-content-grid {
+    justify-content: center;
+    display: grid;
+    grid-template-columns: 24% 24% 24% 24%;
+    grid-template-rows: auto auto auto auto;
+    grid-gap: 1em;
+    margin: 0 2%;
 }
 
-.refresh-drives-btn {
-  display: flex;
-  padding: 1vw; /* Increased padding to make the button larger */
-  justify-content: flex-end;
-  align-items: center;
-  border-radius: 40px;
-  background: #65BE79;
-  color: #FFFFFF;
-  font-size: 1.2vw;
-  margin-left:5vw;
-  margin-top:-4vh;
-  font-family: MontserratBold, serif;
+
+.dashboard-page-title-container {
+    font-family: MontserratBold, serif;
+    font-size: 2.5rem;
+    color: white;
+    grid-row: 1 / 1;
+    grid-column: 1 / 1;
 }
 
-.delete-btns {
-  display: flex;
-  justify-content: flex-end;
-  margin-top:-15vh;
-  margin-right: 10vh;
+.connected-drives-container {
+    grid-row: 2 / 2;
+    grid-column: span 4;
 }
 
-.delete-btns-button {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  border-radius: 40px;
-  background: #CB4242;
-  color: #FFFFFF;
-  font-family: MontserratBold, serif;
-  font-size: 1.2vw;
-  margin-top:8vh;
-  padding: 1vw;
+.dashboard-page-buttons-container {
+    grid-row: 3 / 3;
+    grid-column: span 4;
+}
+
+.connect-drives-container {
+    border-top: 3px solid white;
+    text-align: center;
+    width: 50%;
+    margin: 1% auto;
+    grid-row: 4 / 4;
+    grid-column: span 4;
 }
 
 .text-under-line {
-  display: flex;
-  font-family: MontserratLight, serif;
-  color:#FFFFFF;
-  font-size: 1.2vw;
+    display: flex;
+    font-family: MontserratLight, serif;
+    color: #FFFFFF;
+    font-size: 1.2rem;
+    width: 100%;
+    text-align: center;
+    flex-direction: column;
 }
 
-.manage-connections {
-  color: white;
-  border: none;
-  background: none;
-  font-size: 1.2vw;
-  font-family: MontserratBold, serif;
+.manage-connections-hyperlink {
+    color: white;
+    border: none;
+    background: none;
+    font-size: 1.3rem;
+    font-family: MontserratBold, serif;
 }
 
-.manage-connections:hover {
-  cursor: pointer;
-  border-bottom: 1px solid #ffffff;
+.manage-connections-hyperlink:hover {
+    cursor: pointer;
+    border-bottom: 1px solid #ffffff;
 }
