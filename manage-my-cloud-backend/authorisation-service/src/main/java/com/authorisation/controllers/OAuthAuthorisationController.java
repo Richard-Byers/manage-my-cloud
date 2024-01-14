@@ -1,14 +1,14 @@
-package com.authorisationservice.controller;
+package com.authorisation.controllers;
 
-import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeTokenRequest;
-import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
-import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
-import com.google.api.client.googleapis.auth.oauth2.GoogleTokenResponse;
+import com.authorisation.entities.UserEntity;
+import com.authorisation.services.UserService;
+import com.google.api.client.googleapis.auth.oauth2.*;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.About;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.web.csrf.CsrfToken;
@@ -23,6 +23,9 @@ import java.util.*;
 @CrossOrigin(origins = "*")
 @RestController
 public class OAuthAuthorisationController {
+
+    @Autowired
+    private UserService userService;
     private static final String CREDENTIALS_FILE_PATH = "/credentials.json";
 
     @GetMapping("/csrf-token-endpoint")
@@ -36,33 +39,39 @@ public class OAuthAuthorisationController {
         if (requestedWith == null) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Invalid request header");
         }
-
+        System.out.println("Auth Code: " + authCode);
         try {
-        GoogleClientSecrets clientSecrets =
-                GoogleClientSecrets.load(
-                        JacksonFactory.getDefaultInstance(), new InputStreamReader(getClass().getResourceAsStream(CREDENTIALS_FILE_PATH)));
-        GoogleTokenResponse tokenResponse =
-                new GoogleAuthorizationCodeTokenRequest(
-                        new NetHttpTransport(),
-                        JacksonFactory.getDefaultInstance(),
-                        "https://www.googleapis.com/oauth2/v4/token",
-                        clientSecrets.getDetails().getClientId(),
-                        clientSecrets.getDetails().getClientSecret(),
-                        authCode,
-                        "postmessage")
-                        .execute();
+            GoogleClientSecrets clientSecrets =
+                    GoogleClientSecrets.load(
+                            JacksonFactory.getDefaultInstance(), new InputStreamReader(getClass().getResourceAsStream(CREDENTIALS_FILE_PATH)));
+            GoogleTokenResponse tokenResponse =
+                    new GoogleAuthorizationCodeTokenRequest(
+                            new NetHttpTransport(),
+                            JacksonFactory.getDefaultInstance(),
+                            "https://www.googleapis.com/oauth2/v4/token",
+                            clientSecrets.getDetails().getClientId(),
+                            clientSecrets.getDetails().getClientSecret(),
+                            authCode,
+                            "postmessage")
+                            .execute();
 
-        //Need to store the tokenResponse somewhere in DB or memory
+
+
             String accessToken = tokenResponse.getAccessToken();
 
-            //Just was testing it out
-//            GoogleCredential credential = new GoogleCredential().setAccessToken(accessToken);
-//            Drive drive =
-//                    new Drive.Builder(new NetHttpTransport(), JacksonFactory.getDefaultInstance(), credential)
-//                            .setApplicationName("Auth Code Exchange Demo")
-//                            .build();
-//
-//            About about = drive.about().get().setFields("*").execute();
+            String idTokenStr = tokenResponse.getIdToken();
+            GoogleIdToken idToken = GoogleIdToken.parse(JacksonFactory.getDefaultInstance(), idTokenStr);
+            GoogleIdToken.Payload payload = idToken.getPayload();
+            String email = payload.getEmail();
+
+            System.out.println("Access Token: " + accessToken);
+            System.out.println("Email: " + email);
+
+            UserEntity userEntity =  userService.registerGoogleUser(email, accessToken);
+
+
+
+
             return ResponseEntity.ok(Collections.singletonMap("message", "Logged In"));
         } catch (Exception e) {
             // Log the exception

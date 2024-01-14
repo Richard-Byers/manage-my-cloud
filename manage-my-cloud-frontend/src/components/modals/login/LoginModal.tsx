@@ -83,7 +83,7 @@ const LoginModal: React.FC = () => {
     const googleLogin = useGoogleLogin({
         onSuccess: codeResponse => {
             console.log(codeResponse);
-            const authCode = codeResponse.code; // or codeResponse.authCode, depending on the structure of codeResponse
+            const authCode = codeResponse.code; 
 
             // Send the code to the server
             fetch('http://localhost:8080/storetoken', {

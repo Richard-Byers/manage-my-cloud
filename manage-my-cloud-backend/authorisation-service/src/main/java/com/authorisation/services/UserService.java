@@ -57,6 +57,28 @@ public class UserService implements IUserService {
         return userEntityRepository.save(newUser);
     }
 
+    public UserEntity registerGoogleUser(String email, String googleToken) {
+
+        Optional<UserEntity> userOptional = this.findUserByEmail(email);
+
+        if (userOptional.isPresent()) {
+            googleLogin(email, "DefaultPassword");
+        }
+
+        var newUser = new UserEntity();
+
+        //We can get these via google too
+        newUser.setFirstName("N/A");
+        newUser.setLastName("N/A");
+        newUser.setEmail(email);
+        newUser.setPassword("DefaultPassword");
+        newUser.setRole("USER");
+        newUser.setEnabled(true);
+        newUser.setRefreshToken(googleToken);
+
+        return userEntityRepository.save(newUser);
+    }
+
     public UserDto login(CredentialsDto credentialsDto) {
         UserEntity user = userEntityRepository.findByEmail(credentialsDto.getEmail())
                 .orElseThrow(() -> new UserNotFoundException("Unknown user", HttpStatus.NOT_FOUND));
@@ -66,6 +88,16 @@ public class UserService implements IUserService {
         }
 
         if (passwordEncoder.matches(credentialsDto.getPassword(), user.getPassword())) {
+            return userMapper.toUserDto(user);
+        }
+        throw new InvalidPasswordException("Invalid password", HttpStatus.BAD_REQUEST);
+    }
+
+    public UserDto googleLogin(String email, String password) {
+        UserEntity user = userEntityRepository.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException("Unknown user", HttpStatus.NOT_FOUND));
+
+        if (passwordEncoder.matches(password, user.getPassword())) {
             return userMapper.toUserDto(user);
         }
         throw new InvalidPasswordException("Invalid password", HttpStatus.BAD_REQUEST);
