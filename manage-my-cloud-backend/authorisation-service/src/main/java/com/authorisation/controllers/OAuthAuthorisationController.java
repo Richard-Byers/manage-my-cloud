@@ -1,5 +1,8 @@
 package com.authorisation.controllers;
 
+import com.authorisation.dto.CredentialsDto;
+import com.authorisation.config.UserAuthenticationProvider;
+import com.authorisation.dto.UserDto;
 import com.authorisation.entities.UserEntity;
 import com.authorisation.services.UserService;
 import com.google.api.client.googleapis.auth.oauth2.*;
@@ -26,6 +29,9 @@ public class OAuthAuthorisationController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private UserAuthenticationProvider userAuthenticationProvider;
     private static final String CREDENTIALS_FILE_PATH = "/credentials.json";
 
     @GetMapping("/csrf-token-endpoint")
@@ -35,7 +41,7 @@ public class OAuthAuthorisationController {
     }
 
     @PostMapping("/storetoken")
-    public ResponseEntity<Map<String, String>> storeAuthCode(@RequestHeader("X-Requested-With") String requestedWith, @RequestBody String authCode) {
+    public ResponseEntity<UserDto> storeAuthCode(@RequestHeader("X-Requested-With") String requestedWith, @RequestBody String authCode) {
         if (requestedWith == null) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Invalid request header");
         }
@@ -69,10 +75,11 @@ public class OAuthAuthorisationController {
 
             UserEntity userEntity =  userService.registerGoogleUser(email, accessToken);
 
+            CredentialsDto credentialsDto = new CredentialsDto(email, "DefaultPassword");
+            UserDto userDto = userService.googleLogin(credentialsDto);
+            userDto.setToken(userAuthenticationProvider.createToken(userDto.getEmail()));
 
-
-
-            return ResponseEntity.ok(Collections.singletonMap("message", "Logged In"));
+            return ResponseEntity.ok(userDto);
         } catch (Exception e) {
             // Log the exception
             System.out.println(e);

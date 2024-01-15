@@ -17,10 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Calendar;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -62,7 +59,7 @@ public class UserService implements IUserService {
         Optional<UserEntity> userOptional = this.findUserByEmail(email);
 
         if (userOptional.isPresent()) {
-            googleLogin(email, "DefaultPassword");
+            return null;
         }
 
         var newUser = new UserEntity();
@@ -93,11 +90,11 @@ public class UserService implements IUserService {
         throw new InvalidPasswordException("Invalid password", HttpStatus.BAD_REQUEST);
     }
 
-    public UserDto googleLogin(String email, String password) {
-        UserEntity user = userEntityRepository.findByEmail(email)
+    public UserDto googleLogin(CredentialsDto credentialsDto) {
+        UserEntity user = userEntityRepository.findByEmail(credentialsDto.getEmail())
                 .orElseThrow(() -> new UserNotFoundException("Unknown user", HttpStatus.NOT_FOUND));
 
-        if (passwordEncoder.matches(password, user.getPassword())) {
+        if (Objects.equals(credentialsDto.getPassword(), user.getPassword())) {
             return userMapper.toUserDto(user);
         }
         throw new InvalidPasswordException("Invalid password", HttpStatus.BAD_REQUEST);

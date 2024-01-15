@@ -81,35 +81,30 @@ const LoginModal: React.FC = () => {
     };
 
     const googleLogin = useGoogleLogin({
-        onSuccess: codeResponse => {
+        onSuccess: async (codeResponse) => {
             console.log(codeResponse);
             const authCode = codeResponse.code; 
 
             // Send the code to the server
-            fetch('http://localhost:8080/storetoken', {
-                method: 'POST',
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'Content-Type': 'application/octet-stream; charset=utf-8'
-                },
-                body: authCode
-            })
-            .then(response => response.json())
-            .then(data => {
-                // Handle or verify the server response
-                console.log(data);
-                if (data.message === 'Logged In') {
-                    navigate('/dashboard');
-                }
-            })
-            .catch(error => {
+            try {
+                const response = await fetch('http://localhost:8080/storetoken', {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Content-Type': 'application/octet-stream; charset=utf-8'
+                    },
+                    body: authCode
+                });
+                const data = await response.json();
+                localStorage.setItem('token', data.token); // Set the token
+                navigate('/dashboard');
+            } catch (error) {
                 // Handle the error
                 console.error('Error:', error);
-            });
+            }
         },
         flow: 'auth-code',
         scope: 'https://www.googleapis.com/auth/drive',
-
     });
 
     return (
