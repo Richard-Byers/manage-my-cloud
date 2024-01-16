@@ -1,26 +1,19 @@
 package com.authorisation.controllers;
 
-import com.authorisation.dto.CredentialsDto;
 import com.authorisation.config.UserAuthenticationProvider;
 import com.authorisation.dto.UserDto;
-import com.authorisation.entities.UserEntity;
 import com.authorisation.services.UserService;
 import com.google.api.client.googleapis.auth.oauth2.*;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
-import com.google.api.services.drive.Drive;
-import com.google.api.services.drive.model.About;
 import org.json.JSONObject;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.io.InputStreamReader;
-import java.util.*;
 
 @CrossOrigin(origins = "*")
 @RestController
@@ -39,7 +32,7 @@ public class OAuthAuthorisationController {
         return csrfToken.getToken();
     }
 
-    @PostMapping("/storetoken")
+    @PostMapping("/registergoogleuser")
     public ResponseEntity<UserDto> storeAuthCode( @RequestBody String authCode) {
 
         String jsonString = authCode.substring(authCode.indexOf("{"));
@@ -63,17 +56,18 @@ public class OAuthAuthorisationController {
 
 
 
-            String accessToken = tokenResponse.getAccessToken();
+            String refreshToken = tokenResponse.getRefreshToken();
 
             String idTokenStr = tokenResponse.getIdToken();
             GoogleIdToken idToken = GoogleIdToken.parse(JacksonFactory.getDefaultInstance(), idTokenStr);
             GoogleIdToken.Payload payload = idToken.getPayload();
+
             String email = payload.getEmail();
+            String firstName = (String) payload.get("given_name");
+            String lastName = (String) payload.get("family_name");
+            String pictureUrl = (String) payload.get("picture");
 
-            System.out.println("Access Token: " + accessToken);
-            System.out.println("Email: " + email);
-
-            userService.registerGoogleUser(email, accessToken);
+            userService.registerGoogleUser(email, firstName, lastName, pictureUrl, refreshToken);
 
             UserDto userDto = userService.googleLogin(email);
             userDto.setToken(userAuthenticationProvider.createToken(userDto.getEmail()));
@@ -84,25 +78,5 @@ public class OAuthAuthorisationController {
             System.out.println(e);
         }
         return null;
-    }
-
-    @GetMapping("/getDetails")
-    public Map<String, Object> getAbout(GoogleCredential credential) {
-        Map<String, Object> response = new HashMap<>();
-        try {
-            Drive drive =
-                    new Drive.Builder(new NetHttpTransport(), JacksonFactory.getDefaultInstance(), credential)
-                            .setApplicationName("Auth Code Exchange Demo")
-                            .build();
-
-            About about = drive.about().get().setFields("*").execute();
-            response.put("about", about);
-
-        } catch (Exception e) {
-            // Log the exception
-            e.printStackTrace();
-            response.put("error", "Error: " + e.getMessage());
-        }
-        return response;
     }
 }

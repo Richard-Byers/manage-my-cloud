@@ -54,7 +54,7 @@ public class UserService implements IUserService {
         return userEntityRepository.save(newUser);
     }
 
-    public UserEntity registerGoogleUser(String email, String googleToken) {
+    public UserEntity registerGoogleUser(String email, String firstname, String lastName, String pictureUrl, String refreshToken) {
 
         Optional<UserEntity> userOptional = this.findUserByEmail(email);
 
@@ -64,15 +64,14 @@ public class UserService implements IUserService {
 
         var newUser = new UserEntity();
 
-        //We can get these via google too
-        newUser.setFirstName("N/A");
-        newUser.setLastName("N/A");
+        newUser.setGoogleProfileImageUrl(pictureUrl);
         newUser.setEmail(email);
-        newUser.setPassword("DefaultPassword");
+        newUser.setFirstName(firstname);
+        newUser.setLastName(lastName);
         newUser.setRole("USER");
         newUser.setEnabled(true);
         newUser.setAccountType("GOOGLE");
-        newUser.setRefreshToken(googleToken);
+        newUser.setRefreshToken(refreshToken);
 
         return userEntityRepository.save(newUser);
     }
