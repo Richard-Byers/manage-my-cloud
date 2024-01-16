@@ -3,7 +3,7 @@ import './ProfilePage.css';
 import Navbar from '../../nav/Navbar';
 import ProfileActionsCard from './cards/ProfileActionsCard';
 import UserProfileCard from "./cards/UserProfileCard";
-import ProfilePreferences from "./cards/ProfilePreferencesCard";
+import ProfilePreferencesCard from "./cards/ProfilePreferencesCard";
 
 const ProfilePage = () => {
 
@@ -14,14 +14,18 @@ const ProfilePage = () => {
     return (
         <div>
             <Navbar/>
-            <div className={"profile-page-content"}>
-                <div className={"profile-page-title"}>
+            <div className={"profile-page-content-grid"}>
+                <div className={"profile-page-title-container"}>
                     Profile
                 </div>
-                <div className={"card-container"}>
+                <div className={"user-profile-card-container"}>
                     <UserProfileCard/>
+                </div>
+                <div className={"profile-actions-card-container"}>
                     <ProfileActionsCard/>
-                    <ProfilePreferences/>
+                </div>
+                <div className={"profile-preferences-card-container"}>
+                    <ProfilePreferencesCard/>
                 </div>
             </div>
         </div>

@@ -4,7 +4,6 @@ import './Card.css';
 
 function ProfileActionsCard() {
     return (
-        <div className="small-card">
             <div className="card-content">
                 <div className={"card-title"}>
                     Account Actions
@@ -14,7 +13,6 @@ function ProfileActionsCard() {
                 <button className="actions-button">View Terms of Service</button>
                 <button className="actions-button">Download Terms of Service</button>
             </div>
-        </div>
     );
 }
 

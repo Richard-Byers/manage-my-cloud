@@ -1,0 +1,34 @@
+.dashboard-button-container{
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.dashboard-button-container button:first-child{
+    margin-right: auto;
+}
+
+.dashboard-button-container button:nth-child(2){
+    margin-right: 2vh;
+}
+
+.dashboard-button{
+    justify-content: center;
+    align-items: center;
+    border-radius: 10px;
+    background: #65BE79;
+    color: #FFFFFF;
+    font-family: MontserratBold, serif;
+    font-size: 1rem;
+    padding: 0.8em 1.6em;
+    border: none;
+    cursor: pointer;
+    box-shadow: 6px 9px 5px 0px rgba(0,0,0,0.18);
+    -webkit-box-shadow: 6px 9px 5px 0px rgba(0,0,0,0.18);
+    -moz-box-shadow: 6px 9px 5px 0px rgba(0,0,0,0.18);
+}
+
+.dashboard-button:hover{
+    background: #5ab06b;
+    transition: 0.2s ease-in-out;
+}
