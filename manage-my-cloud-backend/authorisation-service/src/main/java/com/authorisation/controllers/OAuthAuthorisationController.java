@@ -73,10 +73,9 @@ public class OAuthAuthorisationController {
             System.out.println("Access Token: " + accessToken);
             System.out.println("Email: " + email);
 
-            UserEntity userEntity =  userService.registerGoogleUser(email, accessToken);
+            userService.registerGoogleUser(email, accessToken);
 
-            CredentialsDto credentialsDto = new CredentialsDto(email, "DefaultPassword");
-            UserDto userDto = userService.googleLogin(credentialsDto);
+            UserDto userDto = userService.googleLogin(email);
             userDto.setToken(userAuthenticationProvider.createToken(userDto.getEmail()));
 
             return ResponseEntity.ok(userDto);

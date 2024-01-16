@@ -71,6 +71,7 @@ public class UserService implements IUserService {
         newUser.setPassword("DefaultPassword");
         newUser.setRole("USER");
         newUser.setEnabled(true);
+        newUser.setAccountType("GOOGLE");
         newUser.setRefreshToken(googleToken);
 
         return userEntityRepository.save(newUser);
@@ -90,14 +91,11 @@ public class UserService implements IUserService {
         throw new InvalidPasswordException("Invalid password", HttpStatus.BAD_REQUEST);
     }
 
-    public UserDto googleLogin(CredentialsDto credentialsDto) {
-        UserEntity user = userEntityRepository.findByEmail(credentialsDto.getEmail())
+    public UserDto googleLogin(String email) {
+        UserEntity user = userEntityRepository.findByEmail(email)
                 .orElseThrow(() -> new UserNotFoundException("Unknown user", HttpStatus.NOT_FOUND));
 
-        if (Objects.equals(credentialsDto.getPassword(), user.getPassword())) {
-            return userMapper.toUserDto(user);
-        }
-        throw new InvalidPasswordException("Invalid password", HttpStatus.BAD_REQUEST);
+        return userMapper.toUserDto(user);
     }
 
     @Override

@@ -56,12 +56,9 @@ export const AuthWrapper = () => {
             try {
                 const response = await buildAxiosRequest("POST", "/storetoken", { authCode });
                 const data = response.data;
-                console.log(data);
-                console.log(user);
                 setUser(data);
-                console.log(user);
                 localStorage.setItem('token', data.token); // Set the token
-                return data;
+                navigate("/profile")
             } catch (error) {
                 // Handle the error
                 console.error('Error:', error);

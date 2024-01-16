@@ -36,6 +36,9 @@ public class UserEntity {
     @Getter
     @Setter
     private String refreshToken;
+    @Getter
+    @Setter
+    private String accountType;
 
     @NaturalId(mutable = true)
     public String getEmail() {
