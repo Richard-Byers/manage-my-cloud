@@ -33,4 +33,20 @@ public class RestExceptionHandler {
                 .status(ex.getStatus())
                 .body(ErrorDto.builder().message(ex.getMessage()).build());
     }
+
+    @ExceptionHandler(value = {EmailException.class})
+    @ResponseBody
+    public ResponseEntity<String> handleException(EmailException ex) {
+        return ResponseEntity
+                .status(ex.getStatus())
+                .body(ex.getMessage());
+    }
+
+    @ExceptionHandler(value = {UserNotVerifiedException.class})
+    @ResponseBody
+    public ResponseEntity<String> handleException(UserNotVerifiedException ex) {
+        return ResponseEntity
+                .status(ex.getStatus())
+                .body(ex.getMessage());
+    }
 }

@@ -7,11 +7,12 @@ import com.authorisation.entities.VerificationToken;
 import com.authorisation.exception.InvalidPasswordException;
 import com.authorisation.exception.UserAlreadyExistsException;
 import com.authorisation.exception.UserNotFoundException;
+import com.authorisation.exception.UserNotVerifiedException;
 import com.authorisation.mappers.UserMapper;
 import com.authorisation.registration.RegistrationRequest;
 import com.authorisation.registration.password.PasswordResetRequest;
-import com.authorisation.repositories.VerificationTokenRepository;
 import com.authorisation.repositories.UserEntityRepository;
+import com.authorisation.repositories.VerificationTokenRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -29,7 +30,6 @@ public class UserService implements IUserService {
     private final PasswordResetTokenService passwordResetTokenService;
     private final UserMapper userMapper;
 
-    @Override
     public List<UserEntity> getUsers() {
         return userEntityRepository.findAll();
     }
@@ -37,13 +37,13 @@ public class UserService implements IUserService {
     @Override
     public UserEntity registerUser(RegistrationRequest registrationRequest) {
 
-        Optional<UserEntity> userOptional = this.findUserByEmail(registrationRequest.email());
+        Optional<UserEntity> userOptional = findUserByEmail(registrationRequest.email());
 
         if (userOptional.isPresent()) {
             throw new UserAlreadyExistsException(String.format("User with email %s already exists", registrationRequest.email()));
         }
 
-        var newUser = new UserEntity();
+        UserEntity newUser = new UserEntity();
 
         newUser.setFirstName(registrationRequest.firstName());
         newUser.setLastName(registrationRequest.lastName());
@@ -81,7 +81,7 @@ public class UserService implements IUserService {
                 .orElseThrow(() -> new UserNotFoundException("Unknown user", HttpStatus.NOT_FOUND));
 
         if (!user.isEnabled()) {
-            throw new UserNotFoundException("User not verified", HttpStatus.BAD_REQUEST);
+            throw new UserNotVerifiedException("User not verified", HttpStatus.BAD_REQUEST);
         }
 
         if (passwordEncoder.matches(credentialsDto.getPassword(), user.getPassword())) {
@@ -144,7 +144,7 @@ public class UserService implements IUserService {
     public VerificationToken generateNewVerificationToken(String oldToken) {
 
         VerificationToken verificationToken = verificationTokenRepository.findByToken(oldToken);
-        VerificationToken verificationTokenTime = new VerificationToken();
+        VerificationToken verificationTokenTime = new VerificationToken(oldToken);
 
         verificationToken.setToken(UUID.randomUUID().toString());
         verificationToken.setExpiryTime(verificationTokenTime.getExpiryTime());

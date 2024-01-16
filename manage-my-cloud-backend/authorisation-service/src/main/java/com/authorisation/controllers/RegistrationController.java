@@ -3,6 +3,7 @@ package com.authorisation.controllers;
 import com.authorisation.entities.PasswordResetToken;
 import com.authorisation.event.RegistrationCompleteEvent;
 import com.authorisation.event.RegistrationCompleteEventListener;
+import com.authorisation.exception.EmailException;
 import com.authorisation.registration.RegistrationRequest;
 import com.authorisation.registration.password.PasswordResetRequest;
 import com.authorisation.entities.VerificationToken;
@@ -15,6 +16,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.UnsupportedEncodingException;
@@ -92,7 +94,7 @@ public class RegistrationController {
             sendPasswordResetEmailLink(userEntity.get(), applicationUrl(request), passwordResetToken);
             return String.format("A new password reset link has been sent to %s. Please check your email", userEntity.get().getEmail());
         } else {
-            return "No user found with email " + passwordResetRequest.getEmail();
+            return String.format("No user found with email %s", passwordResetRequest.getEmail());
         }
     }
 
@@ -121,7 +123,7 @@ public class RegistrationController {
         try {
             eventListener.sendVerificationEmail(verificationUrl, userEntity);
         } catch (MessagingException | UnsupportedEncodingException e) {
-            log.error("Error occurred while sending verification email to user: " + userEntity.getEmail());
+            throw new EmailException("Error occurred while sending verification email to user: " + userEntity.getEmail(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

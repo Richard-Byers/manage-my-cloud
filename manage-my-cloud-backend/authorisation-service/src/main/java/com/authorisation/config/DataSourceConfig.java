@@ -17,7 +17,7 @@ public class DataSourceConfig {
         HikariConfig config = new HikariConfig();
 
         // Configure which instance and what database user to connect with.
-        config.setJdbcUrl(String.format("jdbc:postgresql:///%s", "postgres")); // e.g. "jdbc:postgresql://localhost:5432/postgres"
+        config.setJdbcUrl(String.format("jdbc:postgresql:///%s", "postgres"));
         config.setUsername("postgres"); // e.g. "root", _postgres"
         config.setPassword(System.getenv("DB_PASSWORD")); // e.g. "my-password"
 

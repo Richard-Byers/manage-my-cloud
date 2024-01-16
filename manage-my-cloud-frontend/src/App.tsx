@@ -2,9 +2,8 @@ import React from 'react';
 import './App.css';
 import {BrowserRouter} from 'react-router-dom';
 import AppRouting from "./components/routing/AppRouting";
-import Navbar from "./components/nav/Navbar";
-import { GoogleOAuthProvider } from '@react-oauth/google';
 import {AuthWrapper} from "./components/routing/AuthWrapper";
+import { GoogleOAuthProvider } from '@react-oauth/google';
 
 function App() {
     return (

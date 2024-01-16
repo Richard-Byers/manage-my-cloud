@@ -54,7 +54,7 @@ export const AuthWrapper = () => {
 
             // Send the code to the server
             try {
-                const response = await buildAxiosRequest("POST", "/registergoogleuser", { authCode });
+                const response = await buildAxiosRequest("POST", "/storetoken", { authCode });
                 const data = response.data;
                 setUser(data);
                 localStorage.setItem('token', data.token); // Set the token

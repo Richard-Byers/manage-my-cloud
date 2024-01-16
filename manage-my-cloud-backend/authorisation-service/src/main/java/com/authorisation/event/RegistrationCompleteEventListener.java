@@ -6,6 +6,7 @@ import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
 import org.springframework.context.ApplicationListener;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -19,6 +20,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class RegistrationCompleteEventListener implements ApplicationListener<RegistrationCompleteEvent> {
 
+    private final Logger logger;
     private final UserService userService;
     private final JavaMailSender mailSender;
 
@@ -40,8 +42,8 @@ public class RegistrationCompleteEventListener implements ApplicationListener<Re
         //Send verification email to the user
         try {
             sendVerificationEmail(verificationUrl, userEntity);
-        } catch (MessagingException | UnsupportedEncodingException e) {
-            log.error("Error occurred while sending verification email to user: " + userEntity.getEmail());
+        } catch (Exception e) {
+            logger.error(String.format("Error occurred while sending verification email to user: %s", userEntity.getEmail()));
         }
 
     }

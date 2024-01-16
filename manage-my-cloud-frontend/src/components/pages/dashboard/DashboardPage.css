@@ -1,0 +1,59 @@
+.dashboard-page-content-grid {
+    justify-content: center;
+    display: grid;
+    grid-template-columns: 24% 24% 24% 24%;
+    grid-template-rows: auto auto auto auto;
+    grid-gap: 1em;
+    margin: 0 2%;
+}
+
+
+.dashboard-page-title-container {
+    font-family: MontserratBold, serif;
+    font-size: 2.5rem;
+    color: white;
+    grid-row: 1 / 1;
+    grid-column: 1 / 1;
+}
+
+.connected-drives-container {
+    grid-row: 2 / 2;
+    grid-column: span 4;
+}
+
+.dashboard-page-buttons-container {
+    grid-row: 3 / 3;
+    grid-column: span 4;
+}
+
+.connect-drives-container {
+    border-top: 3px solid white;
+    text-align: center;
+    width: 50%;
+    margin: 1% auto;
+    grid-row: 4 / 4;
+    grid-column: span 4;
+}
+
+.text-under-line {
+    display: flex;
+    font-family: MontserratLight, serif;
+    color: #FFFFFF;
+    font-size: 1.2rem;
+    width: 100%;
+    text-align: center;
+    flex-direction: column;
+}
+
+.manage-connections-hyperlink {
+    color: white;
+    border: none;
+    background: none;
+    font-size: 1.3rem;
+    font-family: MontserratBold, serif;
+}
+
+.manage-connections-hyperlink:hover {
+    cursor: pointer;
+    border-bottom: 1px solid #ffffff;
+}

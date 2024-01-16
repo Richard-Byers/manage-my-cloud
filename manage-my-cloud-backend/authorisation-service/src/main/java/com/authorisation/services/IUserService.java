@@ -7,12 +7,9 @@ import com.authorisation.entities.VerificationToken;
 import com.authorisation.registration.RegistrationRequest;
 import com.authorisation.registration.password.PasswordResetRequest;
 
-import java.util.List;
 import java.util.Optional;
 
 public interface IUserService {
-
-    List<UserEntity> getUsers();
 
     UserEntity registerUser(RegistrationRequest registrationRequest);
 

@@ -1,0 +1,23 @@
+.card-title {
+    display: flex;
+    justify-content: center;
+    color: black;
+    border-bottom: black 1px solid;
+    position: relative;
+    font-size: 24px;
+    margin-bottom: 5%;
+    font-family: MontserratRegular, serif;
+}
+
+.card-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    background: #FFF;
+    box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.18);
+    -webkit-box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.18);
+    -moz-box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.18);
+    border-radius: 20px;
+    height: 100%;
+}

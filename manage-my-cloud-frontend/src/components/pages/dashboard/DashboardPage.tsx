@@ -1,19 +1,47 @@
 import Navbar from "../../nav/Navbar";
-import React, { useEffect, useState } from 'react';
+import React from "react";
+import ConnectedDrivesCard from "./cards/ConnectedDrivesCard";
+import './DashboardPage.css';
+import {useNavigate} from "react-router-dom";
+import {ROUTES} from "../../../constants/RouteConstants";
+import DashboardPageButtons from "./DashboardPageButtons";
 
-const ManageConnectionsPage = () => {
+const DashboardPage = () => {
+
+    const navigate = useNavigate();
+
+    function navigateToManageConnections() {
+        navigate(ROUTES.MANAGE_CONNECTIONS);
+    }
 
     return (
         <div>
             <Navbar/>
-            <h1>Dashboard Page</h1>
-            <a href="http://localhost:8080/getDetails" style={{ textDecoration: 'none' }}>
-                            <button className={"modal-login-google-button"}>
-                                Click to return details of cloud
+            <div className={"dashboard-page-content-grid"}>
+                <div className="dashboard-page-title-container">
+                    Dashboard
+                </div>
+                <div className={"connected-drives-container"}>
+                    <ConnectedDrivesCard/>
+                </div>
+                <div className={"dashboard-page-buttons-container"}>
+                    <DashboardPageButtons/>
+                </div>
+                <div className={"connect-drives-container"}>
+                    <div className="text-under-line">
+                        <p>If you would like to add or remove drives please head to
+                            <button className={'manage-connections-hyperlink'}
+                                    onClick={navigateToManageConnections}>Manage
+                                Connections
                             </button>
-                            </a>
+                        </p>
+
+                    </div>
+                </div>
+            </div>
         </div>
+
     )
 };
 
-export default ManageConnectionsPage;
+export default DashboardPage;
