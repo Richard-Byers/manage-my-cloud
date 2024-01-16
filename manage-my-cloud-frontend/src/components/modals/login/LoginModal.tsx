@@ -17,7 +17,7 @@ interface LoginProps {
 }
 
 const LoginModal: React.FC = () => {
-    const {login} = AuthData();
+    const {login, googleLogin} = AuthData();
     const navigate = useNavigate();
     const [showModal, setShowModal] = useState(false);
     const [showSignUpModal, setShowSignUpModal] = useState(false);
@@ -80,32 +80,9 @@ const LoginModal: React.FC = () => {
             });
     };
 
-    const googleLogin = useGoogleLogin({
-        onSuccess: async (codeResponse) => {
-            console.log(codeResponse);
-            const authCode = codeResponse.code; 
-
-            // Send the code to the server
-            try {
-                const response = await fetch('http://localhost:8080/storetoken', {
-                    method: 'POST',
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'Content-Type': 'application/octet-stream; charset=utf-8'
-                    },
-                    body: authCode
-                });
-                const data = await response.json();
-                localStorage.setItem('token', data.token); // Set the token
-                navigate('/dashboard');
-            } catch (error) {
-                // Handle the error
-                console.error('Error:', error);
-            }
-        },
-        flow: 'auth-code',
-        scope: 'https://www.googleapis.com/auth/drive',
-    });
+    const handleGoogleLogin = () => {
+        googleLogin()
+    };
 
     return (
         <>
@@ -129,7 +106,7 @@ const LoginModal: React.FC = () => {
                                 and help the environment?
                             </div>
 
-                            <button className={"modal-login-google-button"} onClick={() => googleLogin()}>
+                            <button className={"modal-login-google-button"} onClick={handleGoogleLogin}>
                                 <img className={"modal-login-google-logo"} src={googleLogo} alt={"Google Logo"}/>
                                 Log in using Google
                             </button>

@@ -3,6 +3,7 @@ import AppRouting from "./AppRouting";
 import {buildAxiosRequest} from "../helpers/AxiosHelper";
 import {useNavigate} from "react-router-dom";
 import {ROUTES} from "../../constants/RouteConstants";
+import { useGoogleLogin } from '@react-oauth/google';
 
 interface User {
     id: number;
@@ -10,11 +11,13 @@ interface User {
     lastName: string;
     email: string;
     token: string;
+    accountType: string | null;
 }
 
 interface AuthContextProps {
     user: User | null;
     login: (email: string, password: string) => Promise<User>;
+    googleLogin: () => void;
     logout: () => void;
 }
 
@@ -44,6 +47,30 @@ export const AuthWrapper = () => {
         }
     };
 
+    const googleLogin = useGoogleLogin({
+        onSuccess: async (codeResponse) => {
+            console.log(codeResponse);
+            const authCode = codeResponse.code; 
+
+            // Send the code to the server
+            try {
+                const response = await buildAxiosRequest("POST", "/storetoken", { authCode });
+                const data = response.data;
+                console.log(data);
+                console.log(user);
+                setUser(data);
+                console.log(user);
+                localStorage.setItem('token', data.token); // Set the token
+                return data;
+            } catch (error) {
+                // Handle the error
+                console.error('Error:', error);
+            }
+        },
+        flow: 'auth-code',
+        scope: 'https://www.googleapis.com/auth/drive',
+    });
+
     const logout = () => {
         setUser(null);
         localStorage.removeItem('token');
@@ -51,7 +78,7 @@ export const AuthWrapper = () => {
     };
 
     return (
-        <AuthContext.Provider value={{ user, login, logout }}>
+        <AuthContext.Provider value={{ user, login, googleLogin, logout }}>
             <>
                 <AppRouting />
             </>

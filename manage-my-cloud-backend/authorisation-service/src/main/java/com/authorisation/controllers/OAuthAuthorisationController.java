@@ -10,6 +10,7 @@ import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.About;
+import org.json.JSONObject;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,9 +19,7 @@ import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.io.IOException;
 import java.io.InputStreamReader;
-import java.security.GeneralSecurityException;
 import java.util.*;
 
 @CrossOrigin(origins = "*")
@@ -41,11 +40,12 @@ public class OAuthAuthorisationController {
     }
 
     @PostMapping("/storetoken")
-    public ResponseEntity<UserDto> storeAuthCode(@RequestHeader("X-Requested-With") String requestedWith, @RequestBody String authCode) {
-        if (requestedWith == null) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Invalid request header");
-        }
-        System.out.println("Auth Code: " + authCode);
+    public ResponseEntity<UserDto> storeAuthCode( @RequestBody String authCode) {
+
+        String jsonString = authCode.substring(authCode.indexOf("{"));
+        JSONObject jsonObject = new JSONObject(jsonString);
+        String authCodeOutput = jsonObject.getString("authCode");
+
         try {
             GoogleClientSecrets clientSecrets =
                     GoogleClientSecrets.load(
@@ -57,7 +57,7 @@ public class OAuthAuthorisationController {
                             "https://www.googleapis.com/oauth2/v4/token",
                             clientSecrets.getDetails().getClientId(),
                             clientSecrets.getDetails().getClientSecret(),
-                            authCode,
+                            authCodeOutput,
                             "postmessage")
                             .execute();
 
