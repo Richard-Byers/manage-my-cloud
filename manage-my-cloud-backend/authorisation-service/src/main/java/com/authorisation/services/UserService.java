@@ -58,6 +58,7 @@ public class UserService implements IUserService {
 
         Optional<UserEntity> userOptional = this.findUserByEmail(email);
 
+        //return null, don't need to do anything
         if (userOptional.isPresent()) {
             return null;
         }
