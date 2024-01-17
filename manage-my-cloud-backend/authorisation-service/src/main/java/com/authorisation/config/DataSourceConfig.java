@@ -17,9 +17,12 @@ public class DataSourceConfig {
         HikariConfig config = new HikariConfig();
 
         // Configure which instance and what database user to connect with.
-        config.setJdbcUrl(String.format("jdbc:postgresql:///%s", "postgres"));
+        config.setJdbcUrl(String.format("jdbc:postgresql:///%s", "mmc"));
         config.setUsername("postgres"); // e.g. "root", _postgres"
         config.setPassword(System.getenv("DB_PASSWORD")); // e.g. "my-password"
+
+        config.addDataSourceProperty("socketFactory", "com.google.cloud.sql.postgres.SocketFactory");
+        config.addDataSourceProperty("cloudSqlInstance", "cedar-setup-401715:europe-west2:mmc-postgresql");
 
         // The ipTypes argument can be used to specify a comma delimited list of preferred IP types
         // for connecting to a Cloud SQL instance. The argument ipTypes=PRIVATE will force the
@@ -31,3 +34,4 @@ public class DataSourceConfig {
     }
 
 }
+
