@@ -30,10 +30,6 @@ public class UserService implements IUserService {
     private final PasswordResetTokenService passwordResetTokenService;
     private final UserMapper userMapper;
 
-    public List<UserEntity> getUsers() {
-        return userEntityRepository.findAll();
-    }
-
     @Override
     public UserEntity registerUser(RegistrationRequest registrationRequest) {
 

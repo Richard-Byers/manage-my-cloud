@@ -26,12 +26,6 @@ public class OAuthAuthorisationController {
     private UserAuthenticationProvider userAuthenticationProvider;
     private static final String CREDENTIALS_FILE_PATH = "/credentials.json";
 
-    @GetMapping("/csrf-token-endpoint")
-    public String getCsrfToken(HttpServletRequest request) {
-        CsrfToken csrfToken = (CsrfToken) request.getAttribute("_csrf");
-        return csrfToken.getToken();
-    }
-
     @PostMapping("/registergoogleuser")
     public ResponseEntity<UserDto> storeAuthCode( @RequestBody String authCode) {
 
