@@ -2,6 +2,7 @@ package com.authorisation.controllers;
 
 import com.authorisation.config.UserAuthenticationProvider;
 import com.authorisation.dto.CredentialsDto;
+import com.authorisation.dto.EmailDto;
 import com.authorisation.dto.UserDto;
 import com.authorisation.services.UserService;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +22,13 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<UserDto> login(@RequestBody @Valid CredentialsDto credentialsDto) {
         UserDto userDto = userService.login(credentialsDto);
+        userDto.setToken(userAuthenticationProvider.createToken(userDto.getEmail()));
+        return ResponseEntity.ok(userDto);
+    }
+
+    @PostMapping("/refresh-user")
+    public ResponseEntity<UserDto> refreshUser(@RequestBody @Valid EmailDto emailDto) {
+        UserDto userDto = userService.refreshUser(emailDto);
         userDto.setToken(userAuthenticationProvider.createToken(userDto.getEmail()));
         return ResponseEntity.ok(userDto);
     }

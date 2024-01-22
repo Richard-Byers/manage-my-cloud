@@ -1,0 +1,102 @@
+.modal-login-button {
+    color: black;
+    width: 200px;
+    height: 55px;
+    border-radius: 40px;
+    background: #f6c82c;
+    font-size: 17px;
+    font-family: MontserratBold, serif;
+    box-shadow: 0 4px 25px 0 #05919f;
+    border: none;
+
+    transition: transform .2s;
+}
+
+.modal-login-button:hover {
+    cursor: pointer;
+    transform: translateY(-3px);
+}
+
+.modal-logo {
+    background: #0f8f9e;
+    padding: 100px 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    text-align: center;
+}
+
+.modal-login-google-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 412px;
+    height: 46px;
+    border-radius: 40px;
+    font-family: MontserratRegular, serif;
+    font-size: 16px;
+    margin: 25px 0 15px 0;
+    border: 1px solid black;
+    background: white;
+}
+
+.modal-login-google-button:hover {
+    cursor: pointer;
+    background: #e6e6e6;
+}
+
+.modal-login-google-logo {
+    margin-right: 10px;
+}
+
+.close-login-button:hover {
+    cursor: pointer;
+}
+
+.sign-up-login-container {
+    padding-top: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-login-reset-signup {
+    margin: 0 10px;
+    font-size: 16px;
+    border: none;
+    background: none;
+    font-family: MontserratBold, serif;
+    color: black;
+}
+
+.modal-login-reset-signup:hover {
+    cursor: pointer;
+    border-bottom: 1px black solid;
+}
+
+.or-separator {
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.or-separator::before,
+.or-separator::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background-color: #000;
+    margin: 0 10px;
+}
+
+/*Animations*/
+
+@keyframes fadeInPopUp {
+    from {
+        opacity: 0;
+        transform: translateY(50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0px);
+    }
+}

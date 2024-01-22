@@ -30,6 +30,8 @@ public class SecurityConfig {
                 .and()
                 .authorizeHttpRequests(requests -> requests
                         .requestMatchers(HttpMethod.POST, "/login").permitAll()
+                        .requestMatchers("/onedrive-store-tokens").permitAll()
+                        .requestMatchers("/refresh-user").permitAll()
                         .anyRequest().authenticated()).build();
     }
 }
