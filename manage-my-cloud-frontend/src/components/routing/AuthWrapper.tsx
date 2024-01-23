@@ -3,6 +3,7 @@ import AppRouting from "./AppRouting";
 import {buildAxiosRequest} from "../helpers/AxiosHelper";
 import {useNavigate} from "react-router-dom";
 import {ROUTES} from "../../constants/RouteConstants";
+import { useGoogleLogin } from '@react-oauth/google';
 import Cookies from 'universal-cookie'
 
 
@@ -12,6 +13,7 @@ interface User {
     lastName: string;
     email: string;
     token: string;
+    accountType: string | null;
     linkedAccounts: {
         linkedAccountsCount: number;
         oneDrive: boolean;
@@ -21,6 +23,7 @@ interface User {
 interface AuthContextProps {
     user: User | null;
     login: (email: string, password: string) => Promise<User>;
+    googleLogin: () => void;
     logout: () => void;
     refreshUser: (email: string | undefined) => void;
     loading: boolean;
@@ -62,6 +65,27 @@ export const AuthWrapper = () => {
         }
     };
 
+    const googleLogin = useGoogleLogin({
+        onSuccess: async (codeResponse) => {
+            // Get the code from the response
+            const authCode = codeResponse.code;
+
+            // Send the code to the server
+            try {
+                const response = await buildAxiosRequest("POST", "/registergoogleuser", { authCode });
+                const data = response.data;
+                setUser(data);
+                localStorage.setItem('token', data.token); // Set the token
+                navigate("/profile")
+            } catch (error) {
+                // Handle the error
+                console.error('Error:', error);
+            }
+        },
+        flow: 'auth-code',
+        scope: 'https://www.googleapis.com/auth/drive',
+    });
+
     const refreshUser = async (email: string | undefined): Promise<void> => {
         try {
             const response = await buildAxiosRequest("POST", "/refresh-user", {email});
@@ -80,9 +104,9 @@ export const AuthWrapper = () => {
     };
 
     return (
-        <AuthContext.Provider value={{user, login, logout, refreshUser,loading}}>
+        <AuthContext.Provider value={{ user, login, googleLogin, refreshUser ,logout, loading }}>
             <>
-                <AppRouting/>
+                <AppRouting />
             </>
         </AuthContext.Provider>
     );

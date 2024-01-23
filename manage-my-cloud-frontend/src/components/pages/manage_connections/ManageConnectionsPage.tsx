@@ -2,14 +2,14 @@ import Navbar from "../../nav/Navbar";
 import React, {useEffect} from "react";
 import './ManageConnectionsPage.css';
 import {AuthData} from "../../routing/AuthWrapper";
-import AddConnectionsModal from "../../modals/addConnections/AddConnectionsModal";
+import AddConnectionsModal from "../../modals/addConnections/AddConnectionsModal"
 import {buildAxiosRequest} from "../../helpers/AxiosHelper";
 
 const ManageConnectionsPage = () => {
 
     const {user, refreshUser} = AuthData();
     console.log(user?.linkedAccounts)
-    const linkAccoountsClassname = user?.linkedAccounts.linkedAccountsCount === 0 ? "manage-connections-page-link-accounts-container-center" : "manage-connections-page-link-accounts-container";
+    const linkAccountsClassname = user?.linkedAccounts.linkedAccountsCount === 0 ? "manage-connections-page-link-accounts-container-center" : "manage-connections-page-link-accounts-container";
 
     useEffect(() => {
         const urlSearchParams = new URLSearchParams(window.location.search);
@@ -34,7 +34,7 @@ const ManageConnectionsPage = () => {
                 <div className="manage-connections-page-title-container">
                     Manage Connections
                 </div>
-                <div className={linkAccoountsClassname}>
+                <div className={linkAccountsClassname}>
                     {user?.linkedAccounts.linkedAccountsCount === 0 ? (
                         <div className={"manage-connections-page-link-text"}> To link an account press the button
                             below </div>) : null}
