@@ -26,13 +26,10 @@ public class SecurityConfig {
                 .csrf().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
-                .authorizeHttpRequests().requestMatchers("/register/**").permitAll()
-                .and()
                 .authorizeHttpRequests(requests -> requests
+                        .requestMatchers("/register/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/registergoogleuser").permitAll()
-                        .requestMatchers("/onedrive-store-tokens").permitAll()
-                        .requestMatchers("/refresh-user").permitAll()
                         .anyRequest().authenticated()).build();
     }
 }
