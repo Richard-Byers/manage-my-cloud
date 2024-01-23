@@ -15,7 +15,13 @@
     grid-column: 1 / -1;
 }
 
-.manage-connections-page-link-accounts-container-center{
+.manage-connections-page-link-button-container{
+    display:flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.manage-connections-page-link-accounts-container-center {
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -25,7 +31,7 @@
     grid-column: 1/-1;
 }
 
-.manage-connections-page-link-accounts-container{
+.manage-connections-page-link-accounts-container {
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -34,7 +40,7 @@
     color: white;
 }
 
-.manage-connections-page-link-text{
+.manage-connections-page-link-text {
     font-family: MontserratBold, serif;
     margin-top: 6.5em;
     margin-bottom: 1em;

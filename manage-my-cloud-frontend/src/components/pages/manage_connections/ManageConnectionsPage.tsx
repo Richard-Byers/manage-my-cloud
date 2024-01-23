@@ -3,13 +3,20 @@ import React, {useEffect} from "react";
 import './ManageConnectionsPage.css';
 import {AuthData} from "../../routing/AuthWrapper";
 import AddConnectionsModal from "../../modals/addConnections/AddConnectionsModal"
-import {buildAxiosRequest} from "../../helpers/AxiosHelper";
+import {buildAxiosRequest, buildAxiosRequestWithHeaders} from "../../helpers/AxiosHelper";
+import Connection from "./Connection";
 
 const ManageConnectionsPage = () => {
 
     const {user, refreshUser} = AuthData();
-    console.log(user?.linkedAccounts)
-    const linkAccountsClassname = user?.linkedAccounts.linkedAccountsCount === 0 ? "manage-connections-page-link-accounts-container-center" : "manage-connections-page-link-accounts-container";
+
+    const linkedAccountsArray = Object.entries(user?.linkedAccounts || {})
+        .filter(([key]) => key !== 'linkedAccountsCount')
+        .map(([key, value]) => ({key, value}));
+
+    const linkAccountsClassname = user?.linkedAccounts.linkedAccountsCount === 0 ?
+        "manage-connections-page-link-accounts-container-center" :
+        "manage-connections-page-link-accounts-container";
 
     useEffect(() => {
         const urlSearchParams = new URLSearchParams(window.location.search);
@@ -18,9 +25,12 @@ const ManageConnectionsPage = () => {
         newUrlSearchParams.delete('code');
         const newUrl = `${window.location.pathname}${newUrlSearchParams.toString()}`;
         window.history.replaceState({}, document.title, newUrl);
+        const headers = {
+            Authorization: `Bearer ${user?.token}`
+        }
 
         if (code) {
-            buildAxiosRequest('GET', `/onedrive-store-tokens?code=${code}&email=${user?.email}`, {}).then(() => {
+            buildAxiosRequestWithHeaders('GET', `/onedrive-store-tokens?code=${code}&email=${user?.email}`,headers ,{}).then(() => {
                 refreshUser(user?.email);
                 window.history.replaceState({}, document.title, newUrl);
             });
@@ -34,12 +44,26 @@ const ManageConnectionsPage = () => {
                 <div className="manage-connections-page-title-container">
                     Manage Connections
                 </div>
+
                 <div className={linkAccountsClassname}>
                     {user?.linkedAccounts.linkedAccountsCount === 0 ? (
-                        <div className={"manage-connections-page-link-text"}> To link an account press the button
-                            below </div>) : null}
-                    <AddConnectionsModal oneDrive={user?.linkedAccounts.oneDrive}/>
+                        <>
+                            <div className={"manage-connections-page-link-text"}> To link an account press the button
+                                below
+                            </div>
+                            <AddConnectionsModal
+                                oneDrive={user?.linkedAccounts.oneDrive}/> </>) : linkedAccountsArray.map(({
+                                                                                                               key,
+                                                                                                               value
+                                                                                                           }) => (
+                        <Connection key={key} connectionProvider={key} isConnected={value}/>
+                    ))}
                 </div>
+
+                {user?.linkedAccounts.linkedAccountsCount !== undefined && user?.linkedAccounts.linkedAccountsCount >= 1 ? (
+                    <div className={"manage-connections-page-link-button-container"}>
+                        <AddConnectionsModal oneDrive={user?.linkedAccounts.oneDrive}/>
+                    </div>) : null}
             </div>
         </div>
     )

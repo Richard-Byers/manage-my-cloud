@@ -1,4 +1,6 @@
 import React from "react";
+import "./LinkOneDrive.css";
+import OneDriveLogo from "../../images/manage-connections/OneDriveLogo.png";
 
 const LinkOneDrive = () => {
 
@@ -22,7 +24,10 @@ const LinkOneDrive = () => {
 
     return (
         <div>
-            <button onClick={handleOneDriveLink}>Link with OneDrive</button>
+            <button className={"link-onedrive-button"} onClick={handleOneDriveLink}>
+                <img src={OneDriveLogo} alt={"OneDrive Logo"}/>
+                <p>Link with OneDrive</p>
+            </button>
         </div>
     )
 };

@@ -1,6 +1,5 @@
 import React, {useState} from "react";
 import "./AddConnectionsModal.css";
-import "../Modal.css";
 import LinkOneDrive from "../../pages/manage_connections/LinkOneDrive";
 
 interface AddConnectionsModalProps {
@@ -20,13 +19,14 @@ const AddConnectionsModal: React.FC<AddConnectionsModalProps> = ({oneDrive}) => 
 
     return (
         <>
-            <button className={"modal-login-button"} onClick={toggleModal}>
+            <button className={"add-connections-modal-button"} onClick={toggleModal}>
                 +
             </button>
 
             {showModal && (
                 <div className="modal-overlay" onClick={closeModal}>
-                    <div className="modal">
+                    <div className="add-connections-modal">
+                        <p>Link with one of our available providers below</p>
                         {!oneDrive ? (<LinkOneDrive/>) : null}
                     </div>
                 </div>

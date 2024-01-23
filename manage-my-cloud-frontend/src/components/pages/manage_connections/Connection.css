@@ -1,0 +1,35 @@
+
+.connection-container{
+    margin: 0.5em;
+    padding: 0.5em;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 95%;
+    height: auto;
+    background-color: white;
+    color: black;
+    border-radius: 10px;
+    box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.18);
+    -webkit-box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.18);
+    -moz-box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.18);
+    transition: 0.2s ease-in-out;
+}
+
+.connection-container:hover {
+    transform: scale(1.01);
+    cursor: pointer;
+}
+
+.connection-container img {
+    width: 80%;
+    height: 80%;
+    object-fit: contain;
+}
+
+.connection-container p {
+    margin: 0.5em 0 0.5em 0;
+    font-size: 1.8rem;
+    font-family: MontserratBold, serif;
+}

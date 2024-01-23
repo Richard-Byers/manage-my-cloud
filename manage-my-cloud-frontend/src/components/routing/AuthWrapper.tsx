@@ -1,9 +1,9 @@
 import {createContext, useContext, useEffect, useState} from "react"
 import AppRouting from "./AppRouting";
-import {buildAxiosRequest} from "../helpers/AxiosHelper";
+import {buildAxiosRequest, buildAxiosRequestWithHeaders} from "../helpers/AxiosHelper";
 import {useNavigate} from "react-router-dom";
 import {ROUTES} from "../../constants/RouteConstants";
-import { useGoogleLogin } from '@react-oauth/google';
+import {useGoogleLogin} from '@react-oauth/google';
 import Cookies from 'universal-cookie'
 
 
@@ -72,10 +72,10 @@ export const AuthWrapper = () => {
 
             // Send the code to the server
             try {
-                const response = await buildAxiosRequest("POST", "/registergoogleuser", { authCode });
+                const response = await buildAxiosRequest("POST", "/registergoogleuser", {authCode});
                 const data = response.data;
                 setUser(data);
-                localStorage.setItem('token', data.token); // Set the token
+                cookies.set('user', JSON.stringify(data));
                 navigate("/profile")
             } catch (error) {
                 // Handle the error
@@ -88,7 +88,10 @@ export const AuthWrapper = () => {
 
     const refreshUser = async (email: string | undefined): Promise<void> => {
         try {
-            const response = await buildAxiosRequest("POST", "/refresh-user", {email});
+            const headers = {
+                Authorization: `Bearer ${user?.token}`
+            }
+            const response = await buildAxiosRequestWithHeaders("POST", "/refresh-user", headers, {email});
             const userData = response.data;
             setUser(userData);
             cookies.set('user', JSON.stringify(userData));
@@ -104,9 +107,9 @@ export const AuthWrapper = () => {
     };
 
     return (
-        <AuthContext.Provider value={{ user, login, googleLogin, refreshUser ,logout, loading }}>
+        <AuthContext.Provider value={{user, login, googleLogin, refreshUser, logout, loading}}>
             <>
-                <AppRouting />
+                <AppRouting/>
             </>
         </AuthContext.Provider>
     );
