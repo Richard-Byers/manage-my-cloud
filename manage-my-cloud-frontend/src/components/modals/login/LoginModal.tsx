@@ -8,6 +8,7 @@ import EmailIcon from '@mui/icons-material/Email';
 import LockIcon from '@mui/icons-material/Lock';
 import {SignUpModal} from "../signUp/SignUpModal";
 import {ResetPasswordModal} from "../resetPassword/ResetPasswordModal";
+import { useGoogleLogin } from '@react-oauth/google';
 import {AuthData} from "../../routing/AuthWrapper";
 
 interface LoginProps {
@@ -16,7 +17,7 @@ interface LoginProps {
 }
 
 const LoginModal: React.FC = () => {
-    const {login} = AuthData();
+    const {login, googleLogin} = AuthData();
     const navigate = useNavigate();
     const [showModal, setShowModal] = useState(false);
     const [showSignUpModal, setShowSignUpModal] = useState(false);
@@ -79,6 +80,10 @@ const LoginModal: React.FC = () => {
             });
     };
 
+    const handleGoogleLogin = () => {
+        googleLogin()
+    };
+
     return (
         <>
             <button className={"modal-login-button"} onClick={toggleModal}>
@@ -101,7 +106,7 @@ const LoginModal: React.FC = () => {
                                 and help the environment?
                             </div>
 
-                            <button className={"modal-login-google-button"}>
+                            <button className={"modal-login-google-button"} onClick={handleGoogleLogin}>
                                 <img className={"modal-login-google-logo"} src={googleLogo} alt={"Google Logo"}/>
                                 Log in using Google
                             </button>

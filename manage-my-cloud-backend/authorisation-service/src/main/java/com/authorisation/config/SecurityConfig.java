@@ -30,6 +30,7 @@ public class SecurityConfig {
                 .and()
                 .authorizeHttpRequests(requests -> requests
                         .requestMatchers(HttpMethod.POST, "/login").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/registergoogleuser").permitAll()
                         .anyRequest().authenticated()).build();
     }
 }

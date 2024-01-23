@@ -18,9 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Calendar;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -52,6 +50,29 @@ public class UserService implements IUserService {
         return userEntityRepository.save(newUser);
     }
 
+    public UserEntity registerGoogleUser(String email, String firstname, String lastName, String pictureUrl, String refreshToken) {
+
+        Optional<UserEntity> userOptional = this.findUserByEmail(email);
+
+        //return null, don't need to do anything
+        if (userOptional.isPresent()) {
+            return null;
+        }
+
+        var newUser = new UserEntity();
+
+        newUser.setGoogleProfileImageUrl(pictureUrl);
+        newUser.setEmail(email);
+        newUser.setFirstName(firstname);
+        newUser.setLastName(lastName);
+        newUser.setRole("USER");
+        newUser.setEnabled(true);
+        newUser.setAccountType("GOOGLE");
+        newUser.setRefreshToken(refreshToken);
+
+        return userEntityRepository.save(newUser);
+    }
+
     public UserDto login(CredentialsDto credentialsDto) {
         UserEntity user = userEntityRepository.findByEmail(credentialsDto.getEmail())
                 .orElseThrow(() -> new UserNotFoundException("Unknown user", HttpStatus.NOT_FOUND));
@@ -64,6 +85,13 @@ public class UserService implements IUserService {
             return userMapper.toUserDto(user);
         }
         throw new InvalidPasswordException("Invalid password", HttpStatus.BAD_REQUEST);
+    }
+
+    public UserDto googleLogin(String email) {
+        UserEntity user = userEntityRepository.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException("Unknown user", HttpStatus.NOT_FOUND));
+
+        return userMapper.toUserDto(user);
     }
 
     @Override

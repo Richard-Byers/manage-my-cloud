@@ -18,7 +18,10 @@ public class VerificationTokenGivens {
                 "johndoe@gmail.com",
                 "password",
                 "USER",
-                true
+                true,
+                null,
+                null,
+                null
         ));
         return verificationToken;
     }
@@ -34,7 +37,10 @@ public class VerificationTokenGivens {
                 "johndoe@gmail.com",
                 "password",
                 "USER",
-                false
+                false,
+                null,
+                null,
+                null
         ));
         return verificationToken;
     }
