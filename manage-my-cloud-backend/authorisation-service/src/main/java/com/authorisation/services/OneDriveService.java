@@ -14,7 +14,7 @@ import static com.authorisation.Constants.MS_AUTH_CODE_URL;
 
 @AllArgsConstructor
 @Service
-public class OneDriveService {
+public class OneDriveService implements IOneDriveService{
 
     private RestTemplate restTemplate;
     private final CloudPlatformService cloudPlatformService;
@@ -54,6 +54,10 @@ public class OneDriveService {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public void unlinkOneDrive(String email) {
+        cloudPlatformService.deleteCloudPlatform(email, "OneDrive");
     }
 
     private void storeUserPlatformLink(OneDriveTokenResponse oneDriveTokenResponse, String email) {

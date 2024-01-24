@@ -22,6 +22,4 @@ public class OneDriveAuthController {
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
-
-
 }

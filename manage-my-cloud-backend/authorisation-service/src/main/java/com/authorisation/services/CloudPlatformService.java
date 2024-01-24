@@ -5,6 +5,7 @@ import com.authorisation.entities.LinkedAccounts;
 import com.authorisation.entities.UserEntity;
 import com.authorisation.repositories.CloudPlatformRepository;
 import com.authorisation.repositories.UserEntityRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -42,6 +43,25 @@ public class CloudPlatformService implements ICloudPlatformService {
         cloudPlatform.setRefreshToken(encryptedRefreshToken);
 
         return cloudPlatformRepository.save(cloudPlatform);
+    }
+
+    @Transactional
+    public void deleteCloudPlatform(String userEmail, String platformName) {
+        UserEntity userEntity = userEntityRepository.findByEmail(userEmail).orElseThrow(() -> new RuntimeException("User not found"));
+        LinkedAccounts linkedAccounts = userEntity.getLinkedAccounts();
+
+        if ("OneDrive".equals(platformName)) {
+            if (linkedAccounts == null) {
+                linkedAccounts = new LinkedAccounts();
+                userEntity.setLinkedAccounts(linkedAccounts);
+            }
+            linkedAccounts.setOneDrive(false);
+            linkedAccounts.setLinkedAccountsCount(linkedAccounts.getLinkedAccountsCount() - 1);
+        }
+
+        userEntityRepository.save(userEntity);
+
+        cloudPlatformRepository.deleteByUserEntityEmailAndPlatformName(userEntity.getEmail(), platformName);
     }
 
 }

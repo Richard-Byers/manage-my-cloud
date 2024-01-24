@@ -19,6 +19,7 @@ public class CloudPlatform {
     @ManyToOne
     @JoinColumn(name = "user_email", referencedColumnName = "email", nullable = false)
     private UserEntity userEntity;
+    @Column(name = "platform_name")
     private String platformName;
     @Column(length = 2000)
     private String accessToken;

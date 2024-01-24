@@ -17,9 +17,9 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(controllers = OAuthAuthorisationController.class)
+@WebMvcTest(controllers = GoogleAuthController.class)
 @AutoConfigureMockMvc(addFilters = false)
-public class OAuthAuthorisationControllerTest {
+public class GoogleAuthControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
