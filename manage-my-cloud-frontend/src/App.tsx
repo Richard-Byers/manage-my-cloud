@@ -3,13 +3,18 @@ import './App.css';
 import {BrowserRouter} from 'react-router-dom';
 import AppRouting from "./components/routing/AppRouting";
 import {AuthWrapper} from "./components/routing/AuthWrapper";
+import { Suspense } from 'react';
+import { useTranslation} from 'react-i18next';
 
 function App() {
-    return (
-        <BrowserRouter>
-            <AuthWrapper/>
-        </BrowserRouter>
+      return (
+            <BrowserRouter>
+          <Suspense fallback="...loading">
+            <App />
+          </Suspense>
+        <AuthWrapper />
+      </BrowserRouter>
     );
-}
+  }
 
-export default App;
+  export default App;
