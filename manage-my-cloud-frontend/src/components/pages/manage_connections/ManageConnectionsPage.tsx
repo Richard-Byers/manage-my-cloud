@@ -2,8 +2,8 @@ import Navbar from "../../nav/Navbar";
 import React, {useEffect} from "react";
 import './ManageConnectionsPage.css';
 import {AuthData} from "../../routing/AuthWrapper";
-import AddConnectionsModal from "../../modals/addConnections/AddConnectionsModal"
-import {buildAxiosRequest, buildAxiosRequestWithHeaders} from "../../helpers/AxiosHelper";
+import AddConnectionsModal from "../../modals/managingConnections/AddConnectionsModal"
+import {buildAxiosRequestWithHeaders} from "../../helpers/AxiosHelper";
 import Connection from "./Connection";
 
 const ManageConnectionsPage = () => {

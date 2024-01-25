@@ -1,12 +1,11 @@
 
 .connection-container{
-    margin: 0.5em;
-    padding: 0.5em;
+    padding-top: 0.5em;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    width: 95%;
+    width: 100%;
     height: auto;
     background-color: white;
     color: black;
@@ -15,11 +14,6 @@
     -webkit-box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.18);
     -moz-box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.18);
     transition: 0.2s ease-in-out;
-}
-
-.connection-container:hover {
-    transform: scale(1.01);
-    cursor: pointer;
 }
 
 .connection-container img {

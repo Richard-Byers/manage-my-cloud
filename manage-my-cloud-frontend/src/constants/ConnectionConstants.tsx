@@ -9,12 +9,10 @@ interface ConnectionTitles {
     [key: string]: string;
 }
 
-const CONNECTION_LOGOS: ConnectionLogos = {
+export const CONNECTION_LOGOS: ConnectionLogos = {
     oneDrive : OneDriveLogo,
 }
 
-const CONNECTION_TITLE: ConnectionTitles = {
+export const CONNECTION_TITLE: ConnectionTitles = {
     oneDrive : "OneDrive",
 }
-
-export {CONNECTION_LOGOS, CONNECTION_TITLE};
