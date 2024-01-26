@@ -7,14 +7,14 @@ import { Suspense } from 'react';
 import { useTranslation} from 'react-i18next';
 
 function App() {
-      return (
-            <BrowserRouter>
+  return (
+      <BrowserRouter>
           <Suspense fallback="...loading">
-            <App />
+              <AuthWrapper/>
           </Suspense>
-        <AuthWrapper />
+          <AuthWrapper/>
       </BrowserRouter>
-    );
-  }
+  );
+}
 
-  export default App;
+export default App;
