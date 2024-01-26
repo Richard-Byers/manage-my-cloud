@@ -12,7 +12,7 @@ export const buildAxiosRequest = (method: string, url: string, data: any) => {
     });
 }
 
-export const buildAxiosRequestWithHeaders = (method: string, url: string, headers: any ,data: any) => {
+export const buildAxiosRequestWithHeaders = (method: string, url: string, headers: any, data: any) => {
 
     return axios({
         method: method,

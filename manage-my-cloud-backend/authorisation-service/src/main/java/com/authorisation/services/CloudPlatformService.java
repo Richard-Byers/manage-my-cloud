@@ -9,6 +9,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import static com.authorisation.Constants.ONEDRIVE;
 import static com.authorisation.util.EncryptionUtil.encrypt;
 
 @Service
@@ -22,7 +23,7 @@ public class CloudPlatformService implements ICloudPlatformService {
         UserEntity userEntity = userEntityRepository.findByEmail(userEmail).orElseThrow(() -> new RuntimeException("User not found"));
         LinkedAccounts linkedAccounts = userEntity.getLinkedAccounts();
 
-        if ("OneDrive".equals(platformName)) {
+        if (ONEDRIVE.equals(platformName)) {
             if (linkedAccounts == null) {
                 linkedAccounts = new LinkedAccounts();
                 userEntity.setLinkedAccounts(linkedAccounts);
@@ -50,7 +51,7 @@ public class CloudPlatformService implements ICloudPlatformService {
         UserEntity userEntity = userEntityRepository.findByEmail(userEmail).orElseThrow(() -> new RuntimeException("User not found"));
         LinkedAccounts linkedAccounts = userEntity.getLinkedAccounts();
 
-        if ("OneDrive".equals(platformName)) {
+        if (ONEDRIVE.equals(platformName)) {
             if (linkedAccounts == null) {
                 linkedAccounts = new LinkedAccounts();
                 userEntity.setLinkedAccounts(linkedAccounts);
