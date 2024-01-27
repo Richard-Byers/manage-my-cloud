@@ -10,7 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Collections;
 
 @Service
 public class GoogleAuthService {
@@ -29,19 +31,7 @@ public class GoogleAuthService {
         String authCodeOutput = jsonObject.getString("authCode");
 
         try {
-            GoogleClientSecrets clientSecrets =
-                    GoogleClientSecrets.load(
-                            JacksonFactory.getDefaultInstance(), new InputStreamReader(getClass().getResourceAsStream(CREDENTIALS_FILE_PATH)));
-            GoogleTokenResponse tokenResponse =
-                    new GoogleAuthorizationCodeTokenRequest(
-                            new NetHttpTransport(),
-                            JacksonFactory.getDefaultInstance(),
-                            "https://www.googleapis.com/oauth2/v4/token",
-                            clientSecrets.getDetails().getClientId(),
-                            clientSecrets.getDetails().getClientSecret(),
-                            authCodeOutput,
-                            "postmessage")
-                            .execute();
+            GoogleTokenResponse tokenResponse = getGoogleTokenResponse(authCodeOutput);
 
             String refreshToken = tokenResponse.getRefreshToken();
 
@@ -65,5 +55,27 @@ public class GoogleAuthService {
             System.out.println(e);
         }
         return null;
+    }
+
+    protected GoogleClientSecrets loadClientSecrets() throws IOException {
+        return GoogleClientSecrets.load(
+                JacksonFactory.getDefaultInstance(),
+                new InputStreamReader(getClass().getResourceAsStream("/credentials.json"))
+        );
+    }
+
+    public GoogleTokenResponse getGoogleTokenResponse(String authCodeOutput) throws IOException {
+        GoogleClientSecrets clientSecrets =
+                GoogleClientSecrets.load(
+                        JacksonFactory.getDefaultInstance(), new InputStreamReader(getClass().getResourceAsStream(CREDENTIALS_FILE_PATH)));
+        return new GoogleAuthorizationCodeTokenRequest(
+                new NetHttpTransport(),
+                JacksonFactory.getDefaultInstance(),
+                "https://www.googleapis.com/oauth2/v4/token",
+                clientSecrets.getDetails().getClientId(),
+                clientSecrets.getDetails().getClientSecret(),
+                authCodeOutput,
+                "postmessage")
+                .execute();
     }
 }

@@ -4,12 +4,14 @@ import com.authorisation.config.UserAuthenticationProvider;
 import com.authorisation.dto.UserDto;
 import com.authorisation.entities.UserEntity;
 import com.authorisation.services.UserService;
+import com.authorisation.services.GoogleAuthService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.mockito.ArgumentMatchers.anyString;
@@ -30,6 +32,9 @@ public class GoogleAuthControllerTest {
     @MockBean
     private UserAuthenticationProvider userAuthenticationProvider;
 
+    @MockBean
+    private GoogleAuthService googleAuthService;
+
     @Test
     public void whenValidInput_thenReturns200() throws Exception {
         UserEntity userEntity = new UserEntity();
@@ -42,6 +47,8 @@ public class GoogleAuthControllerTest {
         when(userService.registerGoogleUser(anyString(), anyString(), anyString(), anyString(), anyString())).thenReturn(userEntity);
         when(userService.googleLogin(anyString())).thenReturn(userDto);
         when(userAuthenticationProvider.createToken(anyString())).thenReturn("token");
+
+        when(googleAuthService.storeAuthCode(anyString())).thenReturn(ResponseEntity.ok(userDto));
 
         String authCodeJson = "{\"authCode\":\"4/0AfJohXnSbVBJQR7PG35P1gHkn5KYEWALPjQ5U2zx_9wXLDxODxq6tAnyyKRBkZi4xZ9NBQ\"}";
 
