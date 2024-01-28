@@ -5,6 +5,8 @@ public class Constants {
     //GOOGLE COMMON CONSTANTS
     public static final String GOOGLE_CREDENTIALS_FILE_PATH = "/credentials.json";
 
+    public static final String GOOGLEDRIVE = "GoogleDrive";
+
     //ONEDRIVE COMMON CONSTANTS
     public static final String ONEDRIVE = "OneDrive";
 

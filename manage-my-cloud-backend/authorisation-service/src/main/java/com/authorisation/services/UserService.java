@@ -55,7 +55,7 @@ public class UserService implements IUserService {
         return userEntityRepository.save(newUser);
     }
 
-    public UserEntity registerGoogleUser(String email, String firstname, String lastName, String pictureUrl, String refreshToken) {
+    public UserEntity registerGoogleUser(String email, String firstname, String lastName, String pictureUrl) {
 
         Optional<UserEntity> userOptional = this.findUserByEmail(email);
 
@@ -73,7 +73,7 @@ public class UserService implements IUserService {
         newUser.setRole("USER");
         newUser.setEnabled(true);
         newUser.setAccountType("GOOGLE");
-        newUser.setRefreshToken(refreshToken);
+        newUser.setLinkedAccounts(new LinkedAccounts());
 
         return userEntityRepository.save(newUser);
     }

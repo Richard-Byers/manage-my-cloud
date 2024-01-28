@@ -1,15 +1,13 @@
 package com.authorisation.controllers;
 
-import com.authorisation.config.UserAuthenticationProvider;
 import com.authorisation.dto.UserDto;
-import com.authorisation.services.UserService;
 import com.authorisation.services.GoogleAuthService;
+import com.google.api.client.googleapis.auth.oauth2.GoogleTokenResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import org.springframework.web.bind.annotation.*;
-
-import java.io.InputStreamReader;
 
 @CrossOrigin(origins = "*")
 @RestController
@@ -18,10 +16,16 @@ public class GoogleAuthController {
     @Autowired
     private GoogleAuthService googleAuthService;
 
-    private static final String CREDENTIALS_FILE_PATH = "/credentials.json";
-
     @PostMapping("/registergoogleuser")
     public ResponseEntity<UserDto> storeAuthCode(@RequestBody String authCode) {
         return googleAuthService.storeAuthCode(authCode);
+    }
+
+    @PostMapping("/link-google-account")
+    public ResponseEntity<GoogleTokenResponse>linkGoogleAccount(@RequestBody String authCode, @RequestParam("email") String email) {
+
+        GoogleTokenResponse response = googleAuthService.linkGoogleAccount(authCode, email);
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }

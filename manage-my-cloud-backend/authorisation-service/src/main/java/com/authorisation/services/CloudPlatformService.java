@@ -9,6 +9,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import static com.authorisation.Constants.GOOGLEDRIVE;
 import static com.authorisation.Constants.ONEDRIVE;
 import static com.authorisation.util.EncryptionUtil.encrypt;
 
@@ -30,6 +31,15 @@ public class CloudPlatformService implements ICloudPlatformService {
             }
             linkedAccounts.setOneDrive(true);
             linkedAccounts.setLinkedAccountsCount(linkedAccounts.getLinkedAccountsCount() + 1);
+        } else if (GOOGLEDRIVE.equals(platformName)) {
+            if (linkedAccounts == null) {
+                linkedAccounts = new LinkedAccounts();
+                userEntity.setLinkedAccounts(linkedAccounts);
+            }
+            linkedAccounts.setGoogleDrive(true);
+            linkedAccounts.setLinkedAccountsCount(linkedAccounts.getLinkedAccountsCount() + 1);
+        } else {
+            throw new RuntimeException("Platform not supported");
         }
 
         userEntityRepository.save(userEntity);
@@ -58,6 +68,15 @@ public class CloudPlatformService implements ICloudPlatformService {
             }
             linkedAccounts.setOneDrive(false);
             linkedAccounts.setLinkedAccountsCount(linkedAccounts.getLinkedAccountsCount() - 1);
+        } else if (GOOGLEDRIVE.equals(platformName)) {
+            if (linkedAccounts == null) {
+                linkedAccounts = new LinkedAccounts();
+                userEntity.setLinkedAccounts(linkedAccounts);
+            }
+            linkedAccounts.setGoogleDrive(false);
+            linkedAccounts.setLinkedAccountsCount(linkedAccounts.getLinkedAccountsCount() - 1);
+        } else {
+            throw new RuntimeException("Platform not supported");
         }
 
         userEntityRepository.save(userEntity);

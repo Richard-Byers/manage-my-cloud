@@ -44,7 +44,7 @@ public class GoogleAuthControllerTest {
         userDto.setEmail("test@gmail.com");
         userDto.setToken("token");
 
-        when(userService.registerGoogleUser(anyString(), anyString(), anyString(), anyString(), anyString())).thenReturn(userEntity);
+        when(userService.registerGoogleUser(anyString(), anyString(), anyString(), anyString())).thenReturn(userEntity);
         when(userService.googleLogin(anyString())).thenReturn(userDto);
         when(userAuthenticationProvider.createToken(anyString())).thenReturn("token");
 

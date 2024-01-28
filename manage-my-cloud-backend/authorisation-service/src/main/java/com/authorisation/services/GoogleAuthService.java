@@ -5,6 +5,7 @@ import com.authorisation.dto.UserDto;
 import com.google.api.client.googleapis.auth.oauth2.*;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
+import lombok.AllArgsConstructor;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -12,10 +13,14 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.Collections;
 
+import static com.authorisation.Constants.GOOGLEDRIVE;
+
+@AllArgsConstructor
 @Service
 public class GoogleAuthService {
+
+    private final CloudPlatformService cloudPlatformService;
 
     @Autowired
     private UserService userService;
@@ -33,8 +38,6 @@ public class GoogleAuthService {
         try {
             GoogleTokenResponse tokenResponse = getGoogleTokenResponse(authCodeOutput);
 
-            String refreshToken = tokenResponse.getRefreshToken();
-
             String idTokenStr = tokenResponse.getIdToken();
             GoogleIdToken idToken = GoogleIdToken.parse(JacksonFactory.getDefaultInstance(), idTokenStr);
             GoogleIdToken.Payload payload = idToken.getPayload();
@@ -44,7 +47,7 @@ public class GoogleAuthService {
             String lastName = (String) payload.get("family_name");
             String pictureUrl = (String) payload.get("picture");
 
-            userService.registerGoogleUser(email, firstName, lastName, pictureUrl, refreshToken);
+            userService.registerGoogleUser(email, firstName, lastName, pictureUrl);
 
             UserDto userDto = userService.googleLogin(email);
             userDto.setToken(userAuthenticationProvider.createToken(userDto.getEmail()));
@@ -55,13 +58,6 @@ public class GoogleAuthService {
             System.out.println(e);
         }
         return null;
-    }
-
-    protected GoogleClientSecrets loadClientSecrets() throws IOException {
-        return GoogleClientSecrets.load(
-                JacksonFactory.getDefaultInstance(),
-                new InputStreamReader(getClass().getResourceAsStream("/credentials.json"))
-        );
     }
 
     public GoogleTokenResponse getGoogleTokenResponse(String authCodeOutput) throws IOException {
@@ -77,5 +73,34 @@ public class GoogleAuthService {
                 authCodeOutput,
                 "postmessage")
                 .execute();
+    }
+
+    public GoogleTokenResponse linkGoogleAccount(String authCode, String email) {
+        String jsonString = authCode.substring(authCode.indexOf("{"));
+        JSONObject jsonObject = new JSONObject(jsonString);
+        String authCodeOutput = jsonObject.getString("authCode");
+
+        try {
+            GoogleTokenResponse tokenResponse = getGoogleTokenResponse(authCodeOutput);
+            storeUserPlatformLink(tokenResponse, email);
+
+            return tokenResponse;
+        } catch (Exception e) {
+            // Log the exception
+            System.out.println(e);
+        }
+        return null;
+    }
+
+    public void storeUserPlatformLink(GoogleTokenResponse tokenResponse, String email) {
+        cloudPlatformService.addCloudPlatform(
+                email,
+                GOOGLEDRIVE,
+                tokenResponse.getAccessToken(),
+                tokenResponse.getRefreshToken());
+    }
+
+    public void unlinkGoogleDrive(String email) {
+        cloudPlatformService.deleteCloudPlatform(email, GOOGLEDRIVE);
     }
 }
