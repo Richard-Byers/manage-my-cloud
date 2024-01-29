@@ -1,9 +1,6 @@
 package com.authorisation.entities;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -23,6 +20,7 @@ public class UserEntity {
     private String firstName;
     private String lastName;
     @NaturalId(mutable = true)
+    @Column(unique = true)
     private String email;
     private String password;
     private String role;
@@ -30,5 +28,7 @@ public class UserEntity {
     private String refreshToken;
     private String accountType;
     private String googleProfileImageUrl;
+    @Embedded
+    private LinkedAccounts linkedAccounts;
 
 }

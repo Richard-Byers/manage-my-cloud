@@ -1,5 +1,6 @@
 package com.authorisation.givens;
 
+import com.authorisation.entities.LinkedAccounts;
 import com.authorisation.entities.UserEntity;
 import com.authorisation.entities.VerificationToken;
 
@@ -21,7 +22,8 @@ public class VerificationTokenGivens {
                 true,
                 null,
                 null,
-                null
+                null,
+                new LinkedAccounts()
         ));
         return verificationToken;
     }
@@ -40,7 +42,8 @@ public class VerificationTokenGivens {
                 false,
                 null,
                 null,
-                null
+                null,
+                new LinkedAccounts()
         ));
         return verificationToken;
     }
