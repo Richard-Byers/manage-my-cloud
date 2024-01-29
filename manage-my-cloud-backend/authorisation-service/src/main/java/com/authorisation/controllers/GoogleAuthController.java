@@ -16,7 +16,7 @@ import java.io.InputStreamReader;
 
 @CrossOrigin(origins = "*")
 @RestController
-public class OAuthAuthorisationController {
+public class GoogleAuthController {
 
     @Autowired
     private UserService userService;

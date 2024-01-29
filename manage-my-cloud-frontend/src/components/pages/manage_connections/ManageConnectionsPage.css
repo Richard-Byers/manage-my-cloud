@@ -14,3 +14,34 @@
     grid-row: 1 / 1;
     grid-column: 1 / -1;
 }
+
+.manage-connections-page-link-button-container{
+    display:flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.manage-connections-page-link-accounts-container-center {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.6rem;
+    color: white;
+    grid-column: 1/-1;
+}
+
+.manage-connections-page-link-accounts-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.6rem;
+    color: white;
+}
+
+.manage-connections-page-link-text {
+    font-family: MontserratBold, serif;
+    margin-top: 6.5em;
+    margin-bottom: 1em;
+}

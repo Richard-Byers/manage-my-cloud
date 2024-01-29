@@ -1,6 +1,7 @@
 package com.authorisation.services;
 
 import com.authorisation.dto.CredentialsDto;
+import com.authorisation.dto.EmailDto;
 import com.authorisation.dto.UserDto;
 import com.authorisation.entities.UserEntity;
 import com.authorisation.entities.VerificationToken;
@@ -32,4 +33,6 @@ public interface IUserService {
     void resetUserPassword(UserEntity userEntity, String newPassword);
 
     UserDto login(CredentialsDto credentialsDto);
+
+    UserDto refreshUser(EmailDto credentialsDto);
 }

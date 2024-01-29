@@ -1,7 +1,9 @@
 package com.authorisation.services;
 
 import com.authorisation.dto.CredentialsDto;
+import com.authorisation.dto.EmailDto;
 import com.authorisation.dto.UserDto;
+import com.authorisation.entities.LinkedAccounts;
 import com.authorisation.entities.UserEntity;
 import com.authorisation.entities.VerificationToken;
 import com.authorisation.exception.InvalidPasswordException;
@@ -18,7 +20,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.Calendar;
+import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -46,6 +50,7 @@ public class UserService implements IUserService {
         newUser.setEmail(registrationRequest.email());
         newUser.setPassword(passwordEncoder.encode(registrationRequest.password()));
         newUser.setRole(registrationRequest.role());
+        newUser.setLinkedAccounts(new LinkedAccounts());
 
         return userEntityRepository.save(newUser);
     }
@@ -89,6 +94,13 @@ public class UserService implements IUserService {
 
     public UserDto googleLogin(String email) {
         UserEntity user = userEntityRepository.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException("Unknown user", HttpStatus.NOT_FOUND));
+
+        return userMapper.toUserDto(user);
+    }
+
+    public UserDto refreshUser(EmailDto credentialsDto) {
+        UserEntity user = userEntityRepository.findByEmail(credentialsDto.getEmail())
                 .orElseThrow(() -> new UserNotFoundException("Unknown user", HttpStatus.NOT_FOUND));
 
         return userMapper.toUserDto(user);

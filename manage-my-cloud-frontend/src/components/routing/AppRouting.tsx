@@ -1,13 +1,16 @@
 import React from 'react';
-import {Navigate, Route, Routes, useLocation, useNavigate, useParams} from "react-router-dom";
+import {Navigate, Route, Routes, useLocation} from "react-router-dom";
 import {AuthData} from "./AuthWrapper";
 import {nav} from "./Navigation";
-import LandingPage from "../pages/landing/LandingPage";
 import {ROUTES} from "../../constants/RouteConstants";
 
 const AppRouting = () => {
-    const {user} = AuthData();
+    const { user, loading } = AuthData();
     const location = useLocation(); // Get the current location
+
+    if (loading) {
+        return <div>Loading...</div>;
+    }
 
     return (
         <Routes>

@@ -72,10 +72,9 @@ export const SignUpModal: React.FC<SignUpProps> = ({
         if (firstName && lastName && email && password) {
 
             buildAxiosRequest("POST", "/register", signupInput).then((response) => {
-                console.log(response);
                 setConfirmationEmailMessage((prevState) => ({...prevState, confirmationMessage: response.data}));
             }).catch((error) => {
-                console.log(error);
+                
             });
         } else {
             console.error("Please fill in all the fields");
