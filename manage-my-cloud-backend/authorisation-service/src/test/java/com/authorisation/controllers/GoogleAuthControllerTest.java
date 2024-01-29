@@ -36,7 +36,7 @@ public class GoogleAuthControllerTest {
     private GoogleAuthService googleAuthService;
 
     @Test
-    public void whenValidInput_thenReturns200() throws Exception {
+    public void whenValidInputThenReturns200() throws Exception {
         UserEntity userEntity = new UserEntity();
         userEntity.setEmail("test@gmail.com");
 
@@ -55,6 +55,13 @@ public class GoogleAuthControllerTest {
         mockMvc.perform(post("/registergoogleuser")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(authCodeJson))
+                .andExpect(status().isOk());
+
+        String email = "test@gmail.com";
+        mockMvc.perform(post("/link-google-account")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(authCodeJson)
+                        .param("email", email))
                 .andExpect(status().isOk());
     }
 }

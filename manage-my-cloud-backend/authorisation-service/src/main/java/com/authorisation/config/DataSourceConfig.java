@@ -18,6 +18,12 @@ public class DataSourceConfig {
         // The configuration object specifies behaviors for the connection pool.
         HikariConfig config = new HikariConfig();
 
+        /* Is for docker-compose.yml
+        config.setJdbcUrl(String.format("jdbc:postgresql://postgres/%s", "postgres"));
+        config.setUsername("postgres");
+        config.setPassword("postgres");
+        */
+
         // Configure which instance and what database user to connect with.
         config.setJdbcUrl(String.format("jdbc:postgresql:///%s", "mmc"));
         config.setUsername("postgres"); // e.g. "root", _postgres"
