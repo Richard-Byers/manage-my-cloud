@@ -1,0 +1,18 @@
+
+.modal-logo-signup {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #0f8f9e;
+    padding: 30px 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    text-align: center;
+}
+
+.sign-up-login-container {
+    padding-top: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}

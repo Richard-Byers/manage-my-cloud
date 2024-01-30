@@ -1,0 +1,90 @@
+.container {
+  display:flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: MontserratRegular, serif;
+}
+
+.item {
+  width: 24vw;
+  height: 34vh;
+  background-color: rgb(254, 254, 254);
+  padding: 1em;
+  font-weight: 700;
+  text-align: center;
+  border-radius: 10px;
+  align-items: center;
+  box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.18);
+  -webkit-box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.18);
+  -moz-box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.18);
+  cursor: pointer;
+  transition: transform 0.2s ease-in-out;
+}
+
+.item:hover {
+  transform: scale(1.01);
+}
+
+.g-drive-logo {
+  display:flex;
+    color: #fff;
+    width: 8vw;
+    height:14vh;
+    margin: auto;
+}
+
+.item-drive-name {
+  display: flex;
+  margin-top: 1em;
+  font-size: 0.8vw;
+  font-family: MontserratLight;
+  line-height: normal;
+  font-style: normal;
+}
+
+.item-storage-used {
+  display: flex;
+  margin-top: -1.6em;
+  font-size: 0.8vw;
+  font-family: MontserratLight;
+  line-height: normal;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.dropbox-logo {
+  display:flex;
+    color: #fff;
+    width: 8vw;
+    height:14vh;
+    margin: auto;
+
+}
+
+.onedrive-logo {
+  display:flex;
+    color: #fff;
+    width: 10vw;
+    height:14vh;
+    margin: auto;
+
+}
+
+.head-to-manage-text {
+  margin-top:-4vh;
+  margin-right:3vw;
+}
+
+
+hr {
+  border: none;
+  border-top: 1px solid black; /* Adjust this value to change the color and thickness of the line */
+  width: 100%; /* Adjust this value to change the width of the line */
+  margin: 10px 0; /* Adjust this value to change the space above and below the line */
+}
+
+@font-face {
+  font-family: 'MontserratLight';
+  src: local('MontserratLight'),
+  url('../../../fonts/Montserrat-Light.ttf') format('truetype');
+}
