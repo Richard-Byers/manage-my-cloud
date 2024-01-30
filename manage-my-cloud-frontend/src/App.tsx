@@ -1,13 +1,16 @@
 import React from 'react';
 import './App.css';
-import {BrowserRouter as Router} from 'react-router-dom';
-import AppRouting from "./components/routing/AppRouting";
+import {BrowserRouter} from 'react-router-dom';
+import {AuthWrapper} from "./components/routing/AuthWrapper";
+import {GoogleOAuthProvider} from '@react-oauth/google';
 
 function App() {
     return (
-        <Router>
-            <AppRouting/>
-        </Router>
+        <GoogleOAuthProvider clientId="897733650985-l3188hg9ni6cfd61kf9jpkcce5b83omt.apps.googleusercontent.com">
+            <BrowserRouter>
+                <AuthWrapper/>
+            </BrowserRouter>
+        </GoogleOAuthProvider>
     );
 }
 
