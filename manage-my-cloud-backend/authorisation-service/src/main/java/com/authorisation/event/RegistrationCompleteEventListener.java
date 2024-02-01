@@ -43,7 +43,7 @@ public class RegistrationCompleteEventListener implements ApplicationListener<Re
         try {
             sendVerificationEmail(verificationUrl, userEntity);
         } catch (Exception e) {
-            logger.error(String.format("Error occurred while sending verification email to user: %s", userEntity.getEmail()));
+            logger.error(String.format("Error occurred while sending verification email to user: %s with error %s", userEntity.getEmail(), e.getMessage()));
         }
 
     }

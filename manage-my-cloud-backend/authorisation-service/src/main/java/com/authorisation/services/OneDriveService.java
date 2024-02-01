@@ -2,13 +2,14 @@ package com.authorisation.services;
 
 import com.authorisation.response.OneDriveTokenResponse;
 import lombok.AllArgsConstructor;
-import org.springframework.http.HttpEntity;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.BodyInserters;
+import org.springframework.web.reactive.function.client.WebClient;
+
+import java.util.Date;
 
 import static com.authorisation.Constants.*;
 
@@ -16,37 +17,41 @@ import static com.authorisation.Constants.*;
 @Service
 public class OneDriveService implements IOneDriveService {
 
-    private RestTemplate restTemplate;
+    @Value("${onedrive.clientId}")
+    private String clientId;
+
+    @Value("${onedrive.redirectUri}")
+    private String redirectUri;
+
+    @Value("${onedrive.clientSecret}")
+    private String clientSecret;
+
     private final CloudPlatformService cloudPlatformService;
+    private final WebClient webClient;
 
     public OneDriveTokenResponse getAndStoreUserTokens(String authCode, String email) {
         try {
-            String clientId = System.getenv(ONEDRIVE_CLIENT_ID);
-            String redirectUri = System.getenv(ONEDRIVE_REDIRECT_URI);
             String scope = "files.readwrite.all offline_access";
-            String clientSecret = System.getenv(ONEDRIVE_CLIENT_SECRET);
 
-            HttpHeaders headers = new HttpHeaders();
-            headers.set("Content-Type", "application/x-www-form-urlencoded");
+            OneDriveTokenResponse oneDriveTokenResponse = webClient.post()
+                    .uri(MS_AUTH_CODE_URL)
+                    .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+                    .body(BodyInserters.fromFormData("client_id", clientId)
+                            .with("redirect_uri", redirectUri)
+                            .with("scope", scope)
+                            .with("client_secret", clientSecret)
+                            .with("grant_type", ONEDRIVE_GRANT_TYPE)
+                            .with("code", authCode))
+                    .retrieve()
+                    .bodyToMono(OneDriveTokenResponse.class)
+                    .block();
 
-            MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
-            map.add("client_id", clientId);
-            map.add("redirect_uri", redirectUri);
-            map.add("scope", scope);
-            map.add("client_secret", clientSecret);
-            map.add("grant_type", ONEDRIVE_GRANT_TYPE);
-            map.add("code", authCode);
+            if (oneDriveTokenResponse == null) {
+                throw new Exception("OneDrive token response is null");
+            }
 
-            HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(map, headers);
-
-            OneDriveTokenResponse oneDriveTokenResponse = restTemplate.exchange(
-                    MS_AUTH_CODE_URL,
-                    HttpMethod.POST,
-                    entity,
-                    OneDriveTokenResponse.class
-            ).getBody();
-
-            storeUserPlatformLink(oneDriveTokenResponse, email);
+            Date accessExpiryDate = new Date(System.currentTimeMillis() + (oneDriveTokenResponse.getExpiresIn() * 1000));
+            storeUserPlatformLink(oneDriveTokenResponse, email, accessExpiryDate);
 
             return oneDriveTokenResponse;
         } catch (Exception e) {
@@ -59,12 +64,13 @@ public class OneDriveService implements IOneDriveService {
         cloudPlatformService.deleteCloudPlatform(email, ONEDRIVE);
     }
 
-    private void storeUserPlatformLink(OneDriveTokenResponse oneDriveTokenResponse, String email) {
+    private void storeUserPlatformLink(OneDriveTokenResponse oneDriveTokenResponse, String email, Date accessExpiryDate) {
         cloudPlatformService.addCloudPlatform(
                 email,
                 ONEDRIVE,
                 oneDriveTokenResponse.getAccessToken(),
-                oneDriveTokenResponse.getRefreshToken());
+                oneDriveTokenResponse.getRefreshToken(),
+                accessExpiryDate);
 
     }
 
