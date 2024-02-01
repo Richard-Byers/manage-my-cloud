@@ -24,24 +24,19 @@ public class CloudPlatformService implements ICloudPlatformService {
         UserEntity userEntity = userEntityRepository.findByEmail(userEmail).orElseThrow(() -> new RuntimeException("User not found"));
         LinkedAccounts linkedAccounts = userEntity.getLinkedAccounts();
 
-        if (ONEDRIVE.equals(platformName)) {
+        if (ONEDRIVE.equals(platformName) || GOOGLEDRIVE.equals(platformName)) {
             if (linkedAccounts == null) {
                 linkedAccounts = new LinkedAccounts();
                 userEntity.setLinkedAccounts(linkedAccounts);
             }
-            linkedAccounts.setOneDrive(true);
-            linkedAccounts.setLinkedAccountsCount(linkedAccounts.getLinkedAccountsCount() + 1);
-        } else if (GOOGLEDRIVE.equals(platformName)) {
-            if (linkedAccounts == null) {
-                linkedAccounts = new LinkedAccounts();
-                userEntity.setLinkedAccounts(linkedAccounts);
+            if (ONEDRIVE.equals(platformName)) {
+                linkedAccounts.setOneDrive(true);
+                linkedAccounts.setLinkedAccountsCount(linkedAccounts.getLinkedAccountsCount() + 1);
+            } else {
+                linkedAccounts.setGoogleDrive(true);
+                linkedAccounts.setLinkedAccountsCount(linkedAccounts.getLinkedAccountsCount() + 1);
             }
-            linkedAccounts.setGoogleDrive(true);
-            linkedAccounts.setLinkedAccountsCount(linkedAccounts.getLinkedAccountsCount() + 1);
-        } else {
-            throw new RuntimeException("Platform not supported");
         }
-
         userEntityRepository.save(userEntity);
 
         String encryptedAccessToken = encrypt(accessToken);

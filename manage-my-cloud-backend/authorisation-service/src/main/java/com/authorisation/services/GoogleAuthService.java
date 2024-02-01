@@ -2,6 +2,7 @@ package com.authorisation.services;
 
 import com.authorisation.config.UserAuthenticationProvider;
 import com.authorisation.dto.UserDto;
+import com.authorisation.Constants;
 import com.google.api.client.googleapis.auth.oauth2.*;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
@@ -27,8 +28,6 @@ public class GoogleAuthService {
 
     @Autowired
     private UserAuthenticationProvider userAuthenticationProvider;
-
-    private static final String CREDENTIALS_FILE_PATH = "/credentials.json";
 
     public ResponseEntity<UserDto> storeAuthCode(String authCode) {
         String jsonString = authCode.substring(authCode.indexOf("{"));
@@ -63,7 +62,7 @@ public class GoogleAuthService {
     public GoogleTokenResponse getGoogleTokenResponse(String authCodeOutput) throws IOException {
         GoogleClientSecrets clientSecrets =
                 GoogleClientSecrets.load(
-                        JacksonFactory.getDefaultInstance(), new InputStreamReader(getClass().getResourceAsStream(CREDENTIALS_FILE_PATH)));
+                        JacksonFactory.getDefaultInstance(), new InputStreamReader(getClass().getResourceAsStream(Constants.GOOGLE_CREDENTIALS_FILE_PATH)));
         return new GoogleAuthorizationCodeTokenRequest(
                 new NetHttpTransport(),
                 JacksonFactory.getDefaultInstance(),
