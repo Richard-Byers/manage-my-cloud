@@ -1,21 +1,25 @@
 import React from 'react';
 import './LinkGoogleDrive.css';
 import { useGoogleLogin } from '@react-oauth/google';
-import {buildAxiosRequest } from "../../helpers/AxiosHelper";
+import {buildAxiosRequestWithHeaders } from "../../helpers/AxiosHelper";
 import GoogleDriveLogo from "../../images/manage-connections/GoogleDriveLogo.png";
 import {AuthData} from "../../routing/AuthWrapper";
 
 const LinkGoogleDrive = () => {
-    const {user, refreshUser} = AuthData();
+    const {user} = AuthData();
 
 const handleGoogleDrive = useGoogleLogin({
         onSuccess: async (codeResponse) => {
             // Get the code from the response
             const authCode = codeResponse.code;
 
+            const headers = {
+                Authorization: `Bearer ${user?.token}`
+            }
+
             // Send the code to the server
             try {
-                const response = await buildAxiosRequest("POST", `/link-google-account?email=${encodeURIComponent(user?.email ?? '')}`, {authCode});
+                const response = await buildAxiosRequestWithHeaders("POST", `/link-google-account?email=${encodeURIComponent(user?.email ?? '')}`, headers, {authCode});
                 const data = response.data;
                 
                 window.location.reload();

@@ -30,7 +30,6 @@ public class SecurityConfig {
                         .requestMatchers("/register/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/registergoogleuser").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/link-google-account").permitAll()
                         .anyRequest().authenticated()).build();
     }
 }
