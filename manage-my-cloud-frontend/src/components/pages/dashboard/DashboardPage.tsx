@@ -28,15 +28,17 @@ const DashboardPage = () => {
                 <div className="dashboard-page-title-container">
                     Dashboard
                 </div>
-                <div className={"connected-drives-container"}>
-                    {
-                        linkedAccountsArray.map(({
-                                                     key,
-                                                     value
-                                                 }) => (
-                            <ConnectedDrivesCard key={key} connectionProvider={key}/>
-                        ))}
-                </div>
+
+                {
+                    linkedAccountsArray.map(({
+                                                 key,
+                                                 value
+                                             }) => (
+                        <div className={"connected-drives-container"}><ConnectedDrivesCard key={key}
+                                                                                           connectionProvider={key}/>
+                        </div>
+                    ))}
+
                 <div className={"dashboard-page-buttons-container"}>
                     <DashboardPageButtons/>
                 </div>

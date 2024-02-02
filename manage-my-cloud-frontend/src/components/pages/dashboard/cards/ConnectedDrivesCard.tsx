@@ -40,7 +40,6 @@ const CardContainer: React.FC<ConnectedDrivesCardProps> = ({connectionProvider})
             <img src={CONNECTION_LOGOS[connectionProvider]}
                  alt={`Logo for ${connectionProvider}`}/>
             <div className="item-drive-name">
-                <h2>Display Name:</h2>
                 <h2>{driveInformation.displayName}</h2>
             </div>
             <div className="item-drive-type">

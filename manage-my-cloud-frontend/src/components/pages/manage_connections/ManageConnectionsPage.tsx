@@ -31,7 +31,7 @@ const ManageConnectionsPage = () => {
         }
 
         if (code) {
-            buildAxiosRequestWithHeaders('GET', `/onedrive-store-tokens?code=${code}&email=${user?.email}`,headers ,{}).then(() => {
+            buildAxiosRequestWithHeaders('GET', `/onedrive-store-tokens?code=${code}&email=${user?.email}`, headers, {}).then(() => {
                 refreshUser(user?.email);
                 window.history.replaceState({}, document.title, newUrl);
             });
@@ -46,24 +46,26 @@ const ManageConnectionsPage = () => {
                     Manage Connections
                 </div>
 
-                <div className={linkAccountsClassname}>
-                    {user?.linkedAccounts.linkedAccountsCount === 0 ? (
-                        <>
-                            <div className={"manage-connections-page-link-text"}> To link an account press the button
-                                below
+                {user?.linkedAccounts.linkedAccountsCount === 0 ? (
+                    <>
+                        <div className={linkAccountsClassname}>
+                            <div className={"manage-connections-page-link-text"}>
+                                To link an account press the button below
                             </div>
-                            <AddConnectionsModal
-                                oneDrive={user?.linkedAccounts.oneDrive} googleDrive={user?.linkedAccounts.googleDrive}/> </>) : linkedAccountsArray.filter(({ value }) => value).map(({
-                                                                                                               key,
-                                                                                                               value
-                                                                                                           }) => (
-                        <Connection key={key} connectionProvider={key} isConnected={value}/>
-                    ))}
-                </div>
+                            <AddConnectionsModal oneDrive={user?.linkedAccounts.oneDrive}
+                                                 googleDrive={user?.linkedAccounts.googleDrive}/>
+                        </div>
+                    </>) : linkedAccountsArray.filter(({value}) => value).map(({
+                                                                                   key,
+                                                                                   value
+                                                                               }) => (
+                    <Connection key={key} connectionProvider={key} isConnected={value}/>
+                ))}
 
                 {user?.linkedAccounts.linkedAccountsCount !== undefined && user?.linkedAccounts.linkedAccountsCount >= 1 ? (
                     <div className={"manage-connections-page-link-button-container"}>
-                        <AddConnectionsModal oneDrive={user?.linkedAccounts.oneDrive} googleDrive={user?.linkedAccounts.googleDrive}/>
+                        <AddConnectionsModal oneDrive={user?.linkedAccounts.oneDrive}
+                                             googleDrive={user?.linkedAccounts.googleDrive}/>
                     </div>) : null}
             </div>
         </div>

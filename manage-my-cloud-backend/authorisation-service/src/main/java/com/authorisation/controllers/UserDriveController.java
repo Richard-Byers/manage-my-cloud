@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Date;
 
+import static com.authorisation.Constants.GOOGLEDRIVE;
+import static com.authorisation.Constants.ONEDRIVE;
 import static com.authorisation.util.EncryptionUtil.decrypt;
 
 @RestController
@@ -34,7 +36,7 @@ public class UserDriveController {
             throw new RuntimeException(String.format("Cloud platform not found %s", connectionProvider));
         }
 
-        if (connectionProvider.equals("OneDrive")) {
+        if (connectionProvider.equals(ONEDRIVE)) {
             String accessToken = decrypt(cloudPlatform.getAccessToken());
             Date accessTokenExpiryDate = cloudPlatform.getAccessTokenExpiryDate();
             try {
@@ -43,6 +45,9 @@ public class UserDriveController {
             } catch (Exception e) {
                 return ResponseEntity.badRequest().build();
             }
+        } else if (connectionProvider.equals(GOOGLEDRIVE)) {
+            DriveInformationReponse drive = new DriveInformationReponse("Google Drive", "placeholder", 0L, 0.0);
+            return ResponseEntity.ok(drive);
         }
 
         return ResponseEntity.badRequest().build();

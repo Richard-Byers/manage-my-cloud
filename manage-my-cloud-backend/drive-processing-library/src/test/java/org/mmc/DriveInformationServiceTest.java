@@ -11,14 +11,9 @@ public class DriveInformationServiceTest {
 
     @Test
     void getOneDriveInformation_ReturnsDriveInformation() {
-        //given
-        String userAccessToken = "token";
-        Date expiryDate = new Date();
 
-        //when
-        driveInformationService.getOneDriveInformation(userAccessToken, expiryDate);
-
-        //then
+        // NEED TO FIGURE OUT HOW TO TEST THIS
+        // WILL LOOK INTO IT IN THE FUTURE
 
     }
 

@@ -1,7 +1,7 @@
 package com.authorisation.services;
 
 import com.authorisation.response.OneDriveTokenResponse;
-import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -13,21 +13,27 @@ import java.util.Date;
 
 import static com.authorisation.Constants.*;
 
-@AllArgsConstructor
 @Service
 public class OneDriveService implements IOneDriveService {
 
-    @Value("${onedrive.clientId}")
-    private String clientId;
-
-    @Value("${onedrive.redirectUri}")
-    private String redirectUri;
-
-    @Value("${onedrive.clientSecret}")
-    private String clientSecret;
-
+    private final String clientId;
+    private final String redirectUri;
+    private final String clientSecret;
     private final CloudPlatformService cloudPlatformService;
     private final WebClient webClient;
+
+    @Autowired
+    public OneDriveService(@Value("${onedrive.clientId}") String clientId,
+                           @Value("${onedrive.redirectUri}") String redirectUri,
+                           @Value("${onedrive.clientSecret}") String clientSecret,
+                           CloudPlatformService cloudPlatformService,
+                           WebClient webClient) {
+        this.clientId = clientId;
+        this.redirectUri = redirectUri;
+        this.clientSecret = clientSecret;
+        this.cloudPlatformService = cloudPlatformService;
+        this.webClient = webClient;
+    }
 
     public OneDriveTokenResponse getAndStoreUserTokens(String authCode, String email) {
         try {
