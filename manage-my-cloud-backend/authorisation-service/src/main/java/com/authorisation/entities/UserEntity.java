@@ -25,7 +25,6 @@ public class UserEntity {
     private String password;
     private String role;
     private boolean isEnabled = false;
-    private String refreshToken;
     private String accountType;
     private String googleProfileImageUrl;
     @Embedded

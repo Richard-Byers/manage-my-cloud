@@ -22,7 +22,6 @@ public class VerificationTokenGivens {
                 true,
                 null,
                 null,
-                null,
                 new LinkedAccounts()
         ));
         return verificationToken;
@@ -40,7 +39,6 @@ public class VerificationTokenGivens {
                 "password",
                 "USER",
                 false,
-                null,
                 null,
                 null,
                 new LinkedAccounts()

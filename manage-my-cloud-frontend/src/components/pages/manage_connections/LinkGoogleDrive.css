@@ -1,0 +1,34 @@
+
+.link-googledrive-button {
+    display: flex;
+    align-items: center;
+    font-family: MontserratBold, serif;
+    font-size: 1rem;
+    color: white;
+    background-color: #08a6ee;
+    width: 100%;
+    border-radius: 2px;
+    border: none;
+    box-shadow: 0 10px 15px -3px rgba(0,0,0,0.4);
+}
+
+.link-googledrive-button p{
+    margin: 1rem;
+    align-self: center;
+}
+
+.link-googledrive-button:hover {
+    cursor: pointer;
+    scale: 1.01;
+    transition: 0.1s ease-in-out;
+}
+
+.link-googledrive-button img {
+    padding: 0.5rem;
+    margin: 0.2rem -0.2rem 0.2rem;
+    width: 3rem;
+    height: 3rem;
+    object-fit: contain;
+    background: white;
+    border-radius: 2px;
+}
