@@ -21,6 +21,7 @@ const ManageConnectionsPage = () => {
     useEffect(() => {
         const urlSearchParams = new URLSearchParams(window.location.search);
         const code = urlSearchParams.get('code');
+        refreshUser(user?.email);
         const newUrlSearchParams = new URLSearchParams(window.location.search);
         newUrlSearchParams.delete('code');
         const newUrl = `${window.location.pathname}${newUrlSearchParams.toString()}`;
@@ -52,7 +53,7 @@ const ManageConnectionsPage = () => {
                                 below
                             </div>
                             <AddConnectionsModal
-                                oneDrive={user?.linkedAccounts.oneDrive}/> </>) : linkedAccountsArray.map(({
+                                oneDrive={user?.linkedAccounts.oneDrive} googleDrive={user?.linkedAccounts.googleDrive}/> </>) : linkedAccountsArray.filter(({ value }) => value).map(({
                                                                                                                key,
                                                                                                                value
                                                                                                            }) => (
@@ -62,7 +63,7 @@ const ManageConnectionsPage = () => {
 
                 {user?.linkedAccounts.linkedAccountsCount !== undefined && user?.linkedAccounts.linkedAccountsCount >= 1 ? (
                     <div className={"manage-connections-page-link-button-container"}>
-                        <AddConnectionsModal oneDrive={user?.linkedAccounts.oneDrive}/>
+                        <AddConnectionsModal oneDrive={user?.linkedAccounts.oneDrive} googleDrive={user?.linkedAccounts.googleDrive}/>
                     </div>) : null}
             </div>
         </div>

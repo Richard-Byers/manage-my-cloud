@@ -9,6 +9,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import static com.authorisation.Constants.GOOGLEDRIVE;
 import java.util.Date;
 
 import static com.authorisation.Constants.ONEDRIVE;
@@ -25,15 +26,19 @@ public class CloudPlatformService implements ICloudPlatformService {
         UserEntity userEntity = userEntityRepository.findByEmail(userEmail).orElseThrow(() -> new RuntimeException("User not found"));
         LinkedAccounts linkedAccounts = userEntity.getLinkedAccounts();
 
-        if (ONEDRIVE.equals(platformName)) {
+        if (ONEDRIVE.equals(platformName) || GOOGLEDRIVE.equals(platformName)) {
             if (linkedAccounts == null) {
                 linkedAccounts = new LinkedAccounts();
                 userEntity.setLinkedAccounts(linkedAccounts);
             }
-            linkedAccounts.setOneDrive(true);
-            linkedAccounts.setLinkedAccountsCount(linkedAccounts.getLinkedAccountsCount() + 1);
+            if (ONEDRIVE.equals(platformName)) {
+                linkedAccounts.setOneDrive(true);
+                linkedAccounts.setLinkedAccountsCount(linkedAccounts.getLinkedAccountsCount() + 1);
+            } else {
+                linkedAccounts.setGoogleDrive(true);
+                linkedAccounts.setLinkedAccountsCount(linkedAccounts.getLinkedAccountsCount() + 1);
+            }
         }
-
         userEntityRepository.save(userEntity);
 
         String encryptedAccessToken = encrypt(accessToken);
@@ -61,6 +66,15 @@ public class CloudPlatformService implements ICloudPlatformService {
             }
             linkedAccounts.setOneDrive(false);
             linkedAccounts.setLinkedAccountsCount(linkedAccounts.getLinkedAccountsCount() - 1);
+        } else if (GOOGLEDRIVE.equals(platformName)) {
+            if (linkedAccounts == null) {
+                linkedAccounts = new LinkedAccounts();
+                userEntity.setLinkedAccounts(linkedAccounts);
+            }
+            linkedAccounts.setGoogleDrive(false);
+            linkedAccounts.setLinkedAccountsCount(linkedAccounts.getLinkedAccountsCount() - 1);
+        } else {
+            throw new RuntimeException("Platform not supported");
         }
 
         userEntityRepository.save(userEntity);
