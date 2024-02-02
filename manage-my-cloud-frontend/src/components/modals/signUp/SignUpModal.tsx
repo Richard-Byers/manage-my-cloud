@@ -148,7 +148,9 @@ export const SignUpModal: React.FC<SignUpProps> = ({
                                 Confirmation Sent
                             </div>
                             <div className={"modal-confirmation-email"}>
-                                {confirmationEmailMessage.confirmationMessage}
+                                <div>Confirmation email has been sent to:</div>
+                                <div>{confirmationEmailMessage.confirmationMessage}</div>
+                                <div>Please check your inbox</div>
                             </div>
                         </div>
                     ) : null}

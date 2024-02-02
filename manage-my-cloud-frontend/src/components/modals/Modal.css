@@ -129,10 +129,21 @@
 
 .modal-confirmation-email {
     display: flex;
+    align-self: flex-end;
+    justify-content: space-between;
     flex-direction: column;
-    margin: 0 0 0 10px;
-    border-radius: 8px;
+    margin: auto;
     text-align: center;
+    padding-left: 10px;
+}
+
+.modal-confirmation-email div{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: MontserratRegular, serif;
+    font-size: 1.4rem;
+    margin-bottom: 25px;
 }
 
 .modal-title {

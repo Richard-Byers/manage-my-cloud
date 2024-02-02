@@ -5,10 +5,17 @@ import './DashboardPage.css';
 import {useNavigate} from "react-router-dom";
 import {ROUTES} from "../../../constants/RouteConstants";
 import DashboardPageButtons from "./DashboardPageButtons";
+import {AuthData} from "../../routing/AuthWrapper";
 
 const DashboardPage = () => {
 
     const navigate = useNavigate();
+    const {user} = AuthData();
+
+    const linkedAccountsArray = Object.entries(user?.linkedAccounts || {})
+        .filter(([key]) => key !== 'linkedAccountsCount')
+        .filter(([key, value]) => value)
+        .map(([key, value]) => ({key, value}));
 
     function navigateToManageConnections() {
         navigate(ROUTES.MANAGE_CONNECTIONS);
@@ -22,7 +29,13 @@ const DashboardPage = () => {
                     Dashboard
                 </div>
                 <div className={"connected-drives-container"}>
-                    <ConnectedDrivesCard/>
+                    {
+                        linkedAccountsArray.map(({
+                                                     key,
+                                                     value
+                                                 }) => (
+                            <ConnectedDrivesCard key={key} connectionProvider={key}/>
+                        ))}
                 </div>
                 <div className={"dashboard-page-buttons-container"}>
                     <DashboardPageButtons/>
