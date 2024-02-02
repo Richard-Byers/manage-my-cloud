@@ -1,5 +1,6 @@
 package com.authorisation.givens;
 
+import com.authorisation.entities.LinkedAccounts;
 import com.authorisation.entities.UserEntity;
 import com.authorisation.entities.VerificationToken;
 
@@ -18,7 +19,10 @@ public class VerificationTokenGivens {
                 "johndoe@gmail.com",
                 "password",
                 "USER",
-                true
+                true,
+                null,
+                null,
+                new LinkedAccounts()
         ));
         return verificationToken;
     }
@@ -34,7 +38,10 @@ public class VerificationTokenGivens {
                 "johndoe@gmail.com",
                 "password",
                 "USER",
-                false
+                false,
+                null,
+                null,
+                new LinkedAccounts()
         ));
         return verificationToken;
     }

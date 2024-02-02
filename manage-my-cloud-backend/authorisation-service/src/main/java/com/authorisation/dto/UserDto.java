@@ -1,5 +1,6 @@
 package com.authorisation.dto;
 
+import com.authorisation.entities.LinkedAccounts;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,5 +17,8 @@ public class UserDto {
     private String lastName;
     private String email;
     private String token;
+    private String accountType;
+    private String googleProfileImageUrl;
+    private LinkedAccounts linkedAccounts;
 
 }

@@ -1,0 +1,73 @@
+.remove-connections-unlink-button{
+    font-family: MontserratRegular, serif;
+    font-size: 1.2rem;
+    padding: 0.5em 1em;
+    background-color: #b50000;
+    width: 100%;
+    color: #ffffff;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    border-bottom-right-radius: 10px;
+    border-bottom-left-radius: 10px;
+}
+
+.remove-connections-unlink-button:hover {
+    background-color: #da0000;
+}
+
+.remove-connections-modal {
+    display: grid;
+    grid-template-columns: 48% 48%;
+    grid-template-rows: auto auto;
+    grid-gap: 1em;
+    color: black;
+    background: white;
+    padding: 18px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    font-family: MontserratBold, serif;
+    font-size: 1.2rem;
+    animation: fadeInPopUp 0.3s ease-in-out;
+}
+
+.remove-connections-modal button {
+    font-family: MontserratBold, serif;
+    font-size: 1.2rem;
+    padding: 0.5em 1em;
+}
+
+.remove-connections-modal p {
+    grid-column: 1 / -1;
+    grid-row: 1;
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.yes-button {
+    background-color: #e60000;
+    color: #ffffff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+}
+
+.yes-button:hover {
+    background-color: #ff3333;
+}
+
+.no-button {
+    background-color: #22c75b;
+    color: #000000;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+}
+
+.no-button:hover {
+    background-color: #29d754;
+}

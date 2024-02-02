@@ -5,6 +5,7 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 
 import javax.sql.DataSource;
 
@@ -12,6 +13,7 @@ import javax.sql.DataSource;
 public class DataSourceConfig {
 
     @Bean
+    @Profile("!dev")
     public static DataSource createConnectionPool() {
         // The configuration object specifies behaviors for the connection pool.
         HikariConfig config = new HikariConfig();
@@ -34,3 +36,4 @@ public class DataSourceConfig {
     }
 
 }
+
