@@ -31,17 +31,12 @@ const DashboardPage = () => {
                 </div>
                 <div className={"connect-drives-container"}>
                     <div className="text-under-line">
-                        <p>
-                        {t('main.dashboard.manageConnectionsText', { 
-                            manageConnectionsLink: (
-                            <button className={'manage-connections-hyperlink'}
-                                    onClick={navigateToManageConnections}>Manage
-                                Connections
-                            </button>
-                            ),
-                        })}
+                    <p>
+                        {t('main.dashboard.manageConnectionsTextBeforeLink')}
+                        <button className={'manage-connections-hyperlink'} onClick={navigateToManageConnections}>
+                            {t('main.dashboard.manageConnectionsLink')}
+                        </button>
                         </p>
-
                     </div>
                 </div>
             </div>

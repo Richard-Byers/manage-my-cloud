@@ -3,7 +3,8 @@
       "header": "Manage My Cloud",
       "dashboard": {
         "title": "Dashboard",
-        "manageConnectionsText": "If you would like to add or remove drives, please head to {{manageConnectionsLink}}"
+        "manageConnectionsTextBeforeLink": "If you would like to add or remove drives, please head to ",
+        "manageConnectionsLink": "Manage Connections"        
       },
       "landingPage": {
         "mainText": "Optimise your cloud storage",
@@ -12,27 +13,27 @@
       }, 
       "manageConnectionsPage": {
         "mainText": "Manage Connections"
-    },
-    "profile": {
-      "title": "Profile"
-    },
-    "userProfileCard": {
-      "firstName": "First Name",
-      "lastName": "Last Name",
-      "emailAddress": "Email Address",
-      "password": "Password",
-      "updateProfileDetails": "Update Profile Details",
-      "logout": "Log Out"
-    },
-    "profileActionsCard": {
-      "accountActions": "Account Actions",
-      "deleteAccount": "Delete Account",
-      "requestData": "Request Data",
-      "viewTermsOfService": "View Terms of Service",
-      "downloadTermsOfService": "Download Terms of Service"
-    },
-    "profilePreferencesCard": {
-      "preferences": "Preferences"
-    }
+      },
+      "profile": {
+        "title": "Profile"
+      },
+      "userProfileCard": {
+        "firstName": "First Name",
+        "lastName": "Last Name",
+        "emailAddress": "Email Address",
+        "password": "Password",
+        "updateProfileDetails": "Update Profile Details",
+        "logout": "Log Out"
+      },
+      "profileActionsCard": {
+        "accountActions": "Account Actions",
+        "deleteAccount": "Delete Account",
+        "requestData": "Request Data",
+        "viewTermsOfService": "View Terms of Service",
+        "downloadTermsOfService": "Download Terms of Service"
+      },
+      "profilePreferencesCard": {
+        "preferences": "Preferences"
+      }
   }
 }
