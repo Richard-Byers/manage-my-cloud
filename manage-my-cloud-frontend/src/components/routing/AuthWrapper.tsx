@@ -17,6 +17,7 @@ interface User {
     linkedAccounts: {
         linkedAccountsCount: number;
         oneDrive: boolean;
+        googleDrive: boolean;
     }
 }
 

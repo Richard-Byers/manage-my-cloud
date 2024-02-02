@@ -14,4 +14,5 @@ import lombok.Setter;
 public class LinkedAccounts {
     private int linkedAccountsCount = 0;
     private boolean oneDrive;
+    private boolean googleDrive;
 }
