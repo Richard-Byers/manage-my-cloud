@@ -21,19 +21,13 @@
     display: flex;
     justify-content: center;
     text-align: center;
-    color: #FFF;
+    color: #fff;
     font-family: MontserratBold, serif;
     font-size: 4.25rem;
     font-style: normal;
     font-weight: 700;
     line-height: normal;
     text-transform: uppercase;
-    text-shadow:
-            -1px -1px 0 #09929d,
-            1px -1px 0 #09929d,
-            -1px  1px 0 #09929d,
-            1px  1px 0 #09929d;
-
 }
 
 .landing-page-sub-text {
@@ -43,7 +37,7 @@
 .landing-page-sub-text-description {
     display: flex;
     justify-content: center;
-    color: #FFF;
+    color: #fff;
     font-family: MontserratRegular, serif;
     font-size: 1.375rem;
     font-style: normal;
@@ -51,11 +45,6 @@
     line-height: normal;
     text-align: center;
     padding: 30px 30px;
-    text-shadow:
-            -1px -1px 0 #09929d,
-            1px -1px 0 #09929d,
-            -1px  1px 0 #09929d,
-            1px  1px 0 #09929d;
 }
 
 .landing-page-login-button-div {
@@ -67,6 +56,7 @@
 
 /* For tablet screens */
 @media only screen and (max-width: 768px) {
+
     .landing-page-main-text,
     .landing-page-sub-text {
         font-size: 3rem;
@@ -80,6 +70,7 @@
 
 /* For mobile screens */
 @media only screen and (max-width: 480px) {
+
     .landing-page-main-text,
     .landing-page-sub-text {
         font-size: 2rem;
@@ -89,4 +80,11 @@
         width: 150px;
         height: 150px;
     }
+}
+
+.landing-page-main-text,
+.landing-page-sub-text,
+.landing-page-sub-text-description {
+    text-shadow: -1px -1px 0 #09929d, 1px -1px 0 #09929d, -1px 1px 0 #09929d,
+        1px 1px 0 #09929d;
 }
