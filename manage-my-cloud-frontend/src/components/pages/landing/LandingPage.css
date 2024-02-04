@@ -1,4 +1,4 @@
-
+/* Default styling for all screen sizes. */
 .landing-page-main {
     background: url("../../images/landing/LandingPageBackground.jpg") lightgray 50% / cover no-repeat;
     display: flex;
@@ -16,7 +16,8 @@
     justify-content: center;
 }
 
-.landing-page-main-text {
+.landing-page-main-text,
+.landing-page-sub-text {
     display: flex;
     justify-content: center;
     text-align: center;
@@ -36,21 +37,7 @@
 }
 
 .landing-page-sub-text {
-    display: flex;
-    justify-content: center;
-    color: #FFF;
-    text-align: center;
-    font-family: MontserratBold, serif;
-    font-size: 4.25rem;
-    font-style: normal;
-    font-weight: 700;
-    line-height: normal;
-    text-transform: lowercase;
-    text-shadow:
-            -1px -1px 0 #09929d,
-            1px -1px 0 #09929d,
-            -1px  1px 0 #09929d,
-            1px  1px 0 #09929d;
+    font-size: 3rem;
 }
 
 .landing-page-sub-text-description {
@@ -78,5 +65,28 @@
     margin: 5px 5px;
 }
 
+/* For tablet screens */
+@media only screen and (max-width: 768px) {
+    .landing-page-main-text,
+    .landing-page-sub-text {
+        font-size: 3rem;
+    }
 
+    .landing-page-logo {
+        width: 250px;
+        height: 250px;
+    }
+}
 
+/* For mobile screens */
+@media only screen and (max-width: 480px) {
+    .landing-page-main-text,
+    .landing-page-sub-text {
+        font-size: 2rem;
+    }
+
+    .landing-page-logo {
+        width: 150px;
+        height: 150px;
+    }
+}
