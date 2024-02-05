@@ -5,7 +5,7 @@ import ProfileImgButton from "./profileImgButton";
 
 function UserProfileCard() {
     const { user, logout } = AuthData();
-
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
 
     return (
