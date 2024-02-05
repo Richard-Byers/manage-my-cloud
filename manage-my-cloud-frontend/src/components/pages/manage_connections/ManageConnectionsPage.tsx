@@ -1,13 +1,14 @@
 import Navbar from "../../nav/Navbar";
 import React, {useEffect} from "react";
 import './ManageConnectionsPage.css';
+import { useTranslation } from 'react-i18next';
 import {AuthData} from "../../routing/AuthWrapper";
 import AddConnectionsModal from "../../modals/managingConnections/AddConnectionsModal"
 import {buildAxiosRequestWithHeaders} from "../../helpers/AxiosHelper";
 import Connection from "./Connection";
 
 const ManageConnectionsPage = () => {
-
+    const { t } = useTranslation();
     const {user, refreshUser} = AuthData();
 
     const linkedAccountsArray = Object.entries(user?.linkedAccounts || {})
@@ -43,7 +44,7 @@ const ManageConnectionsPage = () => {
             <Navbar/>
             <div className={"manage-connections-page-content-grid"}>
                 <div className="manage-connections-page-title-container">
-                    Manage Connections
+                    {t('main.manageConnections.title')}
                 </div>
 
                 {user?.linkedAccounts.linkedAccountsCount === 0 ? (

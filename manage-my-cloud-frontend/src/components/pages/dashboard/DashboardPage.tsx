@@ -5,11 +5,13 @@ import './DashboardPage.css';
 import {useNavigate} from "react-router-dom";
 import {ROUTES} from "../../../constants/RouteConstants";
 import DashboardPageButtons from "./DashboardPageButtons";
+import { useTranslation } from "react-i18next";
 import {AuthData} from "../../routing/AuthWrapper";
 
 const DashboardPage = () => {
 
     const navigate = useNavigate();
+    const { t } = useTranslation();
     const {user} = AuthData();
 
     const linkedAccountsArray = Object.entries(user?.linkedAccounts || {})
@@ -26,7 +28,7 @@ const DashboardPage = () => {
             <Navbar/>
             <div className={"dashboard-page-content-grid"}>
                 <div className="dashboard-page-title-container">
-                    Dashboard
+                    {t('main.dashboard.title')}
                 </div>
 
                 {
@@ -44,13 +46,12 @@ const DashboardPage = () => {
                 </div>
                 <div className={"connect-drives-container"}>
                     <div className="text-under-line">
-                        <p>If you would like to add or remove drives please head to
-                            <button className={'manage-connections-hyperlink'}
-                                    onClick={navigateToManageConnections}>Manage
-                                Connections
-                            </button>
+                    <p>
+                        {t('main.dashboard.manageConnectionsTextBeforeLink')}
+                        <button className={'manage-connections-hyperlink'} onClick={navigateToManageConnections}>
+                            {t('main.dashboard.manageConnectionsLink')}
+                        </button>
                         </p>
-
                     </div>
                 </div>
             </div>
