@@ -14,6 +14,7 @@ interface User {
     email: string;
     token: string;
     accountType: string | null;
+    profileImage: Uint8Array | null;
     linkedAccounts: {
         linkedAccountsCount: number;
         oneDrive: boolean;
