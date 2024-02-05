@@ -13,7 +13,6 @@
 .user-profile-picture{
     height: fit-content;
     display: flex;
-
     justify-content: center;
     align-items: center;
     margin : 1% 0;
@@ -28,7 +27,6 @@
     display: flex;
     flex-direction: column;
     margin: 0 2%;
-    text-align: center; /* Add this line to center the text */
 }
 
 .user-profile-card-data-label{

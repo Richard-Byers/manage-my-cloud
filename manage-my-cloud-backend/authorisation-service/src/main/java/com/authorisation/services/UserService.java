@@ -15,15 +15,11 @@ import com.authorisation.registration.RegistrationRequest;
 import com.authorisation.registration.password.PasswordResetRequest;
 import com.authorisation.repositories.UserEntityRepository;
 import com.authorisation.repositories.VerificationTokenRepository;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.Calendar;
 import java.util.Optional;
 import java.util.UUID;
@@ -55,8 +51,7 @@ public class UserService implements IUserService {
         newUser.setPassword(passwordEncoder.encode(registrationRequest.password()));
         newUser.setRole(registrationRequest.role());
         newUser.setLinkedAccounts(new LinkedAccounts());
-        newUser.setEnabled(false);
-        newUser.setProfileImage(loadDefaultProfileImage());
+
         return userEntityRepository.save(newUser);
     }
 
@@ -79,7 +74,7 @@ public class UserService implements IUserService {
         newUser.setEnabled(true);
         newUser.setAccountType("GOOGLE");
         newUser.setLinkedAccounts(new LinkedAccounts());
-        newUser.setLinkedAccounts(new LinkedAccounts());
+
         return userEntityRepository.save(newUser);
     }
 
@@ -130,7 +125,6 @@ public class UserService implements IUserService {
     }
 
     @Override
-    @Transactional
     public String validateToken(String verificationToken) {
         VerificationToken token = verificationTokenRepository.findByToken(verificationToken);
 
@@ -193,24 +187,4 @@ public class UserService implements IUserService {
         userEntity.setPassword(passwordEncoder.encode(newPassword));
         userEntityRepository.save(userEntity);
     }
-    private byte[] loadDefaultProfileImage() {
-        // Load the default profile image from the classpath
-        try {
-            ClassPathResource imageResource = new ClassPathResource("DefaultProfileImage.jpg");
-            InputStream inputStream = imageResource.getInputStream();
-            return inputStream.readAllBytes();
-        } catch (IOException e) {
-            throw new RuntimeException("Error loading default profile image", e);
-        }
-    }
-
-    public void updateProfileImage(UserEntity user, byte[] newImage) {
-        user.setProfileImage(newImage);
-        userEntityRepository.save(user);
-    }
-
-
-
-
-
 }

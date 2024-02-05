@@ -7,14 +7,12 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.NaturalId;
 
-
 @Getter
 @Setter
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserEntity {
-
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,9 +29,5 @@ public class UserEntity {
     private String googleProfileImageUrl;
     @Embedded
     private LinkedAccounts linkedAccounts;
-    @Column(columnDefinition = "bytea")
-    private byte[] profileImage;
-
-
 
 }
