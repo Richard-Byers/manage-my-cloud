@@ -44,7 +44,7 @@ const ManageConnectionsPage = () => {
             <Navbar/>
             <div className={"manage-connections-page-content-grid"}>
                 <div className="manage-connections-page-title-container">
-                    {t('main.manageConnections.title')}
+                    {t('main.manageConnectionsPage.title')}
                 </div>
 
                 {user?.linkedAccounts.linkedAccountsCount === 0 ? (

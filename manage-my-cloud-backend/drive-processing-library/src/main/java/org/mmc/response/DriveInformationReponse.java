@@ -18,7 +18,7 @@ public class DriveInformationReponse {
     private String driveType;
 
     // This is the total storage available on the drive
-    private Long total;
+    private Double total;
 
     // This is the amount of storage used on the drive
     private Double used;

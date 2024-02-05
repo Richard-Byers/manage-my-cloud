@@ -3,7 +3,7 @@
       "header": "Manage My Cloud",
       "dashboard": {
         "title": "Dashboard",
-        "manageConnectionsTextBeforeLink": "If you would like to add or remove drives, please head to ",
+        "manageConnectionsTextBeforeLink": "To add or remove drives, please head to ",
         "manageConnectionsLink": "Manage Connections"        
       },
       "landingPage": {
@@ -12,7 +12,7 @@
         "subTextDescription": "We aim to de-clutter your cloud storage, \nsave you money, \nand reduce the cloud storage carbon footprint."
       }, 
       "manageConnectionsPage": {
-        "mainText": "Manage Connections"
+        "title": "Manage Connections"
       },
       "profile": {
         "title": "Profile"
