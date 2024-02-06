@@ -10,4 +10,5 @@ cache:
 build:
   stage: build
   script:
+    - cd manage-my-cloud-backend
     - mvn clean install
