@@ -1,19 +1,19 @@
 version: "3.1"
 
 services:
-  manage-my-cloud:
-    image: manage-my-cloud:latest
-    container_name: manage-my-cloud
-    ports:
-      - "8080:8080"
-    depends_on:
-      - postgres
-    environment:
-      - ONEDRIVE_CLIENT_ID=
-      - ONEDRIVE_CLIENT_SECRET=
-      - ONEDRIVE_REDIRECT_URI=
-      - MMC_EMAIL_PASSWORD=
-      - "SPRING_PROFILES_ACTIVE=dev"
+#  manage-my-cloud:
+#    image: manage-my-cloud:latest
+#    container_name: manage-my-cloud
+#    ports:
+#      - "8080:8080"
+#    depends_on:
+#      - postgres
+#    environment:
+#      - ONEDRIVE_CLIENT_ID=
+#      - ONEDRIVE_CLIENT_SECRET=
+#      - ONEDRIVE_REDIRECT_URI=
+#      - MMC_EMAIL_PASSWORD=
+#      - "SPRING_PROFILES_ACTIVE=dev"
   postgres:
     image: postgres:latest
     container_name: postgres

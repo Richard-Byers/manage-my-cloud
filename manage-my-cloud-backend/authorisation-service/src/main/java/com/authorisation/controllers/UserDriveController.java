@@ -4,6 +4,7 @@ import com.authorisation.entities.CloudPlatform;
 import com.authorisation.entities.UserEntity;
 import com.authorisation.services.CloudPlatformService;
 import com.authorisation.services.UserService;
+import com.fasterxml.jackson.databind.JsonNode;
 import lombok.RequiredArgsConstructor;
 import org.mmc.drive.DriveInformationService;
 import org.mmc.response.DriveInformationReponse;
@@ -48,6 +49,33 @@ public class UserDriveController {
         } else if (connectionProvider.equals(GOOGLEDRIVE)) {
             DriveInformationReponse drive = new DriveInformationReponse("Google Drive", "placeholder", 0.0, 0.0);
             return ResponseEntity.ok(drive);
+        }
+
+        return ResponseEntity.badRequest().build();
+    }
+
+    @GetMapping("/onedrive-items")
+    public ResponseEntity<JsonNode> getUserDriveFiles(@RequestParam("email") String email, @RequestParam("provider") String connectionProvider) {
+
+        UserEntity userEntity = userService.findUserByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
+        CloudPlatform cloudPlatform = cloudPlatformService.getUserCloudPlatform(userEntity.getEmail(), connectionProvider);
+
+        if (cloudPlatform == null) {
+            throw new RuntimeException(String.format("Cloud platform not found %s", connectionProvider));
+        }
+
+        if (connectionProvider.equals(ONEDRIVE)) {
+            String accessToken = decrypt(cloudPlatform.getAccessToken());
+            Date accessTokenExpiryDate = cloudPlatform.getAccessTokenExpiryDate();
+            try {
+                JsonNode folders = driveInformationService.listAllItemsInOneDrive(accessToken, accessTokenExpiryDate);
+                return ResponseEntity.ok(folders);
+            } catch (Exception e) {
+                return ResponseEntity.badRequest().build();
+            }
+        } else if (connectionProvider.equals(GOOGLEDRIVE)) {
+            DriveInformationReponse drive = new DriveInformationReponse("Google Drive", "placeholder", 0.0, 0.0);
+            //return ResponseEntity.ok("drive");
         }
 
         return ResponseEntity.badRequest().build();

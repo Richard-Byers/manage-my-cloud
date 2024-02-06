@@ -19,6 +19,7 @@
     justify-content: center;
     align-items: center;
     font-family: MontserratRegular, serif;
+    z-index: 1;
 }
 
 .modal-description {
