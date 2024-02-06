@@ -17,11 +17,12 @@ const ProfileImgButton: React.FC = () => {
         setIsModalOpen(false);
     };
 
+
     const profileImage = user?.profileImage ? `data:image/jpeg;base64,${user.profileImage}` : "manage-my-cloud-frontend/src/components/images/profile_picture.png";
+
     return (
         <>
-            <button className="profile-img-button" onClick={openModal}>
-                <img src={profileImage} alt="Profile" />
+            <button className="profile-img-button" onClick={openModal} style={{backgroundImage: `url(${profileImage})`}}>
             </button>
             {isModalOpen && <ChangeProfileImageModal setIsModalOpen={setIsModalOpen} />}
         </>
