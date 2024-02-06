@@ -1,29 +1,33 @@
-import React from "react";
+import React, {useState} from "react";
 import './UserProfileCard.css';
-import profileLogo from '../../../images/profile_picture.png';
 import {AuthData} from "../../../routing/AuthWrapper";
-import { useTranslation } from 'react-i18next';
+import ProfileImgButton from "./profileImgButton";
 
 function UserProfileCard() {
-    const {user, logout} = AuthData();
-    const { t } = useTranslation();
+    const { user, logout } = AuthData();
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
 
     return (
         <div className={"user-profile-card-content"}>
-            <div className={'user-profile-picture'}>
-                <img className={'profile-picture'} src={profileLogo} alt={'profile logo'}/>
+            <div className='user-profile-card-header'>
+
             </div>
+            <div className={'profile-card-buttons'}>
+                <ProfileImgButton />
+            </div>
+
             <div className='user-info'>
-                <div className='user-profile-card-data-label'>{t('main.userProfileCard.firstName')}:{user?.firstName}</div>
-                <div className='user-profile-card-data-label'>{t('main.userProfileCard.lastName')}:</div>
-                <div className='user-profile-card-data-label'>{t('main.userProfileCard.emailAddress')}:{user?.email}</div>
+                <div className='user-profile-card-data-label'>First Name: {user?.firstName}</div>
+                <div className='user-profile-card-data-label'>Last Name: {user?.lastName}</div>
+                <div className='user-profile-card-data-label'>Email Address: {user?.email}</div>
                 <div className='user-profile-card-data-label'>
-                {t('main.userProfileCard.password')}: ********
+                    Password: ********
                 </div>
             </div>
             <div className={'profile-card-buttons'}>
-                <button className='save-changes-btn'>{t('main.userProfileCard.updateProfileDetails')}</button>
-                <button className='logout-btn' onClick={logout}>{t('main.userProfileCard.logout')}</button>
+                <button className='save-changes-btn'>Update Profile Details</button>
+                <button className='logout-btn' onClick={logout}>Log Out</button>
             </div>
         </div>
     );

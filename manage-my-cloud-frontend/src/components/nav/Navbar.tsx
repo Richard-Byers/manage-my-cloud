@@ -1,15 +1,13 @@
 import React from 'react';
-import {Link} from 'react-router-dom';
+import {Link, useNavigate} from 'react-router-dom';
 import './Navbar.css';
 import logo from '../images/managemycloudlogo.png';
-import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import {ROUTES} from "../../constants/RouteConstants";
 import {Popover} from "@mui/material";
 import {AuthData} from "../routing/AuthWrapper";
-import {useNavigate} from "react-router-dom";
 
 const Navbar: React.FC = () => {
-    const {logout} = AuthData();
+    const {user, logout} = AuthData();
     const navigate = useNavigate();
     const [showProfilePopover, setShowProfilePopover] = React.useState(false);
 
@@ -20,6 +18,9 @@ const Navbar: React.FC = () => {
     function navigateToProfile() {
         navigate(ROUTES.PROFILE);
     }
+
+    // Convert Uint8Array to base64 string
+    const profileImage = user?.profileImage ? `data:image/jpeg;base64,${user.profileImage}` : logo;
 
     return (
         <nav className="navbar">
@@ -46,8 +47,7 @@ const Navbar: React.FC = () => {
                 </li>
             </ul>
             <button className={"profile-button"} onClick={toggleProfilePopover}>
-                <AccountCircleIcon
-                    sx={{fontSize: 50, color: 'white'}}/>
+                <img src={profileImage} alt="Profile" style={{borderRadius: '50%', width: '50px', height: '50px'}}/>
                 {showProfilePopover && (<Popover
                     anchorOrigin={{
                         vertical: 77,
