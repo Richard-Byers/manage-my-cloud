@@ -17,8 +17,8 @@
 }
 
 .connected-drives-container {
-    grid-row: 2 / 2;
-    grid-column: span 4;
+    grid-row: 2 / span 1;
+    grid-column: span 1;
 }
 
 .dashboard-page-buttons-container {

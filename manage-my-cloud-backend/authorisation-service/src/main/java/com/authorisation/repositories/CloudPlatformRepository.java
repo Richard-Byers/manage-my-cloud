@@ -7,4 +7,6 @@ public interface CloudPlatformRepository extends JpaRepository<CloudPlatform, Lo
 
     void deleteByUserEntityEmailAndPlatformName(String email, String platformName);
 
+    CloudPlatform findByUserEntityEmailAndPlatformName(String email, String platformName);
+
 }

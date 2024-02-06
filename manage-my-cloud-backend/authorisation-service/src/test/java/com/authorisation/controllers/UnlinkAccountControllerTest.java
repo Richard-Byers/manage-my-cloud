@@ -1,5 +1,7 @@
 package com.authorisation.controllers;
 
+
+import com.authorisation.services.GoogleAuthService;
 import com.authorisation.services.OneDriveService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,6 +33,9 @@ class UnlinkAccountControllerTest {
 
     @MockBean
     private OneDriveService oneDriveService;
+
+    @MockBean
+    private GoogleAuthService googleAuthService;
 
     @BeforeEach
     public void setup() {

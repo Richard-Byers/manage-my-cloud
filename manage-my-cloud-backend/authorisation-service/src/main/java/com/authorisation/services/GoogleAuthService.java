@@ -1,9 +1,12 @@
 package com.authorisation.services;
 
+import com.authorisation.Constants;
 import com.authorisation.config.UserAuthenticationProvider;
 import com.authorisation.dto.UserDto;
-import com.authorisation.Constants;
-import com.google.api.client.googleapis.auth.oauth2.*;
+import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeTokenRequest;
+import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
+import com.google.api.client.googleapis.auth.oauth2.GoogleTokenResponse;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import lombok.AllArgsConstructor;
@@ -96,7 +99,7 @@ public class GoogleAuthService {
                 email,
                 GOOGLEDRIVE,
                 tokenResponse.getAccessToken(),
-                tokenResponse.getRefreshToken());
+                tokenResponse.getRefreshToken(), null);
     }
 
     public void unlinkGoogleDrive(String email) {
