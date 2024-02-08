@@ -1,14 +1,14 @@
 import Navbar from "../../nav/Navbar";
 import React, {useEffect} from "react";
 import './ManageConnectionsPage.css';
-import { useTranslation } from 'react-i18next';
+import {useTranslation} from 'react-i18next';
 import {AuthData} from "../../routing/AuthWrapper";
 import AddConnectionsModal from "../../modals/managingConnections/AddConnectionsModal"
 import {buildAxiosRequestWithHeaders} from "../../helpers/AxiosHelper";
 import Connection from "./Connection";
 
 const ManageConnectionsPage = () => {
-    const { t } = useTranslation();
+    const {t} = useTranslation();
     const {user, refreshUser} = AuthData();
 
     const linkedAccountsArray = Object.entries(user?.linkedAccounts || {})

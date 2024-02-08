@@ -47,14 +47,14 @@ public class UserDriveController {
                 return ResponseEntity.badRequest().build();
             }
         } else if (connectionProvider.equals(GOOGLEDRIVE)) {
-            DriveInformationReponse drive = new DriveInformationReponse("Google Drive", "placeholder", 0.0, 0.0);
+            DriveInformationReponse drive = new DriveInformationReponse("Google Drive", "email" ,"placeholder", 0.0, 0.0);
             return ResponseEntity.ok(drive);
         }
 
         return ResponseEntity.badRequest().build();
     }
 
-    @GetMapping("/onedrive-items")
+    @GetMapping("/drive-items")
     public ResponseEntity<JsonNode> getUserDriveFiles(@RequestParam("email") String email, @RequestParam("provider") String connectionProvider) {
 
         UserEntity userEntity = userService.findUserByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
@@ -73,9 +73,6 @@ public class UserDriveController {
             } catch (Exception e) {
                 return ResponseEntity.badRequest().build();
             }
-        } else if (connectionProvider.equals(GOOGLEDRIVE)) {
-            DriveInformationReponse drive = new DriveInformationReponse("Google Drive", "placeholder", 0.0, 0.0);
-            //return ResponseEntity.ok("drive");
         }
 
         return ResponseEntity.badRequest().build();

@@ -4,7 +4,6 @@ import ConnectedDrivesCard from "./cards/ConnectedDrivesCard";
 import './DashboardPage.css';
 import {useNavigate} from "react-router-dom";
 import {ROUTES} from "../../../constants/RouteConstants";
-import DashboardPageButtons from "./DashboardPageButtons";
 import {useTranslation} from "react-i18next";
 import {AuthData} from "../../routing/AuthWrapper";
 
@@ -40,10 +39,6 @@ const DashboardPage = () => {
                                                                                            connectionProvider={key}/>
                         </div>
                     ))}
-
-                <div className={"dashboard-page-buttons-container"}>
-                    <DashboardPageButtons/>
-                </div>
                 <div className={"connect-drives-container"}>
                     <div className="text-under-line">
                         <p>

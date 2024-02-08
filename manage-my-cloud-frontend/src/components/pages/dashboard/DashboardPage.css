@@ -21,11 +21,6 @@
     grid-column: span 1;
 }
 
-.dashboard-page-buttons-container {
-    grid-row: 3 / 3;
-    grid-column: span 4;
-}
-
 .connect-drives-container {
     border-top: 3px solid white;
     text-align: center;
