@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import Spinner from 'react-spinner-material';
 import {buildAxiosRequestWithHeaders} from "../../helpers/AxiosHelper";
 import {AuthData} from "../../routing/AuthWrapper";
+import "../Modal.css";
 
 interface ChangeProfileImageModalProps {
     setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -80,17 +81,16 @@ const ChangeProfileImageModal: React.FC<ChangeProfileImageModalProps> = ({ setIs
     return (
         <>
             <div className="modal-overlay" onClick={closeModal}>
-                <div className="ProfileModal" onClick={stopPropagation}>
-                    <div className={"profile-modal-description"}>
-                        {isLoading ? t('main.changeProfileImage.uploading') :
-                            <span
-                                className={message === t('main.changeProfileImage.success') ? "success-message" : "error-message"}>
+                <div className="modal" onClick={stopPropagation}>
+                    <form className={"profile-modal-form"} onSubmit={handleImageUpload}>
+                        <div className={"profile-modal-description"}>
+                            {isLoading ? t('main.changeProfileImage.uploading') :
+                                <span
+                                    className={message === t('main.changeProfileImage.success') ? "success-message" : "error-message"}>
                             {message}
                         </span>
-                        }
-                    </div>
-
-                    <form className={"profile-modal-form"} onSubmit={handleImageUpload}>
+                            }
+                        </div>
                         <label className={"profile-modal-form-label"}>
                             <input className={"profile-modal-form-input"}
                                    type="file"
