@@ -67,12 +67,11 @@ class UserControllerTest {
     @Test
     void updateProfileImg_UpdateProfileImageThrowsIOException_ReturnsInternalServerError() throws Exception {
         given(userService.findUserByEmail(testUser.getEmail())).willReturn(Optional.of(testUser));
-        willThrow(new IOException("Error updating profile image")).given(userService).updateProfileImage(testUser, testImage.getBytes());
+        willThrow(new RuntimeException("Error updating profile image")).given(userService).updateProfileImage(testUser, testImage.getBytes());
 
         mockMvc.perform(multipart(UPDATE_PROFILE_IMG_URL)
                         .file(testImage)
                         .param("email", testUser.getEmail()))
                 .andExpect(status().isInternalServerError());
     }
-
 }
