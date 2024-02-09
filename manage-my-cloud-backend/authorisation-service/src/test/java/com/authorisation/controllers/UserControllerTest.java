@@ -72,6 +72,6 @@ class UserControllerTest {
         mockMvc.perform(multipart(UPDATE_PROFILE_IMG_URL)
                         .file(testImage)
                         .param("email", testUser.getEmail()))
-                .andExpect(status().isInternalServerError());
+                .andExpect(status().isNotFound());
     }
 }
