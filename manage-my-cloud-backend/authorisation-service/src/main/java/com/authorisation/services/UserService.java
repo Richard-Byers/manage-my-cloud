@@ -55,7 +55,7 @@ public class UserService implements IUserService {
         newUser.setPassword(passwordEncoder.encode(registrationRequest.password()));
         newUser.setRole(registrationRequest.role());
         newUser.setLinkedAccounts(new LinkedAccounts());
-        newUser.setEnabled(false);
+
         newUser.setProfileImage(loadDefaultProfileImage());
         return userEntityRepository.save(newUser);
     }
@@ -130,7 +130,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    @Transactional
+    @Transactional // to avoid LazyInitializationException, If an error occurs during the execution of this method, all database operations within the transaction will be rolled back.
     public String validateToken(String verificationToken) {
         VerificationToken token = verificationTokenRepository.findByToken(verificationToken);
 
@@ -153,7 +153,6 @@ public class UserService implements IUserService {
         verificationTokenRepository.delete(token);
         return "valid";
     }
-
 
     @Override
     public VerificationToken generateNewVerificationToken(String oldToken) {
@@ -208,9 +207,4 @@ public class UserService implements IUserService {
         user.setProfileImage(newImage);
         userEntityRepository.save(user);
     }
-
-
-
-
-
 }

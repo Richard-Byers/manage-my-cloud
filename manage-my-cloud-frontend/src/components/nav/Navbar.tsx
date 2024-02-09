@@ -19,8 +19,8 @@ const Navbar: React.FC = () => {
         navigate(ROUTES.PROFILE);
     }
 
-    // Convert Uint8Array to base64 string
-    const profileImage = user?.profileImage ? `data:image/jpeg;base64,${user.profileImage}` : logo;
+    // Retrieve profile image URL from local storage
+    const profileImage = localStorage.getItem('profileImage') || logo;
 
     return (
         <nav className="navbar">
@@ -47,7 +47,9 @@ const Navbar: React.FC = () => {
                 </li>
             </ul>
             <button className={"profile-button"} onClick={toggleProfilePopover}>
-                <img src={profileImage} alt="Profile" style={{borderRadius: '50%', width: '50px', height: '50px'}}/>
+                <img src={profileImage} alt="Profile" className="popover-style"/>
+
+                {/*these properties are specific to Material-UI's Popover component and cannot be directly translated to CSS.*/}
                 {showProfilePopover && (<Popover
                     anchorOrigin={{
                         vertical: 77,
@@ -57,6 +59,7 @@ const Navbar: React.FC = () => {
                         vertical: 'top',
                         horizontal: 'left',
                     }}
+
                     open>
                     <div className={'popover-container'}>
                         <button className={'popover-button'} onClick={navigateToProfile}>

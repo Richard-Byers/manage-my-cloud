@@ -1,23 +1,20 @@
 import React, {useState} from "react";
 import "./changeProfileImageModal.css";
-
+import { useTranslation } from 'react-i18next';
 import Spinner from 'react-spinner-material';
 import {buildAxiosRequestWithHeaders} from "../../helpers/AxiosHelper";
 import {AuthData} from "../../routing/AuthWrapper";
-
 
 interface ChangeProfileImageModalProps {
     setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-
-
 const ChangeProfileImageModal: React.FC<ChangeProfileImageModalProps> = ({ setIsModalOpen }) => {
     const [imageInput, setImageInput] = useState<{ image: File | null }>({
         image: null,
 
-
     });
+
     const [isLoading, setIsLoading] = useState(false);
 
     const {user, refreshUser} = AuthData();
@@ -31,19 +28,18 @@ const ChangeProfileImageModal: React.FC<ChangeProfileImageModalProps> = ({ setIs
     const headers = {
         Authorization: `Bearer ${user?.token}`
     }
-
+    const { t } = useTranslation();
     const handleImageUpload = (e: React.FormEvent) => {
         e.preventDefault();
-
         const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB
 
         if (!imageInput.image) {
-            setMessage("No image selected. Please select an image to upload.");
+            setMessage(t('main.changeProfileImage.noImageSelected'));
             return;
         }
 
         if (imageInput.image.size > MAX_FILE_SIZE) {
-            setMessage("File size exceeds the 2MB limit. Please select a smaller file.");
+            setMessage(t('main.changeProfileImage.fileSizeError'));
             return;
         }
 
@@ -53,10 +49,10 @@ const ChangeProfileImageModal: React.FC<ChangeProfileImageModalProps> = ({ setIs
         formData.append('image', imageInput.image as Blob);
         formData.append('email', user?.email as string);
 
-        buildAxiosRequestWithHeadersForImageUpload('POST', '/updateProfileImg', headers, formData)
+        buildAxiosRequestWithHeadersForImageUpload('POST', '/update-profile-Img', headers, formData)
             .then(() => {
                 setIsLoading(false); // Stop the loading animation
-                setMessage("Update successful"); // Set the success message
+                setMessage(t('main.changeProfileImage.success'));
             })
             .catch(error => {
                 console.error('Error:', error);
@@ -72,7 +68,6 @@ const ChangeProfileImageModal: React.FC<ChangeProfileImageModalProps> = ({ setIs
         return buildAxiosRequestWithHeaders(method, url, headers, data);
     };
 
-
     const stopPropagation = (e: React.MouseEvent<HTMLDivElement>) => {
         e.stopPropagation();
     };
@@ -87,8 +82,9 @@ const ChangeProfileImageModal: React.FC<ChangeProfileImageModalProps> = ({ setIs
             <div className="modal-overlay" onClick={closeModal}>
                 <div className="ProfileModal" onClick={stopPropagation}>
                     <div className={"profile-modal-description"}>
-                        {isLoading ? "Upload a new profile image" :
-                            <span className={message === "Update successful" ? "success-message" : "error-message"}>
+                        {isLoading ? t('main.changeProfileImage.uploading') :
+                            <span
+                                className={message === t('main.changeProfileImage.success') ? "success-message" : "error-message"}>
                             {message}
                         </span>
                         }
@@ -102,7 +98,7 @@ const ChangeProfileImageModal: React.FC<ChangeProfileImageModalProps> = ({ setIs
                                    onChange={handleImageChange}/>
                         </label>
                         <button className={"profile-modal-form-submit-button"} type="submit">
-                            Upload Image
+                            {t('main.changeProfileImage.uploadImage')}
                         </button>
                     </form>
                     {isLoading && <Spinner />} {/* Render the spinner when loading */}
@@ -111,6 +107,4 @@ const ChangeProfileImageModal: React.FC<ChangeProfileImageModalProps> = ({ setIs
         </>
     );
 }
-
-
 export default ChangeProfileImageModal;

@@ -16,7 +16,7 @@ public class DevDataSourceConfig {
     @Bean
     public DataSource createDevConnectionPool() {
         HikariConfig config = new HikariConfig();
-        config.setJdbcUrl(String.format("jdbc:postgresql://postgres/%s", "postgres"));
+        config.setJdbcUrl(String.format("jdbc:postgresql://localhost/%s", "postgres"));
         config.setUsername("postgres");
         config.setPassword("postgres");
 

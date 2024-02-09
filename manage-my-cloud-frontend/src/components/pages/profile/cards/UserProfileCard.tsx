@@ -1,7 +1,7 @@
 import React, {useState} from "react";
 import './UserProfileCard.css';
 import {AuthData} from "../../../routing/AuthWrapper";
-import ProfileImgButton from "./profileImgButton";
+import ProfileImgButton from './ProfileImgButton';
 
 function UserProfileCard() {
     const { user, logout } = AuthData();

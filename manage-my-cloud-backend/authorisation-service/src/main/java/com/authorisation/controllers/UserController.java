@@ -2,6 +2,7 @@ package com.authorisation.controllers;
 
 import com.authorisation.entities.UserEntity;
 import com.authorisation.services.UserService;
+import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,15 +14,12 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 
 @RestController
+@RequiredArgsConstructor
 public class UserController {
 
     private final UserService userService;
 
-    public UserController(UserService userService) {
-        this.userService = userService;
-    }
-
-    @PostMapping("/updateProfileImg")
+    @PostMapping("/update-profile-Img")
     public ResponseEntity<?> updateProfileImg(@NotNull @RequestParam("image") MultipartFile image, @RequestParam("email") String email) {
         try {
             UserEntity user = userService.findUserByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
@@ -35,5 +33,4 @@ public class UserController {
         }
     }
 
-    // Add other methods here with their own mappings, like /updatename, etc.
 }

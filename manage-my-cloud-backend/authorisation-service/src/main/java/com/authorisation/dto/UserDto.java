@@ -21,7 +21,4 @@ public class UserDto {
     private String googleProfileImageUrl;
     private LinkedAccounts linkedAccounts;
     private byte[] profileImage;
-
-
-
 }
