@@ -1,5 +1,5 @@
 import React, {useState} from "react";
-import "./profileImgButton.css";
+import "./ProfileImgButton.css";
 import ChangeProfileImageModal from "../../../modals/profile/changeProfileImageModal";
 import {AuthData} from "../../../routing/AuthWrapper";
 
