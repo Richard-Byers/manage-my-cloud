@@ -11,11 +11,16 @@ import {useNavigate} from "react-router-dom";
 const Navbar: React.FC = () => {
     const {logout} = AuthData();
     const navigate = useNavigate();
-    const [showProfilePopover, setShowProfilePopover] = React.useState(false);
+    const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+    const open = Boolean(anchorEl);
 
-    function toggleProfilePopover() {
-        setShowProfilePopover(!showProfilePopover);
-    }
+    const handlePopoverOpen = (event: React.MouseEvent<HTMLElement>) => {
+        setAnchorEl(event.currentTarget);
+      };
+
+    const handlePopoverClose = () => {
+    setAnchorEl(null);
+    };
 
     function navigateToProfile() {
         navigate(ROUTES.PROFILE);
@@ -45,29 +50,33 @@ const Navbar: React.FC = () => {
                     </Link>
                 </li>
             </ul>
-            <button className={"profile-button"} onClick={toggleProfilePopover}>
-                <AccountCircleIcon
-                    sx={{fontSize: 50, color: 'white'}}/>
-                {showProfilePopover && (<Popover
-                    anchorOrigin={{
-                        vertical: 77,
-                        horizontal: 1770,
-                    }}
-                    transformOrigin={{
-                        vertical: 'top',
-                        horizontal: 'left',
-                    }}
-                    open>
-                    <div className={'popover-container'}>
-                        <button className={'popover-button'} onClick={navigateToProfile}>
-                            Profile
-                        </button>
-                        <button className={'popover-button'} onClick={logout}>
-                            Logout
-                        </button>
-                    </div>
-                </Popover>)}
-            </button>
+            <div>
+    <button className="profile-button" onClick={handlePopoverOpen}>
+      <AccountCircleIcon sx={{fontSize: 50, color: 'white'}}/>
+    </button>
+    <Popover
+      open={open}
+      anchorEl={anchorEl}
+      onClose={handlePopoverClose}
+      anchorOrigin={{
+        vertical: 'bottom',
+        horizontal: 'center',
+      }}
+      transformOrigin={{
+        vertical: 'top',
+        horizontal: 'center',
+      }}
+    >
+      <div className={'popover-container'}>
+        <button className={'popover-button'} onClick={navigateToProfile}>
+          Profile
+        </button>
+        <button className={'popover-button'} onClick={logout}>
+          Logout
+        </button>
+      </div>
+    </Popover>
+  </div>
         </nav>
     );
 };
