@@ -4,6 +4,7 @@ import com.authorisation.entities.CloudPlatform;
 import com.authorisation.entities.UserEntity;
 import com.authorisation.services.CloudPlatformService;
 import com.authorisation.services.UserService;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,6 +27,7 @@ import java.util.Optional;
 
 import static com.authorisation.givens.CloudPlatformGivens.generateCloudPlatformEncryptedTokens;
 import static com.authorisation.givens.DriveInformationResponseGivens.generateDriveInformationResponse;
+import static com.authorisation.givens.JsonNodeGivens.generateJsonNode;
 import static com.authorisation.givens.UserEntityGivens.generateUserEntityEnabled;
 import static com.authorisation.util.EncryptionUtil.decrypt;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -135,8 +137,8 @@ class UserDriveControllerTest {
 
         //when
         mockMvc.perform(get("/drive-information")
-                .param("email", email)
-                .param("provider", "OneDrive").with(csrf()))
+                        .param("email", email)
+                        .param("provider", "OneDrive").with(csrf()))
                 //then
                 .andExpect(status().isBadRequest());
     }
@@ -162,12 +164,116 @@ class UserDriveControllerTest {
                 .andExpect(status().isBadRequest());
     }
 
+    @Test
+    @WithMockUser
+    void getUserDriveFiles_ValidRequest_ReturnsDriveInformation() throws Exception {
+        //given
+        UserEntity userEntity = generateUserEntityEnabled();
+        String email = userEntity.getEmail();
+        CloudPlatform cloudPlatform = generateCloudPlatformEncryptedTokens();
+        JsonNode expectedJsonNode = generateJsonNode();
+
+        when(userService.findUserByEmail(email)).thenReturn(Optional.of(userEntity));
+        when(cloudPlatformService.getUserCloudPlatform(email, "OneDrive")).thenReturn(cloudPlatform);
+        when(driveInformationService.listAllItemsInOneDrive(decrypt(cloudPlatform.getAccessToken()), cloudPlatform.getAccessTokenExpiryDate())).thenReturn(expectedJsonNode);
+
+        //when
+        MvcResult mvcResult = mockMvc.perform(get("/drive-items")
+                        .param("email", email)
+                        .param("provider", "OneDrive").with(csrf()))
+                //then
+                .andExpect(status().isOk()).andReturn();
+
+        JsonNode response = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), JsonNode.class);
+        assertJsonNodeResponse(expectedJsonNode, response);
+    }
+
+    @Test
+    @WithMockUser
+    void getUserDriveFiles_InvalidUser_ThrowsException() {
+        //given
+        UserEntity userEntity = generateUserEntityEnabled();
+        String email = userEntity.getEmail();
+
+        when(userService.findUserByEmail(email)).thenReturn(Optional.of(userEntity));
+        when(cloudPlatformService.getUserCloudPlatform(email, "OneDrive")).thenReturn(null);
+
+        //when
+        ServletException exception = assertThrows(ServletException.class, () -> mockMvc.perform(get("/drive-items")
+                .param("email", email)
+                .param("provider", "OneDrive").with(csrf())).andReturn());
+        //then
+        assertEquals("Cloud platform not found OneDrive", exception.getRootCause().getMessage());
+    }
+
+    @Test
+    @WithMockUser
+    void getUserDriveFiles_CloudPlatformNull_ThrowsException() {
+        //given
+        UserEntity userEntity = generateUserEntityEnabled();
+        String email = userEntity.getEmail();
+
+        when(userService.findUserByEmail(email)).thenThrow(new RuntimeException("User not found"));
+
+        //when
+        ServletException exception = assertThrows(ServletException.class, () -> mockMvc.perform(get("/drive-items")
+                .param("email", email)
+                .param("provider", "OneDrive").with(csrf())).andReturn());
+
+        assertEquals("User not found", exception.getRootCause().getMessage());
+    }
+
+    @Test
+    @WithMockUser
+    void getUserDriveFiles_GetOneDriveInformation_ReturnsBadRequest() throws Exception {
+        //given
+        UserEntity userEntity = generateUserEntityEnabled();
+        String email = userEntity.getEmail();
+        CloudPlatform cloudPlatform = generateCloudPlatformEncryptedTokens();
+
+        when(userService.findUserByEmail(email)).thenReturn(Optional.of(userEntity));
+        when(cloudPlatformService.getUserCloudPlatform(email, "OneDrive")).thenReturn(cloudPlatform);
+        when(driveInformationService.listAllItemsInOneDrive(any(), any())).thenThrow(new RuntimeException("Drive not found"));
+
+        //when
+        mockMvc.perform(get("/drive-items")
+                        .param("email", email)
+                        .param("provider", "OneDrive").with(csrf()))
+                //then
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser
+    void getUserDriveFiles_IncorrectProvider_ReturnsBadRequest() throws Exception {
+        //given
+        UserEntity userEntity = generateUserEntityEnabled();
+        String email = userEntity.getEmail();
+        CloudPlatform cloudPlatform = generateCloudPlatformEncryptedTokens();
+        DriveInformationReponse expectedDriveInformationReponse = generateDriveInformationResponse();
+
+        when(userService.findUserByEmail(email)).thenReturn(Optional.of(userEntity));
+        when(cloudPlatformService.getUserCloudPlatform(email, "random")).thenReturn(cloudPlatform);
+        when(driveInformationService.getOneDriveInformation(decrypt(cloudPlatform.getAccessToken()), cloudPlatform.getAccessTokenExpiryDate())).thenReturn(expectedDriveInformationReponse);
+
+        //when
+        mockMvc.perform(get("/drive-items")
+                        .param("email", email)
+                        .param("provider", "random").with(csrf()))
+                //then
+                .andExpect(status().isBadRequest());
+    }
+
     //Helper
     private static void assertDriveInformationResponse(DriveInformationReponse expectedDriveInformationReponse, DriveInformationReponse response) {
         assertEquals(expectedDriveInformationReponse.getDisplayName(), response.getDisplayName());
         assertEquals(expectedDriveInformationReponse.getDriveType(), response.getDriveType());
         assertEquals(expectedDriveInformationReponse.getTotal(), response.getTotal());
         assertEquals(expectedDriveInformationReponse.getUsed(), response.getUsed());
+    }
+
+    private static void assertJsonNodeResponse(JsonNode expectedJsonNode, JsonNode response) {
+        assertEquals(expectedJsonNode.get("test"), response.get("test"));
     }
 
 
