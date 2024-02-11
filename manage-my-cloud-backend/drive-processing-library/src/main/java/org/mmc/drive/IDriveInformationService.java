@@ -10,6 +10,7 @@ import java.util.Date;
 public interface IDriveInformationService {
 
     DriveInformationReponse getOneDriveInformation(String userAccessToken, Date expiryDate);
+    DriveInformationReponse getGoogleDriveInformation(String email, String refreshToken);
 
     JsonNode listAllItemsInOneDrive(String userAccessToken, Date expiryDate) throws JsonProcessingException;
 
