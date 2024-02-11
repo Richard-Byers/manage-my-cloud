@@ -5,6 +5,7 @@ import "../Modal.css";
 import React, {useState} from "react";
 import {buildAxiosRequest} from "../../helpers/AxiosHelper";
 import LockIcon from "@mui/icons-material/Lock";
+import CloseIcon from "@mui/icons-material/Close";
 
 interface ForgotPasswordModalProps {
     setForgotPasswordModal: React.Dispatch<React.SetStateAction<boolean>>;
@@ -88,6 +89,8 @@ export const ResetPasswordModal: React.FC<ForgotPasswordModalProps> = ({
             <div className="modal-overlay" onClick={closeForgotPassword}>
                 <div className="modal" onClick={stopPropagation}>
 
+                    <button className={"modal-close-button"} onClick={closeForgotPassword}> <CloseIcon/> </button>
+
                     <div className={"forgot-password-modal-logo"}>
                         <img src={logo} alt={"Manage My Cloud Logo"}/>
                     </div>
@@ -99,9 +102,7 @@ export const ResetPasswordModal: React.FC<ForgotPasswordModalProps> = ({
                             </div>
 
                             <div className={"modal-description"}>
-                                Enter your email and passwords and
-                                <br/>
-                                we will send you a password reset link.
+                                Enter your email and passwords and we will send you a password reset link.
                             </div>
 
                             <form className={"modal-form"}>

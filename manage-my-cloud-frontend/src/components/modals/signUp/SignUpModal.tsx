@@ -6,6 +6,7 @@ import "./SignUpModal.css";
 import "../Modal.css";
 import React, {useState} from "react";
 import {buildAxiosRequest} from "../../helpers/AxiosHelper";
+import CloseIcon from "@mui/icons-material/Close";
 
 interface SignUpProps {
     setShowSignUpModal: React.Dispatch<React.SetStateAction<boolean>>;
@@ -15,6 +16,13 @@ interface ConfirmationProps {
     confirmationMessage: string | null;
 }
 
+interface ShowErrorProps {
+    errorMessage: string | null;
+}
+
+interface ShowSuccessProps {
+    successMessage: string | null;
+}
 
 interface SignupProps {
     firstName: string;
@@ -28,7 +36,6 @@ export const SignUpModal: React.FC<SignUpProps> = ({
                                                        setShowSignUpModal,
                                                    }) => {
     const [confirmationEmailMessage, setConfirmationEmailMessage] = useState<ConfirmationProps>({confirmationMessage: null});
-
     const [signupInput, setSignupInput] = useState<SignupProps>({
         firstName: "",
         lastName: "",
@@ -36,25 +43,31 @@ export const SignUpModal: React.FC<SignUpProps> = ({
         password: "",
         role: "USER",
     });
+    const [showError, setShowError] = useState<ShowErrorProps>({errorMessage: null});
+    const [emailConfirmation, setShowEmailConfirmation] = useState<ShowSuccessProps>({successMessage: null});
 
     const handleFirstNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const firstName = event.target.value;
         setSignupInput((prevState) => ({...prevState, firstName}));
+        setShowError({errorMessage: null});
     };
 
     const handleLastNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const lastName = event.target.value;
         setSignupInput((prevState) => ({...prevState, lastName}));
+        setShowError({errorMessage: null});
     };
 
     const handleEmailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const email = event.target.value;
         setSignupInput((prevState) => ({...prevState, email}));
+        setShowError({errorMessage: null});
     };
 
     const handlePasswordChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const password = event.target.value;
         setSignupInput((prevState) => ({...prevState, password}));
+        setShowError({errorMessage: null});
     };
 
     const closeSignUpModal = () => {
@@ -72,12 +85,11 @@ export const SignUpModal: React.FC<SignUpProps> = ({
         if (firstName && lastName && email && password) {
 
             buildAxiosRequest("POST", "/register", signupInput).then((response) => {
-                setConfirmationEmailMessage((prevState) => ({...prevState, confirmationMessage: response.data}));
+                setShowEmailConfirmation((prevState) => ({successMessage: response.data}));
             }).catch((error) => {
-                
             });
         } else {
-            console.error("Please fill in all the fields");
+            setShowError((prevState) => ({...prevState, errorMessage: "Please fill in all the fields"}));
         }
     };
 
@@ -85,6 +97,8 @@ export const SignUpModal: React.FC<SignUpProps> = ({
         <>
             <div className="modal-overlay" onClick={closeSignUpModal}>
                 <div className="modal" onClick={stopPropagation}>
+
+                    <button className={"modal-close-button"} onClick={closeSignUpModal}><CloseIcon/></button>
 
                     <div className={"modal-logo-signup"}>
                         <img src={logo} alt={"Manage My Cloud Logo"}/>
@@ -136,24 +150,36 @@ export const SignUpModal: React.FC<SignUpProps> = ({
                                     <LockIcon/>
                                 </label>
 
+                                {showError.errorMessage !== null && (
+                                    <div className={"modal-form-error"}>
+                                        {showError.errorMessage}
+                                    </div>
+                                )}
+
+                                {emailConfirmation.successMessage && (
+                                    <div className={"modal-form-success"}>
+                                        Confirmation email sent to: {emailConfirmation.successMessage}
+                                    </div>
+                                )}
+
                                 <button className={"modal-form-submit-button"} type="submit"
                                         onClick={handleSignupSubmission}>Sign Up
                                 </button>
                             </form>
                         </div>
                     )}
-                    {confirmationEmailMessage.confirmationMessage !== null ? (
-                        <div className={"confirmation-container"}>
-                            <div className={"modal-title"}>
-                                Confirmation Sent
-                            </div>
-                            <div className={"modal-confirmation-email"}>
-                                <div>Confirmation email has been sent to:</div>
-                                <div>{confirmationEmailMessage.confirmationMessage}</div>
-                                <div>Please check your inbox</div>
-                            </div>
-                        </div>
-                    ) : null}
+                    {/*{confirmationEmailMessage.confirmationMessage !== null ? (*/}
+                    {/*    <div className={"confirmation-container"}>*/}
+                    {/*        <div className={"modal-title"}>*/}
+                    {/*            Confirmation Sent*/}
+                    {/*        </div>*/}
+                    {/*        <div className={"modal-confirmation-email"}>*/}
+                    {/*            <div>Confirmation email has been sent to:</div>*/}
+                    {/*            <div>{confirmationEmailMessage.confirmationMessage}</div>*/}
+                    {/*            <div>Please check your inbox</div>*/}
+                    {/*        </div>*/}
+                    {/*    </div>*/}
+                    {/*) : null}*/}
                 </div>
             </div>
         </>

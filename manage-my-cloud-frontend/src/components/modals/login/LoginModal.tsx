@@ -6,9 +6,9 @@ import logo from "../../images/managemycloudlogo.png";
 import googleLogo from "../../images/login/google.png";
 import EmailIcon from '@mui/icons-material/Email';
 import LockIcon from '@mui/icons-material/Lock';
+import CloseIcon from '@mui/icons-material/Close';
 import {SignUpModal} from "../signUp/SignUpModal";
 import {ResetPasswordModal} from "../resetPassword/ResetPasswordModal";
-import { useGoogleLogin } from '@react-oauth/google';
 import {AuthData} from "../../routing/AuthWrapper";
 
 interface LoginProps {
@@ -94,6 +94,8 @@ const LoginModal: React.FC = () => {
                 <div className="modal-overlay" onClick={closeModal}>
                     <div className="modal" onClick={stopPropagation}>
 
+                        <button className={"modal-close-button"} onClick={closeModal}> <CloseIcon className="svg_icons"/> </button>
+
                         <div className={"modal-logo"}>
                             <img src={logo} alt={"Manage My Cloud Logo"}/>
                         </div>
@@ -101,9 +103,7 @@ const LoginModal: React.FC = () => {
                         <div className={"modal-form-container"}>
 
                             <div className={"modal-description"}>
-                                Are you ready to start saving money
-                                <br/>
-                                and help the environment?
+                                Are you ready to start saving money and help the environment?
                             </div>
 
                             <button className={"modal-login-google-button"} onClick={handleGoogleLogin}>
