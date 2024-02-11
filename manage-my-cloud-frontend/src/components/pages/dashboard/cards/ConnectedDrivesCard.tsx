@@ -1,13 +1,16 @@
-import React from 'react';
+import React, {useState} from 'react';
 import './ConnectedDrivesCard.css';
 import {AuthData} from "../../../routing/AuthWrapper";
 import {buildAxiosRequestWithHeaders} from "../../../helpers/AxiosHelper";
 import {CONNECTION_LOGOS, CONNECTION_TITLE} from "../../../../constants/ConnectionConstants";
 import LoadingSpinner from "../../../helpers/LoadingSpinner";
 import StorageProgressBar from "../storage_bar/StorageProgressBar";
+import DashboardCardModal from "../../../modals/dashboard/DashboardCardModal";
+import {useTranslation} from "react-i18next";
 
 interface DriveInformation {
     displayName: string,
+    email: string,
     driveType: string,
     total: number,
     used: number,
@@ -20,7 +23,13 @@ interface ConnectedDrivesCardProps {
 const CardContainer: React.FC<ConnectedDrivesCardProps> = ({connectionProvider}) => {
 
     const {user} = AuthData();
+    const {t} = useTranslation();
     const [driveInformation, setDriveInformation] = React.useState<DriveInformation | null>(null);
+    const [dashboardModal, setShowDashboardModal] = useState(false);
+
+    const toggleModal = () => {
+        setShowDashboardModal(!dashboardModal);
+    }
 
     React.useEffect(() => {
         const fetchDriveInformation = async () => {
@@ -29,29 +38,37 @@ const CardContainer: React.FC<ConnectedDrivesCardProps> = ({connectionProvider})
         };
 
         fetchDriveInformation();
-    }, [user]);
+    }, [user, connectionProvider]);
 
     if (!driveInformation) {
         return <LoadingSpinner/>
     }
 
     return (
-        <div className="dashboard-connection-item">
-            <img src={CONNECTION_LOGOS[connectionProvider]}
-                 alt={`Logo for ${connectionProvider}`}/>
-            <div className="item-drive-name">
-                <h2>{driveInformation.displayName}</h2>
+        <>
+            {driveInformation && dashboardModal &&
+                <DashboardCardModal setShowModal={setShowDashboardModal} showModal={dashboardModal}
+                                    connectionProvider={connectionProvider}
+                                    totalStorage={driveInformation.total}
+                                    usedStorage={driveInformation.used}
+                                    email={driveInformation.email}/>}
+            <div className="dashboard-connection-item" onClick={toggleModal}>
+                <img src={CONNECTION_LOGOS[connectionProvider]}
+                     alt={`Logo for ${connectionProvider}`}/>
+                <div className="item-drive-name">
+                    <h2>{driveInformation.displayName}</h2>
+                </div>
+                <div className="item-drive-type">
+                    <h2>{t('main.dashboard.connectedDrivesCard.driveType')}:</h2>
+                    <h2>{driveInformation.driveType}</h2>
+                </div>
+                <div className='item-storage-used'>
+                    <h2>{t('main.dashboard.connectedDrivesCard.storageUsed')}:</h2>
+                    <h2>{driveInformation.used > 0.0 ? driveInformation.used : "< 0"}GB/{driveInformation.total}GB</h2>
+                </div>
+                <StorageProgressBar used={driveInformation.used} total={driveInformation.total}/>
             </div>
-            <div className="item-drive-type">
-                <h2>Drive Type:</h2>
-                <h2>{driveInformation.driveType}</h2>
-            </div>
-            <div className='item-storage-used'>
-                <h2>Storage Used:</h2>
-                <h2>{driveInformation.used}GB/{driveInformation.total}GB</h2>
-            </div>
-            <StorageProgressBar used={driveInformation.used} total={driveInformation.total}/>
-        </div>
+        </>
     );
 }
 
@@ -69,6 +86,7 @@ async function getUserDrives(user: any, connectionProvider: string): Promise<Dri
     }
     return {
         displayName: response.data.displayName,
+        email: response.data.email,
         driveType: response.data.driveType,
         total: response.data.total,
         used: response.data.used,

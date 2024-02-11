@@ -4,14 +4,13 @@ import ConnectedDrivesCard from "./cards/ConnectedDrivesCard";
 import './DashboardPage.css';
 import {useNavigate} from "react-router-dom";
 import {ROUTES} from "../../../constants/RouteConstants";
-import DashboardPageButtons from "./DashboardPageButtons";
-import { useTranslation } from "react-i18next";
+import {useTranslation} from "react-i18next";
 import {AuthData} from "../../routing/AuthWrapper";
 
 const DashboardPage = () => {
 
     const navigate = useNavigate();
-    const { t } = useTranslation();
+    const {t} = useTranslation();
     const {user} = AuthData();
 
     const linkedAccountsArray = Object.entries(user?.linkedAccounts || {})
@@ -40,17 +39,13 @@ const DashboardPage = () => {
                                                                                            connectionProvider={key}/>
                         </div>
                     ))}
-
-                <div className={"dashboard-page-buttons-container"}>
-                    <DashboardPageButtons/>
-                </div>
                 <div className={"connect-drives-container"}>
                     <div className="text-under-line">
-                    <p>
-                        {t('main.dashboard.manageConnectionsTextBeforeLink')}
-                        <button className={'manage-connections-hyperlink'} onClick={navigateToManageConnections}>
-                            {t('main.dashboard.manageConnectionsLink')}
-                        </button>
+                        <p>
+                            {t('main.dashboard.manageConnectionsTextBeforeLink')}
+                            <button className={'manage-connections-hyperlink'} onClick={navigateToManageConnections}>
+                                {t('main.dashboard.manageConnectionsLink')}
+                            </button>
                         </p>
                     </div>
                 </div>

@@ -1,0 +1,33 @@
+
+.profile-modal-form-input {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 16px;
+    margin-bottom: 20px;
+}
+
+.profile-modal-form-submit-button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    background: #05919f;
+    color: #fff;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.profile-modal-form-submit-button:hover {
+    background: #027b8b;
+}
+
+.success-message {
+    color: green;
+    font-weight: bold;
+}
+.error-message {
+    color: red;
+    font-weight: bold;
+}

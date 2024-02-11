@@ -14,6 +14,9 @@ public class DriveInformationReponse {
     // This can be the name of the drive or the name of the user
     private String displayName;
 
+    // This is the email linked to the drive
+    private String email;
+
     // This is the plan type of the drive e.g. personal.....
     private String driveType;
 

@@ -13,7 +13,6 @@ import org.hibernate.annotations.NaturalId;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserEntity {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -29,5 +28,6 @@ public class UserEntity {
     private String googleProfileImageUrl;
     @Embedded
     private LinkedAccounts linkedAccounts;
-
+    @Column(columnDefinition = "bytea")
+    private byte[] profileImage;
 }

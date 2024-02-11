@@ -3,6 +3,7 @@ import './UserProfileCard.css';
 import profileLogo from '../../../images/profile_picture.png';
 import {AuthData} from "../../../routing/AuthWrapper";
 import { useTranslation } from 'react-i18next';
+import ProfileImgButton from "./ProfileImgButton";
 
 function UserProfileCard() {
     const {user, logout} = AuthData();
@@ -10,15 +11,17 @@ function UserProfileCard() {
 
     return (
         <div className={"user-profile-card-content"}>
-            <div className={'user-profile-picture'}>
-                <img className={'profile-picture'} src={profileLogo} alt={'profile logo'}/>
+            <div className={'profile-card-buttons'}>
+                <ProfileImgButton />
             </div>
             <div className='user-info'>
-                <div className='user-profile-card-data-label'>{t('main.userProfileCard.firstName')}:{user?.firstName}</div>
+                <div
+                    className='user-profile-card-data-label'>{t('main.userProfileCard.firstName')}:{user?.firstName}</div>
                 <div className='user-profile-card-data-label'>{t('main.userProfileCard.lastName')}:</div>
-                <div className='user-profile-card-data-label'>{t('main.userProfileCard.emailAddress')}:{user?.email}</div>
+                <div
+                    className='user-profile-card-data-label'>{t('main.userProfileCard.emailAddress')}:{user?.email}</div>
                 <div className='user-profile-card-data-label'>
-                {t('main.userProfileCard.password')}: ********
+                    {t('main.userProfileCard.password')}: ********
                 </div>
             </div>
             <div className={'profile-card-buttons'}>
