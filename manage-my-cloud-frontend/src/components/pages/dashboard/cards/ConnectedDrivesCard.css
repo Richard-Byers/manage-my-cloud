@@ -1,19 +1,16 @@
-.container {
-  display:flex;
-  align-items: center;
-  justify-content: space-between;
-  font-family: MontserratRegular, serif;
-}
 
-.item {
-  width: 24vw;
+.dashboard-connection-item {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: auto;
   height: 34vh;
   background-color: rgb(254, 254, 254);
   padding: 1em;
   font-weight: 700;
   text-align: center;
   border-radius: 10px;
-  align-items: center;
   box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.18);
   -webkit-box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.18);
   -moz-box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.18);
@@ -21,8 +18,19 @@
   transition: transform 0.2s ease-in-out;
 }
 
-.item:hover {
+.dashboard-connection-item h2{
+  margin: 0.4em;
+  padding: 0;
+}
+
+.dashboard-connection-item:hover {
   transform: scale(1.01);
+}
+
+.dashboard-connection-item img{
+  width: 50%;
+  height: 50%;
+  object-fit: contain;
 }
 
 .g-drive-logo {
@@ -35,18 +43,30 @@
 
 .item-drive-name {
   display: flex;
-  margin-top: 1em;
+  justify-content: center;
+  width: 100%;
   font-size: 0.8vw;
-  font-family: MontserratLight;
+  font-family: MontserratLight, serif;
+  line-height: normal;
+  font-style: normal;
+}
+
+.item-drive-type {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  font-size: 0.8vw;
+  font-family: MontserratLight, serif;
   line-height: normal;
   font-style: normal;
 }
 
 .item-storage-used {
   display: flex;
-  margin-top: -1.6em;
+  justify-content: center;
+  width: 100%;
   font-size: 0.8vw;
-  font-family: MontserratLight;
+  font-family: MontserratLight, serif;
   line-height: normal;
   font-weight: 400;
   font-style: normal;

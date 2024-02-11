@@ -1,0 +1,150 @@
+.dashboard-card-modal-grid {
+    display: grid;
+    grid-template-columns: auto auto;
+    grid-template-rows: 1fr;
+    gap: 10px;
+    max-width: 100%;
+    height: 100%;
+    padding: 1em;
+}
+
+.dashboard-card-modal-file-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    grid-column: 1/ span;
+    max-width: 100%;
+    height: auto;
+    margin-bottom: 2em;
+}
+
+.dashboard-card-modal-file-container span {
+    font-size: 0.9rem;
+    width: auto;
+    word-wrap: anywhere;
+}
+
+.dashboard-card-modal-drive-information {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    grid-column: 1/ span;
+    width: fit-content;
+    height: 100%;
+    border-right: 2px solid black;
+    padding-right: 2em;
+}
+
+.dashboard-card-modal-drive-information img {
+    width: 14em;
+    height: 14em;
+    object-fit: contain;
+}
+
+.dashboard-card-modal-drive-information p {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 0.5em;
+}
+
+.dashboard-card-modal-drive-information span {
+    font-size: 1.3rem;
+    margin: 1em 0 1em 0;
+}
+
+.dashboard-card-modal-drive-files-container {
+    display: flex;
+    width: 100%;
+    height: 60vh;
+    overflow: auto;
+}
+
+.dashboard-card-modal-drive-files-grid {
+    display: grid;
+    justify-items: center;
+    align-items: center;
+    grid-template-columns: repeat(3, 1fr);
+    width: fit-content;
+    padding: 1em;
+}
+
+.svg-icon {
+    width: 5em;
+    height: 5em;
+    padding-bottom: 0.2em;
+}
+
+.dashboard-page-buttons-container {
+    grid-row: 2 / span 1;
+    grid-column: 1 / span 2;
+}
+
+@media (max-width: 768px) {
+    .dashboard-card-modal-drive-files-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0;
+    }
+
+    .dashboard-card-modal-drive-files-container {
+        display: flex;
+        justify-content: center;
+        width: 100px;
+        grid-row: 2 / 2;
+        grid-column: 1 / 1;
+    }
+
+    .dashboard-card-modal-grid {
+        display: grid;
+        grid-template-columns: 100%;
+        grid-template-rows: auto auto 10%;
+        overflow-y: auto;
+    }
+
+    .dashboard-card-modal-drive-information {
+        height: fit-content;
+        width: 100%;
+        grid-row: 1 / 1;
+        grid-column: 1 / 1;
+        border: none;
+        padding: 0;
+    }
+
+    .dashboard-card-modal-drive-information p {
+        display: none;
+    }
+
+    .dashboard-card-modal-drive-information span {
+        font-size: 1.2rem;
+        margin: 0.3em 0 0.3em 0;
+    }
+
+    .dashboard-card-modal-drive-information img {
+        width: 6em;
+        height: 6em;
+        object-fit: contain;
+    }
+
+    .dashboard-card-modal-drive-files-container {
+        width: auto;
+        grid-row: 2 / 2;
+        grid-column: 1 / 1;
+    }
+
+    .dashboard-card-modal-file-container {
+        width: 100%;
+    }
+
+    .dashboard-page-buttons-container {
+        height: fit-content;
+        width: 100%;
+        grid-row: 3 / span 1;
+        grid-column: 1 / 1;
+    }
+
+    .svg-icon {
+        width: 3em;
+        height: 3em;
+        padding-bottom: 0.2em;
+    }
+}

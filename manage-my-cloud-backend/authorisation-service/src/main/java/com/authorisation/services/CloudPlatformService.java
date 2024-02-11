@@ -9,6 +9,8 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
+
 import static com.authorisation.Constants.GOOGLEDRIVE;
 import static com.authorisation.Constants.ONEDRIVE;
 import static com.authorisation.util.EncryptionUtil.encrypt;
@@ -20,7 +22,7 @@ public class CloudPlatformService implements ICloudPlatformService {
     private final CloudPlatformRepository cloudPlatformRepository;
     private final UserEntityRepository userEntityRepository;
 
-    public CloudPlatform addCloudPlatform(String userEmail, String platformName, String accessToken, String refreshToken) {
+    public CloudPlatform addCloudPlatform(String userEmail, String platformName, String accessToken, String refreshToken, Date accessTokenExpiryDate) {
         UserEntity userEntity = userEntityRepository.findByEmail(userEmail).orElseThrow(() -> new RuntimeException("User not found"));
         LinkedAccounts linkedAccounts = userEntity.getLinkedAccounts();
 
@@ -47,6 +49,7 @@ public class CloudPlatformService implements ICloudPlatformService {
         cloudPlatform.setPlatformName(platformName);
         cloudPlatform.setAccessToken(encryptedAccessToken);
         cloudPlatform.setRefreshToken(encryptedRefreshToken);
+        cloudPlatform.setAccessTokenExpiryDate(accessTokenExpiryDate);
 
         return cloudPlatformRepository.save(cloudPlatform);
     }
@@ -56,18 +59,15 @@ public class CloudPlatformService implements ICloudPlatformService {
         UserEntity userEntity = userEntityRepository.findByEmail(userEmail).orElseThrow(() -> new RuntimeException("User not found"));
         LinkedAccounts linkedAccounts = userEntity.getLinkedAccounts();
 
+        if (linkedAccounts == null) {
+            linkedAccounts = new LinkedAccounts();
+            userEntity.setLinkedAccounts(linkedAccounts);
+        }
+
         if (ONEDRIVE.equals(platformName)) {
-            if (linkedAccounts == null) {
-                linkedAccounts = new LinkedAccounts();
-                userEntity.setLinkedAccounts(linkedAccounts);
-            }
             linkedAccounts.setOneDrive(false);
             linkedAccounts.setLinkedAccountsCount(linkedAccounts.getLinkedAccountsCount() - 1);
         } else if (GOOGLEDRIVE.equals(platformName)) {
-            if (linkedAccounts == null) {
-                linkedAccounts = new LinkedAccounts();
-                userEntity.setLinkedAccounts(linkedAccounts);
-            }
             linkedAccounts.setGoogleDrive(false);
             linkedAccounts.setLinkedAccountsCount(linkedAccounts.getLinkedAccountsCount() - 1);
         } else {
@@ -77,6 +77,10 @@ public class CloudPlatformService implements ICloudPlatformService {
         userEntityRepository.save(userEntity);
 
         cloudPlatformRepository.deleteByUserEntityEmailAndPlatformName(userEntity.getEmail(), platformName);
+    }
+
+    public CloudPlatform getUserCloudPlatform(String userEmail, String platformName) {
+        return cloudPlatformRepository.findByUserEntityEmailAndPlatformName(userEmail, platformName);
     }
 
 }

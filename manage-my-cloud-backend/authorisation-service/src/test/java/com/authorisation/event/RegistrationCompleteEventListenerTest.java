@@ -78,7 +78,7 @@ class RegistrationCompleteEventListenerTest {
         //then
         verify(userService).saveVerificationToken(any(), any());
         verify(mailSender).createMimeMessage();
-        verify(logger).error("Error occurred while sending verification email to user: " + registrationCompleteEvent.getUserEntity().getEmail());
+        verify(logger).error("Error occurred while sending verification email to user: " + registrationCompleteEvent.getUserEntity().getEmail() + " with error Error");
     }
 
     @Test

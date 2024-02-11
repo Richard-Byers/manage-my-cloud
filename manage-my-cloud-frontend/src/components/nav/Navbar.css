@@ -82,3 +82,9 @@
     src: local('MontserratBold'),
     url('../fonts/Montserrat-Bold.ttf') format('truetype');
 }
+.popover-style {
+    border-radius: 50%;
+    width: 66px;
+    height: 66px;
+    object-fit: cover;
+}
