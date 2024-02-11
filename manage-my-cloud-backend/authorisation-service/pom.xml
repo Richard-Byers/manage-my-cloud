@@ -243,6 +243,8 @@
                                 <exclude>com/authorisation/registration/**</exclude>
                                 <exclude>com/authorisation/dto/**</exclude>
                                 <exclude>com/authorisation/entities/**</exclude>
+                                <exclude>com/authorisation/response/**</exclude>
+                                <exclude>com/authorisation/requests/**</exclude>
                             </excludes>
                         </configuration>
                     </execution>
