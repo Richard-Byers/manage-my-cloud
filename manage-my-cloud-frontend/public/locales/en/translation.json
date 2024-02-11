@@ -49,6 +49,14 @@
     },
     "profilePreferencesCard": {
       "preferences": "Preferences"
+    },
+    "changeProfileImage": {
+      "changeProfileImage": "Change Profile Image",
+      "uploadImage": "Upload Image",
+      "noImageSelected": "No image selected. Please select an image to upload.",
+      "success": "Profile image successfully updated.",
+      "fileSizeError": "File size must be less than 2MB.",
+      "uploading": "Upload a new profile image"
     }
   }
 }

@@ -56,7 +56,6 @@ class UserDriveControllerTest {
     private DriveInformationService driveInformationService;
     ObjectMapper objectMapper = new ObjectMapper();
 
-
     @BeforeEach
     public void setup() {
         mockMvc = MockMvcBuilders
