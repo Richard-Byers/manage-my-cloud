@@ -13,7 +13,6 @@
         }
       },
       "connectedDrivesCard": {
-        "driveType": "Drive Type",
         "storageUsed": "Storage Used"
       },
       "dashboardPageButtons": {
