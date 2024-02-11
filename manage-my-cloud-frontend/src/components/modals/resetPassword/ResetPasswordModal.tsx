@@ -102,7 +102,9 @@ export const ResetPasswordModal: React.FC<ForgotPasswordModalProps> = ({
                             </div>
 
                             <div className={"modal-description"}>
-                                Enter your email and passwords and we will send you a password reset link.
+                                Enter your email and passwords
+                                <br/>
+                                and we will send you a password reset link.
                             </div>
 
                             <form className={"modal-form"}>

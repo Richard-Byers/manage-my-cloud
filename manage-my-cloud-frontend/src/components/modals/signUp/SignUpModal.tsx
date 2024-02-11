@@ -158,7 +158,9 @@ export const SignUpModal: React.FC<SignUpProps> = ({
 
                                 {emailConfirmation.successMessage && (
                                     <div className={"modal-form-success"}>
-                                        Confirmation email sent to: {emailConfirmation.successMessage}
+                                        Confirmation email sent to:
+                                        <br/>
+                                        {emailConfirmation.successMessage}
                                     </div>
                                 )}
 

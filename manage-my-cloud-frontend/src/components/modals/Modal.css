@@ -124,7 +124,7 @@
 
 .modal-form-success {
     display: flex;
-    justify-content: right;
+    justify-content: center;
     font-family: MontserratRegular, serif;
     font-size: 16px;
     color: #42c027;

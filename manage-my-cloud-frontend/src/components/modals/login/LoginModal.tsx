@@ -103,7 +103,9 @@ const LoginModal: React.FC = () => {
                         <div className={"modal-form-container"}>
 
                             <div className={"modal-description"}>
-                                Are you ready to start saving money and help the environment?
+                                Are you ready to start saving money
+                                <br/>
+                                and help the environment?
                             </div>
 
                             <button className={"modal-login-google-button"} onClick={handleGoogleLogin}>
