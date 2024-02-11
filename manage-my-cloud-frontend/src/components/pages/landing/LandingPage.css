@@ -77,7 +77,8 @@
     }
 
     .landing-page-logo {
-        width: 150px;
+        padding-top: 2rem;
+        width: 400px;
         height: 150px;
     }
 }
