@@ -122,7 +122,7 @@ const DashboardCardModal: React.FC<DashboardCardModalProps> = ({
                             <p>{t('main.dashboard.dashboardCardModal.driveInformation.accountDetails')}</p>
                             <span>{email}</span>
                             <span>{t('main.dashboard.dashboardCardModal.driveInformation.usedStorage')} {usedStorage > 0.0 ? usedStorage : "< 0"}/GB</span>
-                            <span>{t('main.dashboard.dashboardCardModal.driveInformation.totalStorage')}/GB</span>
+                            <span>{t('main.dashboard.dashboardCardModal.driveInformation.totalStorage')} {totalStorage}/GB</span>
                         </div>
                         <div className={"dashboard-card-modal-drive-files-container"}>
                             <div className={"dashboard-card-modal-drive-files-grid"}>
