@@ -264,7 +264,7 @@ class RegistrationControllerTest {
         // given
         PasswordResetRequest passwordResetRequest = generatePasswordResetRequest();
         Optional<UserEntity> expectedUserEntity = Optional.empty();
-        String expectedMessage = String.format("No user found with email %s", passwordResetRequest.getEmail());
+        String expectedMessage = "User is not registered";
 
         // when
         given(userService.findUserByEmail(passwordResetRequest.getEmail())).willReturn(expectedUserEntity);

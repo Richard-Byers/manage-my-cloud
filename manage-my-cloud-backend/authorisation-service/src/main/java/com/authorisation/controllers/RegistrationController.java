@@ -105,7 +105,7 @@ public class RegistrationController {
             sendPasswordResetEmailLink(userEntity.get(), applicationUrl(request), passwordResetToken);
             return userEntity.get().getEmail();
         } else {
-            return String.format("No user found with email %s", passwordResetRequest.getEmail());
+            return "User is not registered";
         }
     }
 

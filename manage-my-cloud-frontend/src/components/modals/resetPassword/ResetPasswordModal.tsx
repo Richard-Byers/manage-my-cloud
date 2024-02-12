@@ -75,7 +75,7 @@ export const ResetPasswordModal: React.FC<ForgotPasswordModalProps> = ({
             if (newPassword === confirmPassword) {
                 buildAxiosRequest("POST", "/register/resetUserPassword", resetPasswordInput).then((response) => {
 
-                    if (response.data === "Password reset link already sent") {
+                    if (response.data === "Password reset link already sent" || response.data === "User is not registered") {
                         setShowError((prevState) => ({...prevState, errorMessage: response.data}));
                     } else {
                         setShowEmailConfirmation((prevState) => ({successMessage: response.data}));
