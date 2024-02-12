@@ -60,6 +60,7 @@ const LoginModal: React.FC = () => {
     };
 
     const closeModal = () => {
+        setShowError(false);
         setShowSignUpModal(false);
         setShowModal(false);
     };

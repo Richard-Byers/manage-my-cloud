@@ -1,15 +1,16 @@
 package com.authorisation.controllers;
 
 import com.authorisation.entities.PasswordResetToken;
+import com.authorisation.entities.UserEntity;
+import com.authorisation.entities.VerificationToken;
 import com.authorisation.event.RegistrationCompleteEvent;
 import com.authorisation.event.RegistrationCompleteEventListener;
 import com.authorisation.exception.EmailException;
+import com.authorisation.exception.UserAlreadyExistsException;
 import com.authorisation.registration.RegistrationRequest;
 import com.authorisation.registration.password.PasswordResetRequest;
-import com.authorisation.entities.VerificationToken;
 import com.authorisation.repositories.PasswordResetTokenRepository;
 import com.authorisation.repositories.VerificationTokenRepository;
-import com.authorisation.entities.UserEntity;
 import com.authorisation.services.UserService;
 import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -45,13 +46,17 @@ public class RegistrationController {
     public String registerUser(@RequestBody RegistrationRequest registrationRequest, final HttpServletRequest request) {
 
         //Call register user method to register a user
-        UserEntity userEntity = userService.registerUser(registrationRequest);
+        try {
+            UserEntity userEntity = userService.registerUser(registrationRequest);
 
-        //Publish event for email sending
-        eventPublisher.publishEvent(new RegistrationCompleteEvent(userEntity, applicationUrl(request)));
+            //Publish event for email sending
+            eventPublisher.publishEvent(new RegistrationCompleteEvent(userEntity, applicationUrl(request)));
 
-        //Return the email of the user to use in the confirmation message
-        return userEntity.getEmail();
+            //Return the email of the user to use in the confirmation message
+            return userEntity.getEmail();
+        } catch (UserAlreadyExistsException e) {
+            return e.getMessage();
+        }
     }
 
     @GetMapping("verifyEmail")
@@ -89,10 +94,16 @@ public class RegistrationController {
         Optional<UserEntity> userEntity = userService.findUserByEmail(passwordResetRequest.getEmail());
 
         if (userEntity.isPresent()) {
+            Optional<PasswordResetToken> passwordResetTokenEntity = passwordResetTokenRepository.findByUserEntityId(userEntity.get().getId());
+
+            if (passwordResetTokenEntity.isPresent()) {
+                return "Password reset link already sent";
+            }
+
             String passwordResetToken = UUID.randomUUID().toString();
             userService.createPasswordResetToken(userEntity.get(), passwordResetToken, passwordResetRequest);
             sendPasswordResetEmailLink(userEntity.get(), applicationUrl(request), passwordResetToken);
-            return String.format("A new password reset link has been sent to %s. Please check your email", userEntity.get().getEmail());
+            return userEntity.get().getEmail();
         } else {
             return String.format("No user found with email %s", passwordResetRequest.getEmail());
         }
