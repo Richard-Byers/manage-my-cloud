@@ -191,12 +191,12 @@ public class DriveInformationService implements IDriveInformationService {
         CustomDriveItem root = new CustomDriveItem();
         root.setName("root");
         root.setType("Folder");
-        root.setChildren(performFetchAllFiles(service));
+        root.setChildren(performFetchAllGoogleDriveFiles(service));
 
         return mapper.valueToTree(root);
     }
 
-    private List<CustomDriveItem> performFetchAllFiles(com.google.api.services.drive.Drive service) throws IOException {
+    private List<CustomDriveItem> performFetchAllGoogleDriveFiles(com.google.api.services.drive.Drive service) throws IOException {
         List<CustomDriveItem> allFiles = new ArrayList<>();
 
         // Define the fields included in the response
