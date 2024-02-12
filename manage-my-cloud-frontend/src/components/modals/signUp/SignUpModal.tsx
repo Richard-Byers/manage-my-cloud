@@ -170,18 +170,6 @@ export const SignUpModal: React.FC<SignUpProps> = ({
                             </form>
                         </div>
                     )}
-                    {/*{confirmationEmailMessage.confirmationMessage !== null ? (*/}
-                    {/*    <div className={"confirmation-container"}>*/}
-                    {/*        <div className={"modal-title"}>*/}
-                    {/*            Confirmation Sent*/}
-                    {/*        </div>*/}
-                    {/*        <div className={"modal-confirmation-email"}>*/}
-                    {/*            <div>Confirmation email has been sent to:</div>*/}
-                    {/*            <div>{confirmationEmailMessage.confirmationMessage}</div>*/}
-                    {/*            <div>Please check your inbox</div>*/}
-                    {/*        </div>*/}
-                    {/*    </div>*/}
-                    {/*) : null}*/}
                 </div>
             </div>
         </>
