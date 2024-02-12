@@ -23,7 +23,20 @@
     "landingPage": {
       "mainText": "Optimise your cloud storage",
       "subText": "and save money",
-      "subTextDescription": "We aim to de-clutter your cloud storage, \nsave you money, \nand reduce the cloud storage carbon footprint."
+      "subTextDescription": "We aim to de-clutter your cloud storage, \nsave you money, \nand reduce the cloud storage carbon footprint.",
+      "loginModal": {
+        "getStartedButton": "Get Started",
+        "mainTextOne": "Are you ready to start saving money",
+        "mainTextTwo": "and help the environment?",
+        "loginUsingGoogleButton": "Log in using Google",
+        "invalidUserOrEmailError": "Invalid email or password",
+        "loginButton": "Log In",
+        "signUpText": "Sign Up",
+        "resetPasswordText": "Reset Password"
+      },
+      "signUpModal": {
+        "getStartedButton": "Get Started"
+      }
     },
     "manageConnectionsPage": {
       "title": "Manage Connections"
