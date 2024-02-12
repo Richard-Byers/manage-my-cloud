@@ -1,5 +1,12 @@
 package org.mmc.drive;
 
+import com.google.api.client.auth.oauth2.TokenResponse;
+import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
+import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
+import com.google.api.client.googleapis.auth.oauth2.GoogleRefreshTokenRequest;
+import com.google.api.client.googleapis.auth.oauth2.GoogleTokenResponse;
+import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.api.client.json.jackson2.JacksonFactory;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -9,12 +16,17 @@ import com.microsoft.graph.authentication.TokenCredentialAuthProvider;
 import com.microsoft.graph.models.Drive;
 import com.microsoft.graph.requests.DriveItemCollectionPage;
 import com.microsoft.graph.requests.GraphServiceClient;
+import com.google.api.services.drive.model.About;
+import com.google.api.services.drive.Drive.Builder;
 import com.microsoft.graph.serializer.AdditionalDataManager;
 import okhttp3.Request;
+import org.mmc.Constants;
 import org.mmc.implementations.UserAccessTokenCredential;
 import org.mmc.response.CustomDriveItem;
 import org.mmc.response.DriveInformationReponse;
 
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.text.DecimalFormat;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
@@ -58,9 +70,57 @@ public class DriveInformationService implements IDriveInformationService {
 
         return mapToDriveInformationResponse(drive.owner.user.displayName,
                 oneDriveEmail,
-                drive.driveType,
                 totalGigabytes,
                 usedGigabytes);
+    }
+
+    public DriveInformationReponse getGoogleDriveInformation(String email, String refreshToken) {
+
+        TokenResponse response = new GoogleTokenResponse();
+
+        try {
+            GoogleClientSecrets clientSecrets =
+                    GoogleClientSecrets.load(
+                            JacksonFactory.getDefaultInstance(), new InputStreamReader(getClass().getResourceAsStream(Constants.GOOGLE_CREDENTIALS_FILE_PATH)));
+            response = new GoogleRefreshTokenRequest(
+                    new NetHttpTransport(),
+                    new JacksonFactory(),
+                    refreshToken,
+                    clientSecrets.getDetails().getClientId(),
+                    clientSecrets.getDetails().getClientSecret())
+                    .execute();
+        } catch (IOException e) {
+            System.out.println(e);
+        }
+        // Create a Credential instance with the access token
+        GoogleCredential credential = new GoogleCredential().setAccessToken(response.getAccessToken());
+
+        // Create a Drive service
+        com.google.api.services.drive.Drive service = new Builder(new NetHttpTransport(), new JacksonFactory(), credential)
+                .setApplicationName("Manage My Cloud")
+                .build();
+
+        // Create About objects for the storage and user
+        About aboutStorage = null;
+        About aboutUser = null;
+        try {
+            aboutStorage = service.about().get().setFields("storageQuota").execute();
+            aboutUser = service.about().get().setFields("user").execute();
+        } catch (IOException e) {
+            System.out.println(e);
+        }
+
+        // Get the storage quota
+        About.StorageQuota storageQuota = aboutStorage.getStorageQuota();
+
+        //Convert to GB
+        Double totalStorageInGigabytes = Double.parseDouble(ZERO_DECIMAL_FORMAT.format(storageQuota.getLimit() / BYTES_TO_GIGABYTES_DOUBLE));
+        Double usedStorageInGigabytes = Double.parseDouble(DECIMAL_FORMAT.format(storageQuota.getUsage() / BYTES_TO_GIGABYTES_DOUBLE));
+
+        // Get the full name of the user
+        String userName = aboutUser.getUser().getDisplayName();
+
+        return mapToDriveInformationResponse(userName, email, totalStorageInGigabytes, usedStorageInGigabytes);
     }
 
     public JsonNode listAllItemsInOneDrive(String userAccessToken, Date expiryDate) throws JsonProcessingException {
@@ -114,16 +174,14 @@ public class DriveInformationService implements IDriveInformationService {
         });
     }
 
-    public DriveInformationReponse mapToDriveInformationResponse(String displayName, String email, String driveType, Double total, Double used) {
+    public DriveInformationReponse mapToDriveInformationResponse(String displayName, String email, Double total, Double used) {
 
         DriveInformationReponse driveInformationReponse = new DriveInformationReponse();
         driveInformationReponse.setDisplayName(displayName);
         driveInformationReponse.setEmail(email);
-        driveInformationReponse.setDriveType(driveType);
         driveInformationReponse.setTotal(total);
         driveInformationReponse.setUsed(used);
 
         return driveInformationReponse;
     }
-
 }

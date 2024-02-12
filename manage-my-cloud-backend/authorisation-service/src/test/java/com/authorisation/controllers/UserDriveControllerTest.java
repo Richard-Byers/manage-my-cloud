@@ -267,7 +267,6 @@ class UserDriveControllerTest {
     //Helper
     private static void assertDriveInformationResponse(DriveInformationReponse expectedDriveInformationReponse, DriveInformationReponse response) {
         assertEquals(expectedDriveInformationReponse.getDisplayName(), response.getDisplayName());
-        assertEquals(expectedDriveInformationReponse.getDriveType(), response.getDriveType());
         assertEquals(expectedDriveInformationReponse.getTotal(), response.getTotal());
         assertEquals(expectedDriveInformationReponse.getUsed(), response.getUsed());
     }
