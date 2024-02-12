@@ -19,10 +19,10 @@ public class OneDriveTokenResponse {
     private String scope;
 
     @JsonProperty("expires_in")
-    private String expiresIn;
+    private Long expiresIn;
 
     @JsonProperty("ext_expires_in")
-    private String extExpiresIn;
+    private Long extExpiresIn;
 
     @JsonProperty("access_token")
     private String accessToken;

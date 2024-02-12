@@ -3,10 +3,9 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.1.6</version>
-        <relativePath/> <!-- lookup parent from repository -->
+        <groupId>com.mmc</groupId>
+        <artifactId>manage-my-cloud-backend</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
     </parent>
     <groupId>com</groupId>
     <artifactId>authorisation-service</artifactId>
@@ -15,22 +14,42 @@
     <description>authorisation-service</description>
     <properties>
         <java.version>17</java.version>
+        <!-- MANAGE MY CLOUD DEPENDENCY VERSIONS -->
+
+        <!-- UTILITY VERSIONS -->
         <mapstruct.version>1.5.3.Final</mapstruct.version>
+        <jakarta-validation-api.version>3.0.2</jakarta-validation-api.version>
         <google-gson.version>2.10.1</google-gson.version>
-        <google-oauth-client.version>1.34.1</google-oauth-client.version>
+
+        <!-- SPRINGBOOT VERSIONS -->
+
+        <!-- DATABASE VERSIONS -->
+
+        <!-- CLOUD PROVIDER VERSIONS -->
+        <microsoft-graph.version>5.79.0</microsoft-graph.version>
+        <google-api-client-jackson2.version>1.20.0</google-api-client-jackson2.version>
+        <google-cloud-sql.version>1.11.0</google-cloud-sql.version>
         <google-api-client.version>1.35.0</google-api-client.version>
         <google-api-services-drive.version>v3-rev197-1.25.0</google-api-services-drive.version>
-        <google-cloud-sql.version>1.11.0</google-cloud-sql.version>
+
+        <!-- SECURITY VERSIONS -->
         <java-jwt.version>4.3.0</java-jwt.version>
-        <jakarta-validation-api.version>3.0.2</jakarta-validation-api.version>
-        <google-api-client-jackson2.version>1.20.0</google-api-client-jackson2.version>
+        <google-oauth-client.version>1.34.1</google-oauth-client.version>
+
+        <!-- TESTING VERSIONS -->
+
     </properties>
     <dependencies>
 
+        <!-- MANAGE MY CLOUD DEPENDENCIES -->
+
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-jpa</artifactId>
+            <groupId>org.mmc</groupId>
+            <artifactId>drive-processing-library</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
         </dependency>
+
+        <!-- UTILITY DEPENDENCIES -->
 
         <dependency>
             <groupId>com.google.code.gson</groupId>
@@ -46,8 +65,44 @@
         </dependency>
 
         <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-oauth2-resource-server</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct</artifactId>
+            <version>${mapstruct.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct-processor</artifactId>
+            <version>${mapstruct.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>jakarta.validation</groupId>
+            <artifactId>jakarta.validation-api</artifactId>
+            <version>${jakarta-validation-api.version}</version>
+        </dependency>
+
+        <!-- SPRINGBOOT DEPENDENCIES -->
+
+        <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-security</artifactId>
+            <artifactId>spring-boot-starter-mail</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
 
         <dependency>
@@ -61,29 +116,31 @@
         </dependency>
 
         <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-config</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-oauth2-client</artifactId>
-        </dependency>
+        <!-- DATABASE DEPENDENCIES -->
 
         <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-oauth2-jose</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-oauth2-resource-server</artifactId>
+            <groupId>com.google.cloud.sql</groupId>
+            <artifactId>postgres-socket-factory</artifactId>
+            <version>${google-cloud-sql.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
             <scope>runtime</scope>
+        </dependency>
+
+
+        <!-- CLOUD PROVIDER LIBRARIES -->
+
+        <dependency>
+            <groupId>com.microsoft.graph</groupId>
+            <artifactId>microsoft-graph</artifactId>
+            <version>${microsoft-graph.version}</version>
         </dependency>
 
         <dependency>
@@ -110,60 +167,6 @@
             <version>${google-api-client-jackson2.version}</version>
         </dependency>
 
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <optional>true</optional>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-mail</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-actuator</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.google.cloud.sql</groupId>
-            <artifactId>postgres-socket-factory</artifactId>
-            <version>${google-cloud-sql.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.auth0</groupId>
-            <artifactId>java-jwt</artifactId>
-            <version>${java-jwt.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.mapstruct</groupId>
-            <artifactId>mapstruct</artifactId>
-            <version>${mapstruct.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.mapstruct</groupId>
-            <artifactId>mapstruct-processor</artifactId>
-            <version>${mapstruct.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>jakarta.validation</groupId>
-            <artifactId>jakarta.validation-api</artifactId>
-            <version>${jakarta-validation-api.version}</version>
-        </dependency>
-
-        <!-- CLOUD PROVIDER LIBRARIES -->
-
-        <dependency>
-            <groupId>com.microsoft.graph</groupId>
-            <artifactId>microsoft-graph</artifactId>
-            <version>5.79.0</version>
-        </dependency>
-
         <!-- SECURITY -->
 
         <dependency>
@@ -172,12 +175,32 @@
             <version>${java-jwt.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-config</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-oauth2-client</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-oauth2-jose</artifactId>
+        </dependency>
+
         <!-- TESTING -->
 
         <dependency>
-        <groupId>org.mockito</groupId>
-        <artifactId>mockito-junit-jupiter</artifactId>
-        <scope>test</scope>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-junit-jupiter</artifactId>
+            <scope>test</scope>
         </dependency>
 
         <dependency>
@@ -220,6 +243,8 @@
                                 <exclude>com/authorisation/registration/**</exclude>
                                 <exclude>com/authorisation/dto/**</exclude>
                                 <exclude>com/authorisation/entities/**</exclude>
+                                <exclude>com/authorisation/response/**</exclude>
+                                <exclude>com/authorisation/requests/**</exclude>
                             </excludes>
                         </configuration>
                     </execution>

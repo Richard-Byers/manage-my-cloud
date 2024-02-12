@@ -1,13 +1,14 @@
 import Navbar from "../../nav/Navbar";
 import React, {useEffect} from "react";
 import './ManageConnectionsPage.css';
+import {useTranslation} from 'react-i18next';
 import {AuthData} from "../../routing/AuthWrapper";
 import AddConnectionsModal from "../../modals/managingConnections/AddConnectionsModal"
 import {buildAxiosRequestWithHeaders} from "../../helpers/AxiosHelper";
 import Connection from "./Connection";
 
 const ManageConnectionsPage = () => {
-
+    const {t} = useTranslation();
     const {user, refreshUser} = AuthData();
 
     const linkedAccountsArray = Object.entries(user?.linkedAccounts || {})
@@ -31,7 +32,7 @@ const ManageConnectionsPage = () => {
         }
 
         if (code) {
-            buildAxiosRequestWithHeaders('GET', `/onedrive-store-tokens?code=${code}&email=${user?.email}`,headers ,{}).then(() => {
+            buildAxiosRequestWithHeaders('GET', `/onedrive-store-tokens?code=${code}&email=${user?.email}`, headers, {}).then(() => {
                 refreshUser(user?.email);
                 window.history.replaceState({}, document.title, newUrl);
             });
@@ -43,27 +44,29 @@ const ManageConnectionsPage = () => {
             <Navbar/>
             <div className={"manage-connections-page-content-grid"}>
                 <div className="manage-connections-page-title-container">
-                    Manage Connections
+                    {t('main.manageConnectionsPage.title')}
                 </div>
 
-                <div className={linkAccountsClassname}>
-                    {user?.linkedAccounts.linkedAccountsCount === 0 ? (
-                        <>
-                            <div className={"manage-connections-page-link-text"}> To link an account press the button
-                                below
+                {user?.linkedAccounts.linkedAccountsCount === 0 ? (
+                    <>
+                        <div className={linkAccountsClassname}>
+                            <div className={"manage-connections-page-link-text"}>
+                                To link an account press the button below
                             </div>
-                            <AddConnectionsModal
-                                oneDrive={user?.linkedAccounts.oneDrive} googleDrive={user?.linkedAccounts.googleDrive}/> </>) : linkedAccountsArray.filter(({ value }) => value).map(({
-                                                                                                               key,
-                                                                                                               value
-                                                                                                           }) => (
-                        <Connection key={key} connectionProvider={key} isConnected={value}/>
-                    ))}
-                </div>
+                            <AddConnectionsModal oneDrive={user?.linkedAccounts.oneDrive}
+                                                 googleDrive={user?.linkedAccounts.googleDrive}/>
+                        </div>
+                    </>) : linkedAccountsArray.filter(({value}) => value).map(({
+                                                                                   key,
+                                                                                   value
+                                                                               }) => (
+                    <Connection key={key} connectionProvider={key} isConnected={value}/>
+                ))}
 
                 {user?.linkedAccounts.linkedAccountsCount !== undefined && user?.linkedAccounts.linkedAccountsCount >= 1 ? (
                     <div className={"manage-connections-page-link-button-container"}>
-                        <AddConnectionsModal oneDrive={user?.linkedAccounts.oneDrive} googleDrive={user?.linkedAccounts.googleDrive}/>
+                        <AddConnectionsModal oneDrive={user?.linkedAccounts.oneDrive}
+                                             googleDrive={user?.linkedAccounts.googleDrive}/>
                     </div>) : null}
             </div>
         </div>

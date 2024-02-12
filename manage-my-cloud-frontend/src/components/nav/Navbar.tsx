@@ -1,25 +1,31 @@
 import React from 'react';
-import {Link} from 'react-router-dom';
+import {Link, useNavigate} from 'react-router-dom';
 import './Navbar.css';
 import logo from '../images/managemycloudlogo.png';
-import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import {ROUTES} from "../../constants/RouteConstants";
 import {Popover} from "@mui/material";
 import {AuthData} from "../routing/AuthWrapper";
-import {useNavigate} from "react-router-dom";
 
 const Navbar: React.FC = () => {
-    const {logout} = AuthData();
+    const {user, logout} = AuthData();
     const navigate = useNavigate();
-    const [showProfilePopover, setShowProfilePopover] = React.useState(false);
+    const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+    const open = Boolean(anchorEl);
 
-    function toggleProfilePopover() {
-        setShowProfilePopover(!showProfilePopover);
-    }
+    const handlePopoverOpen = (event: React.MouseEvent<HTMLElement>) => {
+        setAnchorEl(event.currentTarget);
+      };
+
+    const handlePopoverClose = () => {
+    setAnchorEl(null);
+    };
 
     function navigateToProfile() {
         navigate(ROUTES.PROFILE);
     }
+
+    // Retrieve profile image URL from local storage
+    const profileImage = localStorage.getItem('profileImage') || logo;
 
     return (
         <nav className="navbar">
@@ -45,29 +51,33 @@ const Navbar: React.FC = () => {
                     </Link>
                 </li>
             </ul>
-            <button className={"profile-button"} onClick={toggleProfilePopover}>
-                <AccountCircleIcon
-                    sx={{fontSize: 50, color: 'white'}}/>
-                {showProfilePopover && (<Popover
-                    anchorOrigin={{
-                        vertical: 77,
-                        horizontal: 1770,
-                    }}
-                    transformOrigin={{
-                        vertical: 'top',
-                        horizontal: 'left',
-                    }}
-                    open>
-                    <div className={'popover-container'}>
-                        <button className={'popover-button'} onClick={navigateToProfile}>
-                            Profile
-                        </button>
-                        <button className={'popover-button'} onClick={logout}>
-                            Logout
-                        </button>
-                    </div>
-                </Popover>)}
-            </button>
+            <div>
+    <button className="profile-button" onClick={handlePopoverOpen}>
+        <img src={profileImage} alt="Profile" className="popover-style"/>
+    </button>
+    <Popover
+      open={open}
+      anchorEl={anchorEl}
+      onClose={handlePopoverClose}
+      anchorOrigin={{
+        vertical: 'bottom',
+        horizontal: 'center',
+      }}
+      transformOrigin={{
+        vertical: 'top',
+        horizontal: 'center',
+      }}
+    >
+      <div className={'popover-container'}>
+        <button className={'popover-button'} onClick={navigateToProfile}>
+          Profile
+        </button>
+        <button className={'popover-button'} onClick={logout}>
+          Logout
+        </button>
+      </div>
+    </Popover>
+  </div>
         </nav>
     );
 };

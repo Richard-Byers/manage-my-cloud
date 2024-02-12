@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.Date;
+
 @Getter
 @Setter
 @Entity
@@ -23,6 +25,7 @@ public class CloudPlatform {
     private String platformName;
     @Column(length = 2000)
     private String accessToken;
+    private Date accessTokenExpiryDate;
     @Column(length = 2000)
     private String refreshToken;
 

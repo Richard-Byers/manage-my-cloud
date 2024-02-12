@@ -51,7 +51,7 @@ public class RegistrationController {
         eventPublisher.publishEvent(new RegistrationCompleteEvent(userEntity, applicationUrl(request)));
 
         //Return the email of the user to use in the confirmation message
-        return String.format("Confirmation email has been sent to %s. Please verify your account", userEntity.getEmail());
+        return userEntity.getEmail();
     }
 
     @GetMapping("verifyEmail")

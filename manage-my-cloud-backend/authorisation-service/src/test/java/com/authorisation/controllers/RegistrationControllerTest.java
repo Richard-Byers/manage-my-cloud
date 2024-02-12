@@ -69,7 +69,7 @@ class RegistrationControllerTest {
         // given
         RegistrationRequest registrationRequest = generateRegistrationRequest();
         UserEntity expectedUserEntity = generateUserEntity();
-        String expectedMessage = String.format("Confirmation email has been sent to %s. Please verify your account", expectedUserEntity.getEmail());
+        String expectedMessage = expectedUserEntity.getEmail();
 
         // when
         given(userService.registerUser(registrationRequest)).willReturn(expectedUserEntity);

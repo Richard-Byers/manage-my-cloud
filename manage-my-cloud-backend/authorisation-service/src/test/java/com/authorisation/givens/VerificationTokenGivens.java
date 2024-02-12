@@ -22,7 +22,8 @@ public class VerificationTokenGivens {
                 true,
                 null,
                 null,
-                new LinkedAccounts()
+                new LinkedAccounts(),
+                null
         ));
         return verificationToken;
     }
@@ -41,7 +42,8 @@ public class VerificationTokenGivens {
                 false,
                 null,
                 null,
-                new LinkedAccounts()
+                new LinkedAccounts(),
+                null
         ));
         return verificationToken;
     }

@@ -1,0 +1,74 @@
+{
+  "main": {
+    "header": "Manage My Cloud",
+    "dashboard": {
+      "title": "Dashboard",
+      "manageConnectionsTextBeforeLink": "To add or remove drives, please head to ",
+      "manageConnectionsLink": "Manage Connections",
+      "dashboardCardModal": {
+        "driveInformation": {
+          "accountDetails": "Account Details",
+          "usedStorage": "Used Storage",
+          "totalStorage": "Total Storage"
+        }
+      },
+      "connectedDrivesCard": {
+        "storageUsed": "Storage Used"
+      },
+      "dashboardPageButtons": {
+        "deleteDuplicates": "Delete Duplicates",
+        "deleteRecommended": "Delete Recommended"
+      }
+    },
+    "landingPage": {
+      "mainText": "Optimise your cloud storage",
+      "subText": "and save money",
+      "subTextDescription": "We aim to de-clutter your cloud storage, \nsave you money, \nand reduce the cloud storage carbon footprint.",
+      "loginModal": {
+        "getStartedButton": "Get Started",
+        "mainTextOne": "Are you ready to start saving money",
+        "mainTextTwo": "and help the environment?",
+        "loginUsingGoogleButton": "Log in using Google",
+        "invalidUserOrEmailError": "Invalid email or password",
+        "loginButton": "Log In",
+        "signUpText": "Sign Up",
+        "resetPasswordText": "Reset Password"
+      },
+      "signUpModal": {
+        "getStartedButton": "Get Started"
+      }
+    },
+    "manageConnectionsPage": {
+      "title": "Manage Connections"
+    },
+    "profile": {
+      "title": "Profile"
+    },
+    "userProfileCard": {
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "emailAddress": "Email Address",
+      "password": "Password",
+      "updateProfileDetails": "Update Profile Details",
+      "logout": "Log Out"
+    },
+    "profileActionsCard": {
+      "accountActions": "Account Actions",
+      "deleteAccount": "Delete Account",
+      "requestData": "Request Data",
+      "viewTermsOfService": "View Terms of Service",
+      "downloadTermsOfService": "Download Terms of Service"
+    },
+    "profilePreferencesCard": {
+      "preferences": "Preferences"
+    },
+    "changeProfileImage": {
+      "changeProfileImage": "Change Profile Image",
+      "uploadImage": "Upload Image",
+      "noImageSelected": "No image selected. Please select an image to upload.",
+      "success": "Profile image successfully updated.",
+      "fileSizeError": "File size must be less than 2MB.",
+      "uploading": "Upload a new profile image"
+    }
+  }
+}

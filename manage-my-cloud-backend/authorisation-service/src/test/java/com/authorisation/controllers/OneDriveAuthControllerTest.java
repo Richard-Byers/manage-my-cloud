@@ -54,7 +54,7 @@ class OneDriveAuthControllerTest {
         response.setAccessToken("access_token");
         response.setRefreshToken("refresh_token");
         response.setTokenType("token_type");
-        response.setExpiresIn("3600");
+        response.setExpiresIn(3600L);
 
         when(oneDriveService.getAndStoreUserTokens(code, email)).thenReturn(response);
 
