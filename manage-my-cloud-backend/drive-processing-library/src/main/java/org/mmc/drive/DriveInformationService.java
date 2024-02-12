@@ -2,11 +2,11 @@ package org.mmc.drive;
 
 import com.google.api.client.auth.oauth2.TokenResponse;
 import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
-import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 import com.google.api.client.googleapis.auth.oauth2.GoogleRefreshTokenRequest;
 import com.google.api.client.googleapis.auth.oauth2.GoogleTokenResponse;
+import com.google.api.client.http.HttpRequestInitializer;
 import com.google.api.client.http.javanet.NetHttpTransport;
-import com.google.api.client.json.jackson2.JacksonFactory;
+import com.google.api.client.json.gson.GsonFactory;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -15,12 +15,13 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.FileList;
 import com.google.api.client.util.DateTime;
+import com.google.auth.oauth2.AccessToken;
+import com.google.auth.oauth2.GoogleCredentials;
 import com.microsoft.graph.authentication.TokenCredentialAuthProvider;
 import com.microsoft.graph.models.Drive;
 import com.microsoft.graph.requests.DriveItemCollectionPage;
 import com.microsoft.graph.requests.GraphServiceClient;
 import com.google.api.services.drive.model.About;
-import com.google.api.services.drive.Drive.Builder;
 import com.microsoft.graph.serializer.AdditionalDataManager;
 import okhttp3.Request;
 import org.mmc.Constants;
@@ -30,6 +31,7 @@ import org.mmc.response.DriveInformationReponse;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.security.GeneralSecurityException;
 import java.text.DecimalFormat;
 import java.time.Instant;
 import java.time.OffsetDateTime;
@@ -79,17 +81,17 @@ public class DriveInformationService implements IDriveInformationService {
                 usedGigabytes);
     }
 
-    public DriveInformationReponse getGoogleDriveInformation(String email, String refreshToken) {
+    private TokenResponse generateNewGoogleAccessToken(String refreshToken) {
 
         TokenResponse response = new GoogleTokenResponse();
 
         try {
             GoogleClientSecrets clientSecrets =
                     GoogleClientSecrets.load(
-                            JacksonFactory.getDefaultInstance(), new InputStreamReader(getClass().getResourceAsStream(Constants.GOOGLE_CREDENTIALS_FILE_PATH)));
+                            GsonFactory.getDefaultInstance(), new InputStreamReader(getClass().getResourceAsStream(Constants.GOOGLE_CREDENTIALS_FILE_PATH)));
             response = new GoogleRefreshTokenRequest(
                     new NetHttpTransport(),
-                    new JacksonFactory(),
+                    new GsonFactory(),
                     refreshToken,
                     clientSecrets.getDetails().getClientId(),
                     clientSecrets.getDetails().getClientSecret())
@@ -97,11 +99,25 @@ public class DriveInformationService implements IDriveInformationService {
         } catch (IOException e) {
             System.out.println(e);
         }
-        // Create a Credential instance with the access token
-        GoogleCredential credential = new GoogleCredential().setAccessToken(response.getAccessToken());
+
+        return response;
+    }
+
+    public DriveInformationReponse getGoogleDriveInformation(String email, String refreshToken, String accessToken) {
+
+        //Check if access token is expired or not, no point generating new one if one in the DB works
+        try {
+            if (isGoogleAccessTokenExpired(accessToken)) {
+                accessToken = generateNewGoogleAccessToken(refreshToken).getAccessToken();
+            }
+        } catch (GeneralSecurityException e) {
+            System.out.println(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
         // Create a Drive service
-        com.google.api.services.drive.Drive service = new Builder(new NetHttpTransport(), new JacksonFactory(), credential)
+        com.google.api.services.drive.Drive service = new com.google.api.services.drive.Drive.Builder(new NetHttpTransport(), GsonFactory.getDefaultInstance(), getHttpRequestInitializer(accessToken))
                 .setApplicationName("Manage My Cloud")
                 .build();
 
@@ -179,15 +195,40 @@ public class DriveInformationService implements IDriveInformationService {
         });
     }
 
-    public JsonNode fetchAllGoogleDriveFiles(String accessToken) throws IOException {
-        // Create a GoogleCredentials instance and set your access token
-        GoogleCredential credential = new GoogleCredential().setAccessToken(accessToken);
+    private boolean isGoogleAccessTokenExpired(String accessToken) throws GeneralSecurityException, IOException {
 
-        // Create a new authorized API client
-        com.google.api.services.drive.Drive service = new Builder(new NetHttpTransport(), new JacksonFactory(), credential)
+        try {
+
+            com.google.api.services.drive.Drive service = new com.google.api.services.drive.Drive.Builder(new NetHttpTransport(), GsonFactory.getDefaultInstance(), getHttpRequestInitializer(accessToken))
+                    .setApplicationName("Manage My Cloud")
+                    .build();
+
+            //Try to request information back about the user, if it fails, the token is expired
+            service.about().get().setFields("user").execute();
+            return false; // If the code reaches this point, then the access token is still valid
+        } catch (Exception e) {
+            if (e.getMessage().contains("401 Unauthorized")) {
+                return true; // The access token is expired or invalid
+            } else {
+                throw e; // Some other error occurred
+            }
+        }
+    }
+
+    public JsonNode fetchAllGoogleDriveFiles(String refreshToken, String accessToken) throws IOException {
+
+        //Check if access token is expired or not, no point generating new one if one in the DB works
+        try {
+            if (isGoogleAccessTokenExpired(accessToken)) {
+                accessToken = generateNewGoogleAccessToken(refreshToken).getAccessToken();
+            }
+        } catch (GeneralSecurityException e) {
+            System.out.println(e);
+        }
+
+        com.google.api.services.drive.Drive service = new com.google.api.services.drive.Drive.Builder(new NetHttpTransport(), GsonFactory.getDefaultInstance(), getHttpRequestInitializer(accessToken))
                 .setApplicationName("Manage My Cloud")
                 .build();
-
         CustomDriveItem root = new CustomDriveItem();
         root.setName("root");
         root.setType("Folder");
@@ -227,6 +268,15 @@ public class DriveInformationService implements IDriveInformationService {
 
         return allFiles;
     }
+
+    private HttpRequestInitializer getHttpRequestInitializer(String accessToken) {
+        // Create a Credentials instance with the access token
+        GoogleCredentials credentials = GoogleCredentials.create(new AccessToken(accessToken, null));
+
+        return httpRequest -> credentials.getRequestMetadata().forEach(httpRequest.getHeaders()::put);
+    }
+
+
 
     public DriveInformationReponse mapToDriveInformationResponse(String displayName, String email, Double total, Double used) {
 
