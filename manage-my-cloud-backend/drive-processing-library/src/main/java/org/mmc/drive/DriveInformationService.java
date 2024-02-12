@@ -276,8 +276,6 @@ public class DriveInformationService implements IDriveInformationService {
         return httpRequest -> credentials.getRequestMetadata().forEach(httpRequest.getHeaders()::put);
     }
 
-
-
     public DriveInformationReponse mapToDriveInformationResponse(String displayName, String email, Double total, Double used) {
 
         DriveInformationReponse driveInformationReponse = new DriveInformationReponse();
