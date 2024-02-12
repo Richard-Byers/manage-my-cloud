@@ -12,6 +12,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.google.api.services.drive.model.File;
+import com.google.api.services.drive.model.FileList;
 import com.microsoft.graph.authentication.TokenCredentialAuthProvider;
 import com.microsoft.graph.models.Drive;
 import com.microsoft.graph.requests.DriveItemCollectionPage;
@@ -33,6 +35,7 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 
 public class DriveInformationService implements IDriveInformationService {
 
@@ -172,6 +175,49 @@ public class DriveInformationService implements IDriveInformationService {
 
             parent.getChildren().add(customSubItem);
         });
+    }
+
+    public JsonNode fetchAllGoogleDriveFiles(String accessToken) throws IOException {
+        // Create a GoogleCredentials instance and set your access token
+        GoogleCredential credential = new GoogleCredential().setAccessToken(accessToken);
+
+        // Create a new authorized API client
+        com.google.api.services.drive.Drive service = new Builder(new NetHttpTransport(), new JacksonFactory(), credential)
+                .setApplicationName("Manage My Cloud")
+                .build();
+
+        CustomDriveItem root = new CustomDriveItem();
+        root.setName("root");
+        root.setType("Folder");
+        root.setChildren(fetchFilesInFolder(service, "root"));
+
+        return mapper.valueToTree(root);
+    }
+
+    private List<CustomDriveItem> fetchFilesInFolder(com.google.api.services.drive.Drive service, String folderId) throws IOException {
+        List<CustomDriveItem> allFiles = new ArrayList<>();
+
+        // Define the fields included in the response
+        String fields = "nextPageToken, files(id, name, mimeType)";
+
+        // Make the request
+        com.google.api.services.drive.Drive.Files.List request = service.files().list().setFields(fields).setQ("'" + folderId + "' in parents");
+
+        FileList fileList = request.execute();
+        for (File file : fileList.getFiles()) {
+            CustomDriveItem customItem = new CustomDriveItem();
+            customItem.setName(file.getName());
+            customItem.setType(file.getMimeType());
+            customItem.setChildren(new ArrayList<>());
+
+            // If this file is a folder, fetch its files
+            if (file.getMimeType().equals("application/vnd.google-apps.folder")) {
+                customItem.getChildren().addAll(fetchFilesInFolder(service, file.getId()));
+            }
+            allFiles.add(customItem);
+        }
+
+        return allFiles;
     }
 
     public DriveInformationReponse mapToDriveInformationResponse(String displayName, String email, Double total, Double used) {

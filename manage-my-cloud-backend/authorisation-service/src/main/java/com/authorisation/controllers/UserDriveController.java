@@ -74,9 +74,17 @@ public class UserDriveController {
             } catch (Exception e) {
                 return ResponseEntity.badRequest().build();
             }
+        } else if (connectionProvider.equals(GOOGLEDRIVE)) {
+            String accessToken = decrypt(cloudPlatform.getAccessToken());
+            try {
+                JsonNode jsonNode = driveInformationService.fetchAllGoogleDriveFiles(accessToken);
+                return ResponseEntity.ok(jsonNode);
+            } catch (Exception e) {
+                return ResponseEntity.badRequest().build();
+            }
+        } else {
+            return ResponseEntity.badRequest().build();
         }
-
-        return ResponseEntity.badRequest().build();
     }
 
 
