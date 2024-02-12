@@ -14,6 +14,7 @@ import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.FileList;
+import com.google.api.client.util.DateTime;
 import com.microsoft.graph.authentication.TokenCredentialAuthProvider;
 import com.microsoft.graph.models.Drive;
 import com.microsoft.graph.requests.DriveItemCollectionPage;
@@ -30,6 +31,7 @@ import org.mmc.response.DriveInformationReponse;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.text.DecimalFormat;
+import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -189,33 +191,39 @@ public class DriveInformationService implements IDriveInformationService {
         CustomDriveItem root = new CustomDriveItem();
         root.setName("root");
         root.setType("Folder");
-        root.setChildren(fetchFilesInFolder(service, "root"));
+        root.setChildren(performFetchAllFiles(service));
 
         return mapper.valueToTree(root);
     }
 
-    private List<CustomDriveItem> fetchFilesInFolder(com.google.api.services.drive.Drive service, String folderId) throws IOException {
+    private List<CustomDriveItem> performFetchAllFiles(com.google.api.services.drive.Drive service) throws IOException {
         List<CustomDriveItem> allFiles = new ArrayList<>();
 
         // Define the fields included in the response
-        String fields = "nextPageToken, files(id, name, mimeType)";
+        String fields = "nextPageToken, files(id, name, mimeType, createdTime, webViewLink)";
 
-        // Make the request
-        com.google.api.services.drive.Drive.Files.List request = service.files().list().setFields(fields).setQ("'" + folderId + "' in parents");
+        // Make the request, get the fields for each file and ignore folders
+        com.google.api.services.drive.Drive.Files.List request = service.files().list().setFields(fields).setQ("mimeType != 'application/vnd.google-apps.folder'");
 
-        FileList fileList = request.execute();
-        for (File file : fileList.getFiles()) {
-            CustomDriveItem customItem = new CustomDriveItem();
-            customItem.setName(file.getName());
-            customItem.setType(file.getMimeType());
-            customItem.setChildren(new ArrayList<>());
+        FileList fileList;
+        do {
+            fileList = request.execute();
+            for (File file : fileList.getFiles()) {
 
-            // If this file is a folder, fetch its files
-            if (file.getMimeType().equals("application/vnd.google-apps.folder")) {
-                customItem.getChildren().addAll(fetchFilesInFolder(service, file.getId()));
+                // Convert the Google DateTime to Java OffsetDateTime
+                DateTime googleDateTime = file.getCreatedTime();
+                OffsetDateTime offsetDateTime = OffsetDateTime.ofInstant(Instant.ofEpochSecond(googleDateTime.getValue()), ZoneId.systemDefault());
+
+                CustomDriveItem customItem = new CustomDriveItem();
+                customItem.setName(file.getName());
+                customItem.setType(file.getMimeType());
+                customItem.setCreatedDateTime(offsetDateTime);
+                customItem.setWebUrl(file.getWebViewLink());
+
+                allFiles.add(customItem);
             }
-            allFiles.add(customItem);
-        }
+            request.setPageToken(fileList.getNextPageToken());
+        } while (fileList.getNextPageToken() != null && fileList.getNextPageToken().length() > 0);
 
         return allFiles;
     }
