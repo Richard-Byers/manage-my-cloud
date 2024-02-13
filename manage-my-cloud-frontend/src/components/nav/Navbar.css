@@ -47,7 +47,7 @@
     width: 100%;
 }
 
-.navbar-nav li{
+.navbar-nav li {
     list-style: none;
     align-items: center;
 }
@@ -72,6 +72,7 @@
 }
 
 .logo {
+    width: fit-content;
     display: flex;
     justify-content: flex-start;
     color: #fff;
@@ -98,11 +99,11 @@
     padding: 0;
 }
 
-.sidebar-hidden{
+.sidebar-hidden {
     display: none;
 }
 
-.sidebar-visible{
+.sidebar-visible {
     margin: 0;
     padding: 0;
     position: fixed;
@@ -120,36 +121,43 @@
     justify-content: flex-start;
 }
 
-.sidebar li{
+.sidebar li {
     display: none;
     list-style: none;
     padding: 1em;
     width: 100%;
+    border-bottom: 2px solid #000000;
 }
 
-.sidebar li a{
+.sidebar li a {
     color: black;
     text-decoration: none;
     width: 100%;
     font-family: MontserratRegular, serif;
 }
 
-.sidebar-button-open{
+.sidebar-button-open {
     display: none;
     background: none;
     border: none;
     color: white;
 }
 
-.sidebar-button-close{
+.sidebar-button-close {
     display: none;
     background: none;
     border: none;
     color: #000000;
 }
 
-.hide-on-mobile{
+.hide-on-mobile {
     display: flex;
+}
+
+.logo-container {
+    display: flex;
+    align-items: center;
+    width: fit-content;
 }
 
 @font-face {
@@ -160,7 +168,7 @@
 
 @media only screen and (max-width: 940px) {
 
-    .navbar-nav{
+    .navbar-nav {
         margin: 0;
         width: 100%;
     }
@@ -168,18 +176,23 @@
     .sidebar li,
     .sidebar-button-open,
     .sidebar-button-close,
-    .sidebar-visible{
+    .sidebar-visible {
         display: flex;
     }
 
     .profile-button,
-    .hide-on-mobile{
+    .hide-on-mobile {
         display: none;
+    }
+
+    .logo img {
+        height: 80px;
+        object-fit: contain;
     }
 }
 
 @media only screen and (max-width: 400px) {
-    .sidebar-visible{
+    .sidebar-visible {
         width: 100%;
     }
 }
