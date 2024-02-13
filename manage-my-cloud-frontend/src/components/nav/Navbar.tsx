@@ -7,8 +7,10 @@ import {Popover} from "@mui/material";
 import {AuthData} from "../routing/AuthWrapper";
 import MenuIcon from '@mui/icons-material/Menu';
 import CloseIcon from '@mui/icons-material/Close';
+import {useTranslation} from "react-i18next";
 
 const Navbar: React.FC = () => {
+    const {t} = useTranslation();
     const {logout} = AuthData();
     const navigate = useNavigate();
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -54,17 +56,17 @@ const Navbar: React.FC = () => {
 
                 <li>
                     <Link to={ROUTES.DASHBOARD}>
-                        Dashboard
+                        {t("main.navbar.dashboard")}
                     </Link>
                 </li>
                 <li>
                     <Link to={ROUTES.MANAGE_CONNECTIONS}>
-                        Manage Connections
+                        {t("main.navbar.manageConnections")}
                     </Link>
                 </li>
                 <li>
                     <Link to={ROUTES.PROFILE}>
-                        Profile
+                        {t("main.navbar.profile")}
                     </Link>
                 </li>
             </ul>
@@ -77,17 +79,17 @@ const Navbar: React.FC = () => {
                 </li>
                 <li className="hide-on-mobile">
                     <Link to={ROUTES.DASHBOARD} className="nav-link">
-                        Dashboard
+                        {t("main.navbar.dashboard")}
                     </Link>
                 </li>
                 <li className="hide-on-mobile">
                     <Link to={ROUTES.MANAGE_CONNECTIONS} className="nav-link">
-                        Manage Connections
+                        {t("main.navbar.manageConnections")}
                     </Link>
                 </li>
                 <li className="hide-on-mobile">
                     <Link to={ROUTES.PROFILE} className="nav-link">
-                        Profile
+                        {t("main.navbar.profile")}
                     </Link>
                 </li>
                 <li className="nav-item" onClick={showSidebar}>

@@ -69,6 +69,11 @@
       "success": "Profile image successfully updated.",
       "fileSizeError": "File size must be less than 2MB.",
       "uploading": "Upload a new profile image"
+    },
+    "navbar": {
+      "dashboard": "Dashboard",
+      "manageConnections": "Manage Connections",
+      "profile": "Profile"
     }
   }
 }
