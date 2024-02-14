@@ -6,7 +6,6 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleTokenResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-
 import org.springframework.web.bind.annotation.*;
 
 @CrossOrigin(origins = "*")
@@ -22,7 +21,7 @@ public class GoogleAuthController {
     }
 
     @PostMapping("/link-google-account")
-    public ResponseEntity<GoogleTokenResponse>linkGoogleAccount(@RequestBody String authCode, @RequestParam("email") String email) {
+    public ResponseEntity<GoogleTokenResponse> linkGoogleAccount(@RequestBody String authCode, @RequestParam("email") String email) {
 
         GoogleTokenResponse response = googleAuthService.linkGoogleAccount(authCode, email);
 

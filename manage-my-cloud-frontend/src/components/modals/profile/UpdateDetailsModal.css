@@ -1,0 +1,56 @@
+.modal-update-details-button {
+    display: flex;
+    background: none;
+    align-items: center;
+    border-radius: 40px;
+    border: 2px solid #28AE6E;
+    color: #28ad6d;
+    font-family: MontserratBold, serif;
+    font-size: 18px;
+    font-style: normal;
+    width: 35%;
+    height: 40px;
+    justify-content: center;
+}
+
+.modal-update-details-button:hover {
+    cursor: pointer;
+}
+
+
+.modal-form-message {
+    display: flex;
+    justify-content: center;
+    font-family: MontserratRegular, serif;
+    font-size: 16px;
+    margin-top: -15px;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+
+/* For tablets: */
+@media (max-width: 768px) {
+    .modal-update-details-button {
+        font-size: 16px;
+        width: 50%;
+        height: 35px;
+    }
+
+    .modal-form-message {
+        font-size: 14px;
+    }
+}
+
+/* For smartphones: */
+@media (max-width: 480px) {
+    .modal-update-details-button {
+        font-size: 14px;
+        width: 70%;
+        height: 30px;
+    }
+
+    .modal-form-message {
+        font-size: 12px;
+    }
+}

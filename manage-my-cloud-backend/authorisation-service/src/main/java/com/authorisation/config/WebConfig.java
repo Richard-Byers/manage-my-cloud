@@ -1,7 +1,6 @@
 package com.authorisation.config;
 
 
-import com.microsoft.graph.requests.GraphServiceClient;
 import org.mmc.drive.DriveInformationService;
 import org.slf4j.Logger;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
@@ -9,7 +8,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;

@@ -1,15 +1,15 @@
 package com.authorisation.controllers;
 
 import com.authorisation.entities.PasswordResetToken;
+import com.authorisation.entities.UserEntity;
+import com.authorisation.entities.VerificationToken;
 import com.authorisation.event.RegistrationCompleteEvent;
 import com.authorisation.event.RegistrationCompleteEventListener;
 import com.authorisation.exception.EmailException;
 import com.authorisation.registration.RegistrationRequest;
 import com.authorisation.registration.password.PasswordResetRequest;
-import com.authorisation.entities.VerificationToken;
 import com.authorisation.repositories.PasswordResetTokenRepository;
 import com.authorisation.repositories.VerificationTokenRepository;
-import com.authorisation.entities.UserEntity;
 import com.authorisation.services.UserService;
 import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletRequest;

@@ -44,6 +44,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith(MockitoExtension.class)
 class UserDriveControllerTest {
 
+    ObjectMapper objectMapper = new ObjectMapper();
     @Autowired
     private MockMvc mockMvc;
     @Autowired
@@ -54,7 +55,18 @@ class UserDriveControllerTest {
     private CloudPlatformService cloudPlatformService;
     @MockBean
     private DriveInformationService driveInformationService;
-    ObjectMapper objectMapper = new ObjectMapper();
+
+    //Helper
+    private static void assertDriveInformationResponse(DriveInformationReponse expectedDriveInformationReponse, DriveInformationReponse response) {
+        assertEquals(expectedDriveInformationReponse.getDisplayName(), response.getDisplayName());
+        assertEquals(expectedDriveInformationReponse.getDriveType(), response.getDriveType());
+        assertEquals(expectedDriveInformationReponse.getTotal(), response.getTotal());
+        assertEquals(expectedDriveInformationReponse.getUsed(), response.getUsed());
+    }
+
+    private static void assertJsonNodeResponse(JsonNode expectedJsonNode, JsonNode response) {
+        assertEquals(expectedJsonNode.get("test"), response.get("test"));
+    }
 
     @BeforeEach
     public void setup() {
@@ -262,18 +274,6 @@ class UserDriveControllerTest {
                         .param("provider", "random").with(csrf()))
                 //then
                 .andExpect(status().isBadRequest());
-    }
-
-    //Helper
-    private static void assertDriveInformationResponse(DriveInformationReponse expectedDriveInformationReponse, DriveInformationReponse response) {
-        assertEquals(expectedDriveInformationReponse.getDisplayName(), response.getDisplayName());
-        assertEquals(expectedDriveInformationReponse.getDriveType(), response.getDriveType());
-        assertEquals(expectedDriveInformationReponse.getTotal(), response.getTotal());
-        assertEquals(expectedDriveInformationReponse.getUsed(), response.getUsed());
-    }
-
-    private static void assertJsonNodeResponse(JsonNode expectedJsonNode, JsonNode response) {
-        assertEquals(expectedJsonNode.get("test"), response.get("test"));
     }
 
 

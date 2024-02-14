@@ -32,17 +32,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith(MockitoExtension.class)
 class AuthControllerTest {
 
+    private static final String LOGIN_URL = "/login";
+    private static final String REFRESH_USER_URL = "/refresh-user";
+    ObjectMapper objectMapper = new ObjectMapper();
     @Autowired
     private MockMvc mockMvc;
     @MockBean
     private UserService userService;
     @MockBean
     private UserAuthenticationProvider userAuthenticationProvider;
-
-    private static final String LOGIN_URL = "/login";
-    private static final String REFRESH_USER_URL = "/refresh-user";
-
-    ObjectMapper objectMapper = new ObjectMapper();
 
     @Test
     void authController_login_returnsOkWithUser() throws Exception {

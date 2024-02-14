@@ -1,0 +1,92 @@
+.delete-account-modal {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    font-size: 20px;
+}
+
+.delete-account-modal h2 {
+    align-self: center;
+    margin-bottom: 20px;
+    font-size: 24px;
+    text-align: center;
+}
+
+.delete-account-modal input[type="password"] {
+    padding: 10px;
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+.delete-account-modal button {
+    margin-bottom: 5px;
+    padding: 15px;
+    font-size: 18px;
+    background: #05919f;
+    border-radius: 4px;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    width: 150px;
+    height: 50px;
+}
+
+.delete-account-modal button:hover {
+    background: #027b8b;
+}
+
+.delete-account-modal div {
+    color: red;
+    font-size: 14px;
+    height: 20px;
+    align-self: center;
+}
+
+.error-message {
+    color: red;
+    font-size: 14px;
+    height: 20px;
+    align-self: flex-start;
+}
+
+@media (max-width: 992px) {
+    .delete-account-modal {
+        font-size: 18px;
+    }
+
+    .delete-account-modal h2 {
+        font-size: 22px;
+    }
+
+    .delete-account-modal input[type="password"] {
+        font-size: 16px;
+    }
+
+    .delete-account-modal button {
+        font-size: 16px;
+        width: 130px;
+        height: 40px;
+    }
+}
+
+@media (max-width: 768px) {
+    .delete-account-modal {
+        font-size: 16px;
+    }
+
+    .delete-account-modal h2 {
+        font-size: 20px;
+    }
+
+    .delete-account-modal input[type="password"] {
+        font-size: 14px;
+    }
+
+    .delete-account-modal button {
+        font-size: 14px;
+        width: 110px;
+        height: 35px;
+    }
+}

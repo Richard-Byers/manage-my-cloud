@@ -47,7 +47,7 @@ public class UserDriveController {
                 return ResponseEntity.badRequest().build();
             }
         } else if (connectionProvider.equals(GOOGLEDRIVE)) {
-            DriveInformationReponse drive = new DriveInformationReponse("Google Drive", "email" ,"placeholder", 0.0, 0.0);
+            DriveInformationReponse drive = new DriveInformationReponse("Google Drive", "email", "placeholder", 0.0, 0.0);
             return ResponseEntity.ok(drive);
         }
 

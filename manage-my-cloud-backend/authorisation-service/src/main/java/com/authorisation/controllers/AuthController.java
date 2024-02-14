@@ -5,12 +5,12 @@ import com.authorisation.dto.CredentialsDto;
 import com.authorisation.dto.EmailDto;
 import com.authorisation.dto.UserDto;
 import com.authorisation.services.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import jakarta.validation.Valid;
 
 @RequiredArgsConstructor
 @RestController

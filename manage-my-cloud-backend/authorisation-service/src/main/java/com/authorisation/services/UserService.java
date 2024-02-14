@@ -3,6 +3,7 @@ package com.authorisation.services;
 import com.authorisation.dto.CredentialsDto;
 import com.authorisation.dto.EmailDto;
 import com.authorisation.dto.UserDto;
+import com.authorisation.entities.CloudPlatform;
 import com.authorisation.entities.LinkedAccounts;
 import com.authorisation.entities.UserEntity;
 import com.authorisation.entities.VerificationToken;
@@ -13,6 +14,7 @@ import com.authorisation.exception.UserNotVerifiedException;
 import com.authorisation.mappers.UserMapper;
 import com.authorisation.registration.RegistrationRequest;
 import com.authorisation.registration.password.PasswordResetRequest;
+import com.authorisation.repositories.CloudPlatformRepository;
 import com.authorisation.repositories.UserEntityRepository;
 import com.authorisation.repositories.VerificationTokenRepository;
 import jakarta.transaction.Transactional;
@@ -31,7 +33,7 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class UserService implements IUserService {
-
+    private final CloudPlatformRepository cloudPlatformRepository;
     private final UserEntityRepository userEntityRepository;
     private final VerificationTokenRepository verificationTokenRepository;
     private final PasswordEncoder passwordEncoder;
@@ -130,7 +132,8 @@ public class UserService implements IUserService {
     }
 
     @Override
-    @Transactional // to avoid LazyInitializationException, If an error occurs during the execution of this method, all database operations within the transaction will be rolled back.
+    @Transactional
+    // to avoid LazyInitializationException, If an error occurs during the execution of this method, all database operations within the transaction will be rolled back.
     public String validateToken(String verificationToken) {
         VerificationToken token = verificationTokenRepository.findByToken(verificationToken);
 
@@ -192,6 +195,7 @@ public class UserService implements IUserService {
         userEntity.setPassword(passwordEncoder.encode(newPassword));
         userEntityRepository.save(userEntity);
     }
+
     private byte[] loadDefaultProfileImage() {
         // Load the default profile image from the classpath
         try {
@@ -207,4 +211,59 @@ public class UserService implements IUserService {
         user.setProfileImage(newImage);
         userEntityRepository.save(user);
     }
+
+    @Transactional
+    public void deleteUser(CredentialsDto credentialsDto) {
+        UserEntity user = findUserByEmail(credentialsDto.getEmail())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        if (passwordEncoder.matches(credentialsDto.getPassword(), user.getPassword())) {
+            // Check if the user has a OneDrive account linked and delete it if it exists
+            CloudPlatform oneDriveAccount = cloudPlatformRepository.findByUserEntityEmailAndPlatformName(user.getEmail(), "OneDrive");
+            if (oneDriveAccount != null) {
+                try {
+                    cloudPlatformRepository.deleteByUserEntityEmailAndPlatformName(user.getEmail(), "OneDrive");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            // Check if the user has a GoogleDrive account linked and delete it if it exists
+            CloudPlatform googleDriveAccount = cloudPlatformRepository.findByUserEntityEmailAndPlatformName(user.getEmail(), "GoogleDrive");
+            if (googleDriveAccount != null) {
+                cloudPlatformRepository.deleteByUserEntityEmailAndPlatformName(user.getEmail(), "GoogleDrive");
+            }
+            userEntityRepository.delete(user);
+        } else {
+            throw new RuntimeException("Password doesn't match");
+        }
+    }
+
+    public String getUserData(UserEntity user) {
+        LinkedAccounts linkedAccounts = user.getLinkedAccounts();
+        String linkedDriveTypes = "";
+        if (linkedAccounts.isOneDrive()) {
+            linkedDriveTypes += "OneDrive ";
+        }
+        if (linkedAccounts.isGoogleDrive()) {
+            linkedDriveTypes += "GoogleDrive ";
+        }
+
+        // Add a note if there are no linked accounts
+        if (!linkedAccounts.isOneDrive() && !linkedAccounts.isGoogleDrive()) {
+            linkedDriveTypes = "No linked accounts";
+        }
+
+        return String.format("Email: %s\nFirst Name: %s\nLast Name: %s\nLinked Drive Types: %s",
+                user.getEmail(), user.getFirstName(), user.getLastName(), linkedDriveTypes);
+    }
+
+    public void updateDetails(UserEntity user, String newFirstName, String newLastName) {
+        if (newFirstName != null && !newFirstName.isEmpty()) {
+            user.setFirstName(newFirstName);
+        }
+        if (newLastName != null && !newLastName.isEmpty()) {
+            user.setLastName(newLastName);
+        }
+        userEntityRepository.save(user);
+    }
+
 }
