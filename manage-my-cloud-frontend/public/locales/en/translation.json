@@ -13,7 +13,6 @@
         }
       },
       "connectedDrivesCard": {
-        "driveType": "Drive Type",
         "storageUsed": "Storage Used"
       },
       "dashboardPageButtons": {
@@ -24,7 +23,31 @@
     "landingPage": {
       "mainText": "Optimise your cloud storage",
       "subText": "and save money",
-      "subTextDescription": "We aim to de-clutter your cloud storage, \nsave you money, \nand reduce the cloud storage carbon footprint."
+      "subTextDescription": "We aim to de-clutter your cloud storage, \nsave you money, \nand reduce the cloud storage carbon footprint.",
+      "loginModal": {
+        "getStartedButton": "Get Started",
+        "mainTextOne": "Are you ready to start saving money",
+        "mainTextTwo": "and help the environment?",
+        "loginUsingGoogleButton": "Log in using Google",
+        "invalidUserOrEmailError": "Invalid email or password",
+        "loginButton": "Log In",
+        "signUpText": "Sign Up",
+        "resetPasswordText": "Reset Password"
+      },
+      "signUpModal": {
+        "signUpTitle": "Sign up",
+        "mainTextOne": "Are you ready to start saving money",
+        "mainTextTwo": "and help the environment?",
+        "signUpButton": "Sign up",
+        "signUpConfirmationText": "Confirmation email sent to:"
+      },
+      "resetPasswordModal": {
+        "resetPasswordTitle": "Reset Password",
+        "mainTextOne": "Enter your email and passwords",
+        "mainTextTwo": "and we will send you a password reset link.",
+        "resetPasswordButton": "Reset Password",
+        "resetPasswordConfirmationText": "Reset link sent to:"
+      }
     },
     "manageConnectionsPage": {
       "title": "Manage Connections"
@@ -58,6 +81,12 @@
       "fileSizeError": "File size must be less than 2MB.",
       "uploading": "Upload a new profile image"
     },
+
+
+
+
+
+
     "deleteAccountModal": {
       "deleteAccount": "Delete Account",
       "enterPassword": "Enter password",
@@ -93,4 +122,3 @@
     }
   }
 }
-
