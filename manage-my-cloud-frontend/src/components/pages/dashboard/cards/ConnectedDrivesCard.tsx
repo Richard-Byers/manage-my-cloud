@@ -11,7 +11,6 @@ import {useTranslation} from "react-i18next";
 interface DriveInformation {
     displayName: string,
     email: string,
-    driveType: string,
     total: number,
     used: number,
 }
@@ -58,10 +57,6 @@ const CardContainer: React.FC<ConnectedDrivesCardProps> = ({connectionProvider})
                 <div className="item-drive-name">
                     <h2>{driveInformation.displayName}</h2>
                 </div>
-                <div className="item-drive-type">
-                    <h2>{t('main.dashboard.connectedDrivesCard.driveType')}:</h2>
-                    <h2>{driveInformation.driveType}</h2>
-                </div>
                 <div className='item-storage-used'>
                     <h2>{t('main.dashboard.connectedDrivesCard.storageUsed')}:</h2>
                     <h2>{driveInformation.used > 0.0 ? driveInformation.used : "< 0"}GB/{driveInformation.total}GB</h2>
@@ -87,7 +82,6 @@ async function getUserDrives(user: any, connectionProvider: string): Promise<Dri
     return {
         displayName: response.data.displayName,
         email: response.data.email,
-        driveType: response.data.driveType,
         total: response.data.total,
         used: response.data.used,
     };

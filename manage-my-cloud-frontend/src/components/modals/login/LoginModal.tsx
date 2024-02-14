@@ -6,10 +6,11 @@ import logo from "../../images/managemycloudlogo.png";
 import googleLogo from "../../images/login/google.png";
 import EmailIcon from '@mui/icons-material/Email';
 import LockIcon from '@mui/icons-material/Lock';
+import CloseIcon from '@mui/icons-material/Close';
 import {SignUpModal} from "../signUp/SignUpModal";
 import {ResetPasswordModal} from "../resetPassword/ResetPasswordModal";
-import { useGoogleLogin } from '@react-oauth/google';
 import {AuthData} from "../../routing/AuthWrapper";
+import {useTranslation} from "react-i18next";
 
 interface LoginProps {
     email: string;
@@ -17,6 +18,7 @@ interface LoginProps {
 }
 
 const LoginModal: React.FC = () => {
+    const {t} = useTranslation();
     const {login, googleLogin} = AuthData();
     const navigate = useNavigate();
     const [showModal, setShowModal] = useState(false);
@@ -58,6 +60,7 @@ const LoginModal: React.FC = () => {
     };
 
     const closeModal = () => {
+        setShowError(false);
         setShowSignUpModal(false);
         setShowModal(false);
     };
@@ -87,12 +90,14 @@ const LoginModal: React.FC = () => {
     return (
         <>
             <button className={"modal-login-button"} onClick={toggleModal}>
-                Login
+                {t('main.landingPage.loginModal.getStartedButton')}
             </button>
 
             {showModal && (
                 <div className="modal-overlay" onClick={closeModal}>
                     <div className="modal" onClick={stopPropagation}>
+
+                        <button className={"modal-close-button"} onClick={closeModal}> <CloseIcon className="svg_icons"/> </button>
 
                         <div className={"modal-logo"}>
                             <img src={logo} alt={"Manage My Cloud Logo"}/>
@@ -101,14 +106,14 @@ const LoginModal: React.FC = () => {
                         <div className={"modal-form-container"}>
 
                             <div className={"modal-description"}>
-                                Are you ready to start saving money
+                                {t('main.landingPage.loginModal.mainTextOne')}
                                 <br/>
-                                and help the environment?
+                                {t('main.landingPage.loginModal.mainTextTwo')}
                             </div>
 
                             <button className={"modal-login-google-button"} onClick={handleGoogleLogin}>
                                 <img className={"modal-login-google-logo"} src={googleLogo} alt={"Google Logo"}/>
-                                Log in using Google
+                                {t('main.landingPage.loginModal.loginUsingGoogleButton')}
                             </button>
 
                             <div className={"or-separator"}>
@@ -134,11 +139,11 @@ const LoginModal: React.FC = () => {
                                 </label>
                                 {showError && (
                                     <div className={"modal-form-error"}>
-                                        Invalid email or password
+                                        {t('main.landingPage.loginModal.invalidUserOrEmailError')}
                                     </div>
                                 )}
                                 <button className={"modal-form-submit-button"} type="submit">
-                                    Login
+                                    {t('main.landingPage.loginModal.loginButton')}
                                 </button>
                             </form>
 
@@ -146,10 +151,10 @@ const LoginModal: React.FC = () => {
 
                             <div className={"sign-up-login-container"}>
                                 <button className={"modal-login-reset-signup"} onClick={toggleForgotPasswordModal}>
-                                    Reset Password
+                                    {t('main.landingPage.loginModal.resetPasswordText')}
                                 </button>
-                                <button className={"modal-login-reset-signup"} onClick={toggleSignUpModal}>Sign
-                                    Up
+                                <button className={"modal-login-reset-signup"} onClick={toggleSignUpModal}>
+                                    {t('main.landingPage.loginModal.signUpText')}
                                 </button>
                             </div>
                         </div>

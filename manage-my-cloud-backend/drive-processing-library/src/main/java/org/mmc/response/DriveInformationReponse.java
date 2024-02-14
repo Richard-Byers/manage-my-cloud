@@ -17,9 +17,6 @@ public class DriveInformationReponse {
     // This is the email linked to the drive
     private String email;
 
-    // This is the plan type of the drive e.g. personal.....
-    private String driveType;
-
     // This is the total storage available on the drive
     private Double total;
 

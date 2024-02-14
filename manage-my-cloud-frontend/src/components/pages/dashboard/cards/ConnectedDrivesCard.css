@@ -51,16 +51,6 @@
   font-style: normal;
 }
 
-.item-drive-type {
-  display: flex;
-  justify-content: center;
-  width: 100%;
-  font-size: 0.8vw;
-  font-family: MontserratLight, serif;
-  line-height: normal;
-  font-style: normal;
-}
-
 .item-storage-used {
   display: flex;
   justify-content: center;

@@ -1,18 +1,38 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {Link, useNavigate} from 'react-router-dom';
 import './Navbar.css';
 import logo from '../images/managemycloudlogo.png';
 import {ROUTES} from "../../constants/RouteConstants";
 import {Popover} from "@mui/material";
 import {AuthData} from "../routing/AuthWrapper";
+import MenuIcon from '@mui/icons-material/Menu';
+import CloseIcon from '@mui/icons-material/Close';
+import {useTranslation} from "react-i18next";
 
 const Navbar: React.FC = () => {
-    const {user, logout} = AuthData();
+    const {t} = useTranslation();
+    const {logout} = AuthData();
     const navigate = useNavigate();
-    const [showProfilePopover, setShowProfilePopover] = React.useState(false);
+    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+    const [sidebarVisible, setSideBarVisible] = useState(false);
+    const open = Boolean(anchorEl);
 
-    function toggleProfilePopover() {
-        setShowProfilePopover(!showProfilePopover);
+    const sideBarClass = `sidebar ${sidebarVisible ? 'sidebar-visible' : 'sidebar-hidden'}`;
+
+    const handlePopoverOpen = (event: React.MouseEvent<HTMLElement>) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handlePopoverClose = () => {
+        setAnchorEl(null);
+    };
+
+    const showSidebar = () => {
+        setSideBarVisible(true);
+    }
+
+    const hideSideBar = () => {
+        setSideBarVisible(false);
     }
 
     function navigateToProfile() {
@@ -23,44 +43,74 @@ const Navbar: React.FC = () => {
     const profileImage = localStorage.getItem('profileImage') || logo;
 
     return (
-        <nav className="navbar">
-            <li className="logo">
-                <Link to={ROUTES.LANDING} className="nav-link-logo">
-                    <img src={logo} alt="manage my cloud logo" height="100" width="100"/>
-                </Link>
-            </li>
-            <ul className="navbar-nav">
-                <li className="nav-item">
-                    <Link to={ROUTES.DASHBOARD} className="nav-link">
-                        Dashboard
+        <nav className={"nav"}>
+
+            <ul className={sideBarClass}>
+                <li className="nav-item" onClick={hideSideBar}>
+                    <button className={"sidebar-button-close"}><CloseIcon/></button>
+                </li>
+
+                <li>
+                    <img src={profileImage} alt="Profile" className="popover-style"/>
+                </li>
+
+                <li>
+                    <Link to={ROUTES.DASHBOARD}>
+                        {t("main.navbar.dashboard")}
                     </Link>
                 </li>
-                <li className="nav-item">
-                    <Link to={ROUTES.MANAGE_CONNECTIONS} className="nav-link">
-                        Manage Connections
+                <li>
+                    <Link to={ROUTES.MANAGE_CONNECTIONS}>
+                        {t("main.navbar.manageConnections")}
                     </Link>
                 </li>
-                <li className="nav-item">
-                    <Link to={ROUTES.PROFILE} className="nav-link">
-                        Profile
+                <li>
+                    <Link to={ROUTES.PROFILE}>
+                        {t("main.navbar.profile")}
                     </Link>
                 </li>
             </ul>
-            <button className={"profile-button"} onClick={toggleProfilePopover}>
-                <img src={profileImage} alt="Profile" className="popover-style"/>
 
-                {/*these properties are specific to Material-UI's Popover component and cannot be directly translated to CSS.*/}
-                {showProfilePopover && (<Popover
+            <ul className="navbar-nav">
+                <li className="logo">
+                    <Link to={ROUTES.LANDING} className={"logo-container"}>
+                        <img src={logo} alt="manage my cloud logo" height="100" width="100"/>
+                    </Link>
+                </li>
+                <li className="hide-on-mobile">
+                    <Link to={ROUTES.DASHBOARD} className="nav-link">
+                        {t("main.navbar.dashboard")}
+                    </Link>
+                </li>
+                <li className="hide-on-mobile">
+                    <Link to={ROUTES.MANAGE_CONNECTIONS} className="nav-link">
+                        {t("main.navbar.manageConnections")}
+                    </Link>
+                </li>
+                <li className="hide-on-mobile">
+                    <Link to={ROUTES.PROFILE} className="nav-link">
+                        {t("main.navbar.profile")}
+                    </Link>
+                </li>
+                <li className="nav-item" onClick={showSidebar}>
+                    <button className={"sidebar-button-open"}><MenuIcon/></button>
+                </li>
+                <button className="profile-button" onClick={handlePopoverOpen}>
+                    <img src={profileImage} alt="Profile" className="popover-style"/>
+                </button>
+                <Popover
+                    open={open}
+                    anchorEl={anchorEl}
+                    onClose={handlePopoverClose}
                     anchorOrigin={{
-                        vertical: 77,
-                        horizontal: 1770,
+                        vertical: 'bottom',
+                        horizontal: 'center',
                     }}
                     transformOrigin={{
                         vertical: 'top',
-                        horizontal: 'left',
+                        horizontal: 'center',
                     }}
-
-                    open>
+                >
                     <div className={'popover-container'}>
                         <button className={'popover-button'} onClick={navigateToProfile}>
                             Profile
@@ -69,8 +119,8 @@ const Navbar: React.FC = () => {
                             Logout
                         </button>
                     </div>
-                </Popover>)}
-            </button>
+                </Popover>
+            </ul>
         </nav>
     );
 };
