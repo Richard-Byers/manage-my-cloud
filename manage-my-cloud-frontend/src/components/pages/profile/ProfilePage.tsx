@@ -4,11 +4,11 @@ import Navbar from '../../nav/Navbar';
 import ProfileActionsCard from './cards/ProfileActionsCard';
 import UserProfileCard from "./cards/UserProfileCard";
 import ProfilePreferencesCard from "./cards/ProfilePreferencesCard";
-import { useTranslation } from 'react-i18next'; 
+import {useTranslation} from 'react-i18next';
 
 
 const ProfilePage = () => {
-    const { t } = useTranslation();
+    const {t} = useTranslation();
 
     useEffect(() => {
         document.body.style.overflow = "hidden";

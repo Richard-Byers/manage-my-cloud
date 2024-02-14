@@ -35,7 +35,18 @@
         "resetPasswordText": "Reset Password"
       },
       "signUpModal": {
-        "getStartedButton": "Get Started"
+        "signUpTitle": "Sign up",
+        "mainTextOne": "Are you ready to start saving money",
+        "mainTextTwo": "and help the environment?",
+        "signUpButton": "Sign up",
+        "signUpConfirmationText": "Confirmation email sent to:"
+      },
+      "resetPasswordModal": {
+        "resetPasswordTitle": "Reset Password",
+        "mainTextOne": "Enter your email and passwords",
+        "mainTextTwo": "and we will send you a password reset link.",
+        "resetPasswordButton": "Reset Password",
+        "resetPasswordConfirmationText": "Reset link sent to:"
       }
     },
     "manageConnectionsPage": {
@@ -69,6 +80,11 @@
       "success": "Profile image successfully updated.",
       "fileSizeError": "File size must be less than 2MB.",
       "uploading": "Upload a new profile image"
+    },
+    "navbar": {
+      "dashboard": "Dashboard",
+      "manageConnections": "Manage Connections",
+      "profile": "Profile"
     }
   }
 }

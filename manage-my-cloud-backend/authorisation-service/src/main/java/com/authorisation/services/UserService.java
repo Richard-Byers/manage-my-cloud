@@ -50,7 +50,7 @@ public class UserService implements IUserService {
         Optional<UserEntity> userOptional = findUserByEmail(registrationRequest.email());
 
         if (userOptional.isPresent()) {
-            throw new UserAlreadyExistsException(String.format("User with email %s already exists", registrationRequest.email()));
+            throw new UserAlreadyExistsException("User already exists");
         }
 
         UserEntity newUser = new UserEntity();
