@@ -14,12 +14,14 @@ import java.util.Date;
 @NoArgsConstructor
 public class VerificationToken {
 
-    private static final int EXPIRATION_TIME_MINUTES = 10;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long Id;
     private String token;
     private Date expiryTime;
+
+    private static final int EXPIRATION_TIME_MINUTES = 10;
+
     @OneToOne
     @JoinColumn(name = "user_entity_id")
     private UserEntity userEntity;

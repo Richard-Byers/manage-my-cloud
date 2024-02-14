@@ -14,13 +14,15 @@ import java.util.Date;
 @NoArgsConstructor
 public class PasswordResetToken {
 
-    private static final int EXPIRATION_TIME_MINUTES = 10;
     @jakarta.persistence.Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long Id;
     private String token;
     private Date expiryTime;
     private String newPassword;
+
+    private static final int EXPIRATION_TIME_MINUTES = 10;
+
     @OneToOne
     @JoinColumn(name = "user_entity_id")
     private UserEntity userEntity;

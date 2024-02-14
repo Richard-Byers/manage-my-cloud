@@ -41,4 +41,9 @@ h1 {
     margin-left: 2pc;
     margin-bottom: 20%;
     box-shadow: 0 4px 25px 0 #05919f;
+    transition: background-color 0.3s ease;
+}
+
+.actions-button:hover {
+    background-color: #027b8b;
 }

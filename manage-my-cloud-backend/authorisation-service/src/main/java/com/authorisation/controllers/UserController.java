@@ -14,7 +14,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -26,7 +25,6 @@ import java.util.Optional;
 public class UserController {
 
     private final UserService userService;
-
 
     @PostMapping("/update-profile-Img")
     public ResponseEntity<?> updateProfileImg(@NotNull @RequestParam("image") MultipartFile image, @RequestParam("email") String email) {
@@ -51,7 +49,6 @@ public class UserController {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
         }
     }
-
 
     @PostMapping("/data-request")
     public ResponseEntity<Resource> getUserData(@RequestParam String email) {
@@ -95,6 +92,4 @@ public class UserController {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
         }
     }
-
-
 }

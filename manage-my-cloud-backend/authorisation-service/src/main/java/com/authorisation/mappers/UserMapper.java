@@ -8,8 +8,7 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring")
 public interface UserMapper {
 
-    @Mapping(source = "profileImage", target = "profileImage")
-        // workaround for byte[] mapping issue involving postgres and hibernate bytea type.
+    @Mapping(source = "profileImage", target = "profileImage") // workaround for byte[] mapping issue involving postgres and hibernate bytea type.
     UserDto toUserDto(UserEntity user);
 
 }

@@ -3,7 +3,7 @@ import { AuthData } from "../../routing/AuthWrapper";
 import './DeleteAccountModal.css';
 import "../Modal.css";
 import { useTranslation } from 'react-i18next';
-import {buildAxiosRequest, buildAxiosRequestWithHeaders} from "../../helpers/AxiosHelper";
+import {buildAxiosRequestWithHeaders} from "../../helpers/AxiosHelper";
 
 function DeleteAccountModal() {
     const {user, logout} = AuthData();
@@ -20,7 +20,8 @@ function DeleteAccountModal() {
         setShowModal(false);
     };
 
-    const handleDeleteAccount = async () => {
+    const handleDeleteAccount = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
         if (password === "" && confirmPassword === "") {
             setErrorMessage(t('main.deleteAccountModal.errorMessage.enterBothPasswords'));
             return;
@@ -66,26 +67,49 @@ function DeleteAccountModal() {
             <button className="actions-button" onClick={() => setShowModal(true)}>Delete Account</button>
             {showModal && (
                 <div className="modal-overlay" onClick={resetModal}>
-                    <div className="modal delete-account-modal" onClick={e => e.stopPropagation()}>
-                        <h2>Delete Account</h2>
-                        <input
-                            type="password"
-                            placeholder={t('main.deleteAccountModal.enterPassword')}
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                        />
-                        <input
-                            type="password"
-                            placeholder={t('main.deleteAccountModal.confirmPassword')}
-                            value={confirmPassword}
-                            onChange={(e) => setConfirmPassword(e.target.value)}
-                        />
-                        {errorMessage && <div className="error-message">{errorMessage}</div>}
-                        <button
-                            onClick={handleDeleteAccount}
-                        >{t('main.deleteAccountModal.confirm')}
-                        </button>
-                        <button onClick={() => setShowModal(false)}>{t('main.deleteAccountModal.cancel')}</button>
+                    <div className="modal" onClick={e => e.stopPropagation()}>
+                        <div className={"modal-form-container"}>
+                            <div className={"modal-description"}>
+                                Please confirm your Password to delete your account.
+                                <br/>
+                                This action is irreversible.
+                                <br/>
+                            </div>
+
+                            <form className={"modal-form"} onSubmit={(e) => handleDeleteAccount(e)}>
+                                <div className={"modal-form-group"}>
+                                    <label className={"modal-form-label"}>
+                                        <input className={"modal-form-input"}
+                                               type="password"
+                                               placeholder={t('main.deleteAccountModal.enterPassword')}
+                                               value={password}
+                                               onChange={(e) => setPassword(e.target.value)}
+                                        />
+                                    </label>
+                                </div>
+                                <div className={"modal-form-group"}>
+                                    <label className={"modal-form-label"}>
+                                        <input className={"modal-form-input"}
+                                               type="password"
+                                               placeholder={t('main.deleteAccountModal.confirmPassword')}
+                                               value={confirmPassword}
+                                               onChange={(e) => setConfirmPassword(e.target.value)}
+                                        />
+                                    </label>
+                                </div>
+                                {errorMessage && <div className="modal-form-message" style={{color: '#ea1818'}}>{errorMessage}</div>}
+                                <div className="button-container">
+                                    <button
+                                        className="modal-form-submit-button"
+                                        type="submit"
+                                    >{t('main.deleteAccountModal.confirm')}
+                                    </button>
+                                    <button
+                                        className="modal-form-submit-button"
+                                        onClick={() => setShowModal(false)}>{t('main.deleteAccountModal.cancel')}</button>
+                                </div>
+                            </form>
+                        </div>
                     </div>
                 </div>
             )}

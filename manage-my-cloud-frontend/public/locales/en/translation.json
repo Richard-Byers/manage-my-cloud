@@ -85,39 +85,39 @@
       "dashboard": "Dashboard",
       "manageConnections": "Manage Connections",
       "profile": "Profile"
-      },
-      "deleteAccountModal": {
-        "deleteAccount": "Delete Account",
-        "enterPassword": "Enter password",
-        "confirmPassword": "Confirm password",
-        "confirm": "Confirm",
-        "cancel": "Cancel",
-        "errorMessage": {
-          "enterBothPasswords": "Please enter password in both fields",
-          "fillBothPasswords": "Please fill out both password fields",
-          "passwordsDoNotMatch": "Passwords do not match",
-          "accountDeletedSuccessfully": "Account deleted successfully",
-          "errorDeletingAccount": "Error deleting account",
-          "userNotLoggedIn": "User is not logged in",
-          "invalidPassword": "Invalid password"
-        }
-      },
-      "updateDetailsModal": {
-        "updateDetails": "Update Details",
-        "enterNewFirstName": "Enter New First Name",
-        "enterNewLastName": "Enter New Last Name",
-        "enterNewEmail": "Enter New Email",
-        "confirm": "Confirm",
-        "cancel": "Cancel",
-        "FirstName": "First Name:",
-        "LastName": "Last Name:",
-        "errorMessage": {
-          "userNotLoggedIn": "User is not logged in",
-          "successMessage": "Details updated successfully",
-          "emailExists": "Email already exists",
-          "errorUpdatingDetails": "Error updating details",
-          "enterSomething": "Please enter something in at least one field"
-        }
+    },
+    "deleteAccountModal": {
+      "deleteAccount": "Delete Account",
+      "enterPassword": "Enter password",
+      "confirmPassword": "Confirm password",
+      "confirm": "Confirm",
+      "cancel": "Cancel",
+      "errorMessage": {
+        "enterBothPasswords": "Please enter password in both fields",
+        "fillBothPasswords": "Please fill out both password fields",
+        "passwordsDoNotMatch": "Passwords do not match",
+        "accountDeletedSuccessfully": "Account deleted successfully",
+        "errorDeletingAccount": "Error deleting account",
+        "userNotLoggedIn": "User is not logged in",
+        "invalidPassword": "Invalid password"
+      }
+    },
+    "updateDetailsModal": {
+      "updateDetails": "Update Details",
+      "enterNewFirstName": "Enter New First Name",
+      "enterNewLastName": "Enter New Last Name",
+      "enterNewEmail": "Enter New Email",
+      "confirm": "Confirm",
+      "cancel": "Cancel",
+      "FirstName": "First Name:",
+      "LastName": "Last Name:",
+      "errorMessage": {
+        "userNotLoggedIn": "User is not logged in",
+        "successMessage": "Details updated successfully",
+        "emailExists": "Email already exists",
+        "errorUpdatingDetails": "Error updating details",
+        "enterSomething": "Please enter something in at least one field"
       }
     }
   }
+}

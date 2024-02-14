@@ -17,7 +17,6 @@
     cursor: pointer;
 }
 
-
 .modal-form-message {
     display: flex;
     justify-content: center;
@@ -28,8 +27,6 @@
     text-align: center;
 }
 
-
-/* For tablets: */
 @media (max-width: 768px) {
     .modal-update-details-button {
         font-size: 16px;
@@ -42,7 +39,6 @@
     }
 }
 
-/* For smartphones: */
 @media (max-width: 480px) {
     .modal-update-details-button {
         font-size: 14px;
