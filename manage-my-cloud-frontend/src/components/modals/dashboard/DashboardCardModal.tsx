@@ -48,7 +48,6 @@ const DashboardCardModal: React.FC<DashboardCardModalProps> = ({
     React.useEffect(() => {
         const fetchDriveData = async () => {
             const info = await getDriveItems(user, connectionProvider);
-            console.log(info)
             setDriveData(info);
         };
 

@@ -1,5 +1,11 @@
 package org.mmc.drive;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.google.api.client.auth.oauth2.TokenResponse;
 import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
@@ -7,21 +13,17 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleRefreshTokenRequest;
 import com.google.api.client.googleapis.auth.oauth2.GoogleTokenResponse;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.json.JsonMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.google.api.services.drive.Drive.Builder;
+import com.google.api.services.drive.model.About;
 import com.microsoft.graph.authentication.TokenCredentialAuthProvider;
 import com.microsoft.graph.models.Drive;
 import com.microsoft.graph.requests.DriveItemCollectionPage;
 import com.microsoft.graph.requests.GraphServiceClient;
-import com.google.api.services.drive.model.About;
-import com.google.api.services.drive.Drive.Builder;
 import com.microsoft.graph.serializer.AdditionalDataManager;
 import okhttp3.Request;
 import org.mmc.Constants;
 import org.mmc.implementations.UserAccessTokenCredential;
+import org.mmc.pojo.UserPreferences;
 import org.mmc.response.CustomDriveItem;
 import org.mmc.response.DriveInformationReponse;
 
@@ -153,6 +155,14 @@ public class DriveInformationService implements IDriveInformationService {
 
         String jsonString = mapper.writeValueAsString(root);
         return mapper.readTree(jsonString);
+    }
+
+    public JsonNode returnItemsToDelete(JsonNode filesInDrive, UserPreferences userPreferences) {
+
+
+
+
+        return JsonNodeFactory.instance.textNode("Not implemented");
     }
 
     private void listAllSubItemsOneDrive(String itemId, CustomDriveItem parent) {
