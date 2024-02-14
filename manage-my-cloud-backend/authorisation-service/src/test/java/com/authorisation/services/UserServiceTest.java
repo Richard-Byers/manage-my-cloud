@@ -77,7 +77,7 @@ class UserServiceTest {
         //given
         UserEntity expecteduserEntity = generateUserEntity();
         RegistrationRequest registrationRequest = generateRegistrationRequest();
-        UserAlreadyExistsException expected = new UserAlreadyExistsException(String.format("User with email %s already exists", registrationRequest.email()));
+        UserAlreadyExistsException expected = new UserAlreadyExistsException("User already exists");
 
         //when
         given(userEntityRepository.findByEmail(registrationRequest.email())).willReturn(Optional.of(expecteduserEntity));

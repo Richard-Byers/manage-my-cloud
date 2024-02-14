@@ -106,11 +106,11 @@ class RegistrationControllerTest {
                                         .contentType("application/json")
                                         .content(objectMapper.writeValueAsString(registrationRequest)))
                         // then
-                        .andExpect(status().isBadRequest())
+                        .andExpect(status().isOk())
                         .andReturn();
-        UserAlreadyExistsException actualMessage = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), UserAlreadyExistsException.class);
+        String actualMessage = mvcResult.getResponse().getContentAsString();
         //then
-        assertEquals(expectedException.getMessage(), actualMessage.getMessage());
+        assertEquals(expectedException.getMessage(), actualMessage);
     }
 
     @Test
@@ -238,7 +238,7 @@ class RegistrationControllerTest {
         // given
         PasswordResetRequest passwordResetRequest = generatePasswordResetRequest();
         Optional<UserEntity> expectedUserEntity = Optional.of(generateUserEntity());
-        String expectedMessage = String.format("A new password reset link has been sent to %s. Please check your email", expectedUserEntity.get().getEmail());
+        String expectedMessage = expectedUserEntity.get().getEmail();
 
         // when
         given(userService.findUserByEmail(passwordResetRequest.getEmail())).willReturn(expectedUserEntity);
@@ -264,7 +264,7 @@ class RegistrationControllerTest {
         // given
         PasswordResetRequest passwordResetRequest = generatePasswordResetRequest();
         Optional<UserEntity> expectedUserEntity = Optional.empty();
-        String expectedMessage = String.format("No user found with email %s", passwordResetRequest.getEmail());
+        String expectedMessage = "User is not registered";
 
         // when
         given(userService.findUserByEmail(passwordResetRequest.getEmail())).willReturn(expectedUserEntity);

@@ -35,7 +35,18 @@
         "resetPasswordText": "Reset Password"
       },
       "signUpModal": {
-        "getStartedButton": "Get Started"
+        "signUpTitle": "Sign up",
+        "mainTextOne": "Are you ready to start saving money",
+        "mainTextTwo": "and help the environment?",
+        "signUpButton": "Sign up",
+        "signUpConfirmationText": "Confirmation email sent to:"
+      },
+      "resetPasswordModal": {
+        "resetPasswordTitle": "Reset Password",
+        "mainTextOne": "Enter your email and passwords",
+        "mainTextTwo": "and we will send you a password reset link.",
+        "resetPasswordButton": "Reset Password",
+        "resetPasswordConfirmationText": "Reset link sent to:"
       }
     },
     "manageConnectionsPage": {

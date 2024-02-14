@@ -6,9 +6,9 @@ import logo from "../../images/managemycloudlogo.png";
 import googleLogo from "../../images/login/google.png";
 import EmailIcon from '@mui/icons-material/Email';
 import LockIcon from '@mui/icons-material/Lock';
+import CloseIcon from '@mui/icons-material/Close';
 import {SignUpModal} from "../signUp/SignUpModal";
 import {ResetPasswordModal} from "../resetPassword/ResetPasswordModal";
-import { useGoogleLogin } from '@react-oauth/google';
 import {AuthData} from "../../routing/AuthWrapper";
 import {useTranslation} from "react-i18next";
 
@@ -60,6 +60,7 @@ const LoginModal: React.FC = () => {
     };
 
     const closeModal = () => {
+        setShowError(false);
         setShowSignUpModal(false);
         setShowModal(false);
     };
@@ -95,6 +96,8 @@ const LoginModal: React.FC = () => {
             {showModal && (
                 <div className="modal-overlay" onClick={closeModal}>
                     <div className="modal" onClick={stopPropagation}>
+
+                        <button className={"modal-close-button"} onClick={closeModal}> <CloseIcon className="svg_icons"/> </button>
 
                         <div className={"modal-logo"}>
                             <img src={logo} alt={"Manage My Cloud Logo"}/>
