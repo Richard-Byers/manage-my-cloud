@@ -48,7 +48,8 @@ public class UserDriveController {
             }
         } else if (connectionProvider.equals(GOOGLEDRIVE)) {
             String decryptedRefreshToken = decrypt(cloudPlatform.getRefreshToken());
-            DriveInformationReponse drive = driveInformationService.getGoogleDriveInformation(email, decryptedRefreshToken);
+            String decryptedAccessToken = decrypt(cloudPlatform.getAccessToken());
+            DriveInformationReponse drive = driveInformationService.getGoogleDriveInformation(email, decryptedRefreshToken, decryptedAccessToken);
             return ResponseEntity.ok(drive);
         }
 
@@ -74,9 +75,18 @@ public class UserDriveController {
             } catch (Exception e) {
                 return ResponseEntity.badRequest().build();
             }
+        } else if (connectionProvider.equals(GOOGLEDRIVE)) {
+            String decryptedRefreshToken= decrypt(cloudPlatform.getRefreshToken());
+            String decryptedAccessToken = decrypt(cloudPlatform.getAccessToken());
+            try {
+                JsonNode jsonNode = driveInformationService.fetchAllGoogleDriveFiles(decryptedRefreshToken, decryptedAccessToken);
+                return ResponseEntity.ok(jsonNode);
+            } catch (Exception e) {
+                return ResponseEntity.badRequest().build();
+            }
+        } else {
+            return ResponseEntity.badRequest().build();
         }
-
-        return ResponseEntity.badRequest().build();
     }
 
 
