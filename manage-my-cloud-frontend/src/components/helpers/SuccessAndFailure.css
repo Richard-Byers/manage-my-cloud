@@ -1,0 +1,56 @@
+.check-container, .cross-container {
+    width: 150px;
+    height: 150px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    align-self: center;
+}
+
+.checkmark, .cross {
+    width: 100%;
+    height: 100%;
+}
+
+.outer-circle {
+    fill: none;
+    stroke: #5cb85c;
+    stroke-width: 8;
+    stroke-dasharray: 1000;
+    stroke-dashoffset: -1000; /* Changed from 1000 to -1000 */
+    animation: draw 0.8s forwards;
+}
+
+.outer-circle-failure {
+    fill: none;
+    stroke: #d7524e;
+    stroke-width: 8;
+    stroke-dasharray: 1000;
+    stroke-dashoffset: -1000; /* Changed from 1000 to -1000 */
+    animation: draw 0.8s forwards;
+}
+
+.checkmark__check {
+    animation: draw 6s backwards; /* Increased from 3s to 6s */
+}
+
+.checkmark__check, .cross__line {
+    fill: none;
+    stroke: #5cb85c;
+    stroke-width: 8;
+    stroke-linecap: round;
+    stroke-dasharray: 1000;
+    stroke-dashoffset: 1000;
+    animation: draw 2s forwards; /* Increased from 2s to 4s */
+}
+
+@keyframes draw {
+    to {
+        stroke-dashoffset: 0;
+    }
+}
+
+.cross__line {
+    stroke: #d9534f;
+    animation-delay: 0.8s, 1.3s;
+}

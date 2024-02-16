@@ -8,6 +8,8 @@ import {buildAxiosRequestWithHeaders} from "../../helpers/AxiosHelper";
 import {AuthData} from "../../routing/AuthWrapper";
 import LoadingSpinner from "../../helpers/LoadingSpinner";
 import {useTranslation} from "react-i18next";
+import CloseIcon from "@mui/icons-material/Close";
+import {DashboardCardModalEmptyFiles} from "./DashboardCardModalEmptyFiles";
 
 interface DashboardCardModalProps {
     showModal: boolean;
@@ -18,18 +20,20 @@ interface DashboardCardModalProps {
     email: string;
 }
 
-interface Node {
+interface FileNode {
     name: string;
     type: string;
-    children: Node[];
+    id: string;
+    webUrl: string;
+    children: FileNode[];
 }
 
 interface FileNodeProps {
-    node: Node;
+    node: FileNode;
 }
 
 interface FileTreeProps {
-    data: Node;
+    data: FileNode;
 }
 
 const DashboardCardModal: React.FC<DashboardCardModalProps> = ({
@@ -42,7 +46,7 @@ const DashboardCardModal: React.FC<DashboardCardModalProps> = ({
                                                                }) => {
     const {user} = AuthData();
     const {t} = useTranslation();
-    const [driveData, setDriveData] = React.useState<Node>();
+    const [driveData, setDriveData] = React.useState<FileNode>();
     const [loading, setLoading] = React.useState(false);
 
     React.useEffect(() => {
@@ -63,7 +67,9 @@ const DashboardCardModal: React.FC<DashboardCardModalProps> = ({
 
         if (node.type !== "Folder") {
             return (
-                <div className={"dashboard-card-modal-file-container"}>
+                <div className={"dashboard-card-modal-file-container"} onClick={() => {
+                    window.open(node.webUrl, "_blank");
+                }}>
                     <img className="svg-icon" src={getFileType(node.name.split('.').pop() as string)}
                          alt={`File Type`}/>
                     <span>{node.name}</span>
@@ -74,7 +80,7 @@ const DashboardCardModal: React.FC<DashboardCardModalProps> = ({
         return (
             <>
                 {node.children.map(childNode => (
-                    <FileNode key={childNode.name} node={childNode}/>
+                    <FileNode key={childNode.id} node={childNode}/>
                 ))}
             </>
         );
@@ -84,15 +90,15 @@ const DashboardCardModal: React.FC<DashboardCardModalProps> = ({
         return <FileNode node={data}/>;
     };
 
-    const toggleModal = () => {
-        setShowModal(!showModal);
+    const closeModal = () => {
+        setShowModal(false);
     };
 
     const stopPropagation = (e: React.MouseEvent<HTMLDivElement>) => {
         e.stopPropagation();
     };
 
-    async function getDriveItems(user: any, connectionProvider: string): Promise<Node> {
+    async function getDriveItems(user: any, connectionProvider: string): Promise<FileNode> {
 
         const headers = {
             'Authorization': `Bearer ${user.token}`
@@ -110,28 +116,46 @@ const DashboardCardModal: React.FC<DashboardCardModalProps> = ({
         return response.data;
     }
 
+    function areAllChildrenFolders(driveData: FileNode): boolean {
+        return driveData.children.every(child => child.type === 'Folder');
+    }
+
     return (
-        <div className={"modal-overlay"} onClick={toggleModal}>
+        <div className={"modal-overlay"} onClick={closeModal}>
             {loading ? <LoadingSpinner/> :
                 <div className={"modal"} onClick={stopPropagation}>
-                    <div className={"dashboard-card-modal-grid"}>
-                        <div className={"dashboard-card-modal-drive-information"}>
-                            <img src={CONNECTION_LOGOS[connectionProvider]}
-                                 alt={`Logo for ${connectionProvider}`}/>
-                            <p>{t('main.dashboard.dashboardCardModal.driveInformation.accountDetails')}</p>
-                            <span>{email}</span>
-                            <span>{t('main.dashboard.dashboardCardModal.driveInformation.usedStorage')} {usedStorage > 0.0 ? usedStorage : "< 0"}/GB</span>
-                            <span>{t('main.dashboard.dashboardCardModal.driveInformation.totalStorage')} {totalStorage}/GB</span>
-                        </div>
-                        <div className={"dashboard-card-modal-drive-files-container"}>
-                            <div className={"dashboard-card-modal-drive-files-grid"}>
-                                {driveData && <FileTree data={driveData}/>}
+
+                    <button className={"modal-close-button"} onClick={closeModal}>
+                        <CloseIcon className="svg_icons"/>
+                    </button>
+
+                    {driveData && areAllChildrenFolders(driveData) ? <DashboardCardModalEmptyFiles/> :
+
+                        <div className={"dashboard-card-modal-grid"}>
+                            <div className={"dashboard-card-modal-drive-information"}>
+                                <img src={CONNECTION_LOGOS[connectionProvider]}
+                                     alt={`Logo for ${connectionProvider}`}/>
+                                <p>{t('main.dashboard.dashboardCardModal.driveInformation.accountDetails')}</p>
+                                <span>{email}</span>
+                                <span>{t('main.dashboard.dashboardCardModal.driveInformation.usedStorage')} {usedStorage > 0.0 ? usedStorage : "< 0"}/GB</span>
+                                <span>{t('main.dashboard.dashboardCardModal.driveInformation.totalStorage')} {totalStorage}/GB</span>
                             </div>
+                            <div className={"dashboard-card-modal-drive-files-container"}>
+                                <div className={"dashboard-card-modal-drive-files-grid"}>
+                                    {driveData && driveData.children.length > 0 ?
+                                        <FileTree data={driveData}/> : "No files found"}
+                                </div>
+                            </div>
+                            {driveData &&
+                                <div className={"dashboard-page-buttons-container"}>
+                                    <DashboardPageButtons data={driveData}
+                                                          connectionProvider={CONNECTION_TITLE[connectionProvider]}
+                                                          setSowModal={setShowModal}
+                                    />
+                                </div>
+                            }
                         </div>
-                        <div className={"dashboard-page-buttons-container"}>
-                            <DashboardPageButtons/>
-                        </div>
-                    </div>
+                    }
                 </div>
             }
         </div>

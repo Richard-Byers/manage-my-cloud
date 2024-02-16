@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.mmc.drive.DriveInformationService;
 import org.mmc.pojo.UserPreferences;
 import org.mmc.response.DriveInformationReponse;
+import org.mmc.response.FilesDeletedResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -95,7 +96,9 @@ public class UserDriveController {
     }
 
     @PostMapping("/delete-recommended")
-    public ResponseEntity<JsonNode> deleteRecommendedFiles(@RequestParam("email") String email, @RequestParam("provider") String connectionProvider) {
+    public ResponseEntity<FilesDeletedResponse> deleteRecommendedFiles(@RequestParam("email") String email,
+                                                       @RequestParam("provider") String connectionProvider,
+                                                       @RequestBody JsonNode filesToDelete) {
 
         UserEntity userEntity = userService.findUserByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
         CloudPlatform cloudPlatform = cloudPlatformService.getUserCloudPlatform(userEntity.getEmail(), connectionProvider);
@@ -108,8 +111,8 @@ public class UserDriveController {
             String accessToken = decrypt(cloudPlatform.getAccessToken());
             Date accessTokenExpiryDate = cloudPlatform.getAccessTokenExpiryDate();
             try {
-                JsonNode folders = driveInformationService.listAllItemsInOneDrive(accessToken, accessTokenExpiryDate);
-                return ResponseEntity.ok(folders);
+                FilesDeletedResponse filesDeleted = driveInformationService.deleteRecommendedOneDriveFiles(filesToDelete, accessToken, accessTokenExpiryDate);
+                return ResponseEntity.ok().body(filesDeleted);
             } catch (Exception e) {
                 return ResponseEntity.badRequest().build();
             }

@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.google.api.client.auth.oauth2.TokenResponse;
 import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
@@ -26,6 +25,7 @@ import org.mmc.implementations.UserAccessTokenCredential;
 import org.mmc.pojo.UserPreferences;
 import org.mmc.response.CustomDriveItem;
 import org.mmc.response.DriveInformationReponse;
+import org.mmc.response.FilesDeletedResponse;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -35,6 +35,13 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import static org.mmc.enumerations.ItemTypeChecker.DocumentType.isDocumentType;
+import static org.mmc.enumerations.ItemTypeChecker.ImageType.isImageType;
+import static org.mmc.enumerations.ItemTypeChecker.OtherType.isOtherType;
+import static org.mmc.enumerations.ItemTypeChecker.VideoType.isVideoType;
 
 public class DriveInformationService implements IDriveInformationService {
 
@@ -138,16 +145,22 @@ public class DriveInformationService implements IDriveInformationService {
         root.setType("Folder");
         root.setChildren(Collections.synchronizedList(new ArrayList<>()));
 
+        if (driveItems == null) {
+            return mapper.readTree(mapper.writeValueAsString(root));
+        }
+
         driveItems.getCurrentPage().parallelStream().forEach(item -> {
             CustomDriveItem customItem = new CustomDriveItem();
+            customItem.setId(item.id);
             customItem.setName(item.name);
             customItem.setType(item.folder == null ? item.file.mimeType : "Folder");
+            customItem.setLastModifiedDateTime(item.lastModifiedDateTime);
             customItem.setCreatedDateTime(item.createdDateTime);
             customItem.setWebUrl(item.webUrl);
             customItem.setChildren(Collections.synchronizedList(new ArrayList<>()));
 
             if (item.folder != null) {
-                listAllSubItemsOneDrive(item.id, customItem);
+                listAllSubItemsOneDrive(item.id, customItem, root);
             }
 
             root.getChildren().add(customItem);
@@ -157,32 +170,93 @@ public class DriveInformationService implements IDriveInformationService {
         return mapper.readTree(jsonString);
     }
 
-    public JsonNode returnItemsToDelete(JsonNode filesInDrive, UserPreferences userPreferences) {
+    public JsonNode returnItemsToDelete(JsonNode filesInDrive, UserPreferences userPreferences) throws IOException {
 
+        CustomDriveItem filesInUserDrive = mapper.treeToValue(filesInDrive, CustomDriveItem.class);
 
+        boolean recommendVideos = userPreferences.isDeleteVideos();
+        boolean recommendImages = userPreferences.isDeleteImages();
+        boolean recommendDocuments = userPreferences.isDeleteDocuments();
+        int recommendItemsCreatedDaysAgo = userPreferences.getDeleteItemsCreatedAfterDays();
+        int recommendItemsNotChangedDaysAgo = userPreferences.getDeleteItemsNotChangedSinceDays();
 
+        CustomDriveItem recommendations = new CustomDriveItem();
+        recommendations.setName("root");
+        recommendations.setType("Folder");
+        recommendations.setChildren(Collections.synchronizedList(new ArrayList<>()));
 
-        return JsonNodeFactory.instance.textNode("Not implemented");
+        filesInUserDrive.getChildren().parallelStream().forEach(item -> {
+            // Won't delete folders, potential future improvement would be to delete empty folders and add it as another preference option
+            if (!Objects.equals(item.getType(), "Folder")) {
+                String itemName = item.getName();
+                OffsetDateTime createdDateTime = item.getCreatedDateTime();
+                OffsetDateTime lastModifiedDateTime = item.getLastModifiedDateTime();
+                if (recommendImages && isImageType(itemName) && compareDates(createdDateTime, lastModifiedDateTime, recommendItemsCreatedDaysAgo, recommendItemsNotChangedDaysAgo)) {
+                    // if item is an image and falls outside the date range
+                    recommendations.getChildren().add(item);
+                } else if (recommendVideos && isVideoType(itemName) && compareDates(createdDateTime, lastModifiedDateTime, recommendItemsCreatedDaysAgo, recommendItemsNotChangedDaysAgo)) {
+                    // if item is a video and falls outside the date range
+                    recommendations.getChildren().add(item);
+                } else if (recommendDocuments && isDocumentType(itemName) && compareDates(createdDateTime, lastModifiedDateTime, recommendItemsCreatedDaysAgo, recommendItemsNotChangedDaysAgo)) {
+                    // if item is a document and falls outside the date range
+                    recommendations.getChildren().add(item);
+                } else if (isOtherType(itemName) && compareDates(createdDateTime, lastModifiedDateTime, recommendItemsCreatedDaysAgo, recommendItemsNotChangedDaysAgo)) {
+                    // if item is not an image, video, or document and falls outside the date range
+                    recommendations.getChildren().add(item);
+                }
+            }
+        });
+
+        return mapper.readTree(mapper.writeValueAsString(recommendations));
     }
 
-    private void listAllSubItemsOneDrive(String itemId, CustomDriveItem parent) {
+    public FilesDeletedResponse deleteRecommendedOneDriveFiles(JsonNode filesToDelete, String userAccessToken, Date expiryDate) throws JsonProcessingException {
+        OffsetDateTime expiryTime = expiryDate.toInstant().atZone(ZoneId.systemDefault()).toOffsetDateTime();
+        UserAccessTokenCredential userAccessTokenCredential = new UserAccessTokenCredential(userAccessToken, expiryTime);
+        TokenCredentialAuthProvider authProvider = new TokenCredentialAuthProvider(userAccessTokenCredential);
+        this.graphClient = GraphServiceClient.builder().authenticationProvider(authProvider).buildClient();
+        CustomDriveItem filesInUserDrive = mapper.treeToValue(filesToDelete, CustomDriveItem.class);
+        AtomicInteger filesDeleted = new AtomicInteger();
+
+        filesInUserDrive.getChildren().parallelStream().forEach(item -> {
+            try {
+                graphClient.me().drive().items(item.getId()).buildRequest().delete();
+                filesDeleted.getAndIncrement();
+            } catch (Exception e) {
+                throw new RuntimeException("Error deleting file");
+            }
+        });
+        FilesDeletedResponse filesDeletedResponse = new FilesDeletedResponse();
+        filesDeletedResponse.setFilesDeleted(filesDeleted.get());
+        return filesDeletedResponse;
+    }
+
+    private void listAllSubItemsOneDrive(String itemId, CustomDriveItem parent, CustomDriveItem root) {
         DriveItemCollectionPage subItems = graphClient.me().drive().items(itemId).children().buildRequest().get();
+
+        if (subItems == null) {
+            return;
+        }
 
         subItems.getCurrentPage().parallelStream().forEach(subItem -> {
             CustomDriveItem customSubItem = new CustomDriveItem();
+            customSubItem.setId(subItem.id);
             customSubItem.setName(subItem.name);
             customSubItem.setType(subItem.folder == null ? subItem.file.mimeType : "Folder");
+            customSubItem.setLastModifiedDateTime(subItem.lastModifiedDateTime);
             customSubItem.setCreatedDateTime(subItem.createdDateTime);
             customSubItem.setWebUrl(subItem.webUrl);
             customSubItem.setChildren(new ArrayList<>());
 
             if (subItem.folder != null) {
-                listAllSubItemsOneDrive(subItem.id, customSubItem);
+                listAllSubItemsOneDrive(subItem.id, customSubItem, root);
             }
 
-            parent.getChildren().add(customSubItem);
+            root.getChildren().add(customSubItem);
         });
     }
+
+    //Helper Methods
 
     public DriveInformationReponse mapToDriveInformationResponse(String displayName, String email, Double total, Double used) {
 
@@ -193,5 +267,13 @@ public class DriveInformationService implements IDriveInformationService {
         driveInformationReponse.setUsed(used);
 
         return driveInformationReponse;
+    }
+
+    private boolean compareDates(OffsetDateTime createdDateTime,
+                                 OffsetDateTime lastModifiedDateTime,
+                                 int recommendItemsCreatedDaysAgo,
+                                 int recommendItemsNotChangedDaysAgo) {
+        return createdDateTime.isBefore(OffsetDateTime.now().minusDays(recommendItemsCreatedDaysAgo)) ||
+                lastModifiedDateTime.isBefore(OffsetDateTime.now().minusDays(recommendItemsNotChangedDaysAgo));
     }
 }
