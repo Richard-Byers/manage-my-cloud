@@ -5,7 +5,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.google.api.client.util.DateTime;
 import com.google.api.services.drive.model.About;
+import com.google.api.services.drive.model.File;
+import com.google.api.services.drive.model.FileList;
 import com.microsoft.graph.models.Drive;
 import com.microsoft.graph.requests.DriveItemCollectionPage;
 import com.microsoft.graph.requests.GraphServiceClient;
@@ -18,11 +21,10 @@ import org.mmc.response.FilesDeletedResponse;
 
 import java.io.IOException;
 import java.text.DecimalFormat;
+import java.time.Instant;
 import java.time.OffsetDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.Objects;
+import java.time.ZoneId;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.mmc.auth.DriveAuthManager.getGoogleClient;
@@ -69,9 +71,10 @@ public class DriveInformationService implements IDriveInformationService {
                 usedGigabytes);
     }
 
-    public DriveInformationReponse getGoogleDriveInformation(String email, String refreshToken) {
+    public DriveInformationReponse getGoogleDriveInformation(String email, String refreshToken, String accessToken) {
 
-        com.google.api.services.drive.Drive service = getGoogleClient(refreshToken);
+        //Check if access token is expired or not, no point generating new one if one in the DB works
+        com.google.api.services.drive.Drive service = getGoogleClient(refreshToken, accessToken);
 
         // Create About objects for the storage and user
         About aboutStorage = null;
@@ -215,6 +218,54 @@ public class DriveInformationService implements IDriveInformationService {
     }
 
     //Helper Methods
+
+    public JsonNode fetchAllGoogleDriveFiles(String refreshToken, String accessToken) throws IOException {
+
+        com.google.api.services.drive.Drive service = getGoogleClient(refreshToken, accessToken);
+
+        if (service == null) {
+            throw new RuntimeException("Drive not found");
+        }
+
+        CustomDriveItem root = new CustomDriveItem();
+        root.setName("root");
+        root.setType("Folder");
+        root.setChildren(performFetchAllGoogleDriveFiles(service));
+
+        return mapper.valueToTree(root);
+    }
+
+    private List<CustomDriveItem> performFetchAllGoogleDriveFiles(com.google.api.services.drive.Drive service) throws IOException {
+        List<CustomDriveItem> allFiles = new ArrayList<>();
+
+        // Define the fields included in the response
+        String fields = "nextPageToken, files(id, name, mimeType, createdTime, webViewLink)";
+
+        // Make the request, get the fields for each file and ignore folders
+        com.google.api.services.drive.Drive.Files.List request = service.files().list().setFields(fields).setQ("mimeType != 'application/vnd.google-apps.folder'");
+
+        FileList fileList;
+        do {
+            fileList = request.execute();
+            for (File file : fileList.getFiles()) {
+
+                // Convert the Google DateTime to Java OffsetDateTime
+                DateTime googleDateTime = file.getCreatedTime();
+                OffsetDateTime offsetDateTime = OffsetDateTime.ofInstant(Instant.ofEpochSecond(googleDateTime.getValue()), ZoneId.systemDefault());
+
+                CustomDriveItem customItem = new CustomDriveItem();
+                customItem.setName(file.getName());
+                customItem.setType(file.getMimeType());
+                customItem.setCreatedDateTime(offsetDateTime);
+                customItem.setWebUrl(file.getWebViewLink());
+
+                allFiles.add(customItem);
+            }
+            request.setPageToken(fileList.getNextPageToken());
+        } while (fileList.getNextPageToken() != null && fileList.getNextPageToken().length() > 0);
+
+        return allFiles;
+    }
 
     public DriveInformationReponse mapToDriveInformationResponse(String displayName, String email, Double total, Double used) {
 

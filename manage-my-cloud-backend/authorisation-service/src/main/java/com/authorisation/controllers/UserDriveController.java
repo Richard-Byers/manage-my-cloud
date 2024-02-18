@@ -48,10 +48,11 @@ public class UserDriveController {
             }
         } else if (connectionProvider.equals(GOOGLEDRIVE)) {
             String decryptedRefreshToken = decrypt(cloudPlatform.getRefreshToken());
+            String decryptedAccessToken = decrypt(cloudPlatform.getAccessToken());
             try {
-                DriveInformationReponse drive = driveInformationService.getGoogleDriveInformation(email, decryptedRefreshToken);
+                DriveInformationReponse drive = driveInformationService.getGoogleDriveInformation(email, decryptedRefreshToken, decryptedAccessToken);
                 return ResponseEntity.ok(drive);
-            } catch (Exception e) {
+            } catch (Exception e){
                 return ResponseEntity.badRequest().build();
             }
         }
@@ -78,10 +79,19 @@ public class UserDriveController {
             } catch (Exception e) {
                 return ResponseEntity.badRequest().build();
             }
+        } else if (connectionProvider.equals(GOOGLEDRIVE)) {
+            String decryptedRefreshToken= decrypt(cloudPlatform.getRefreshToken());
+            String decryptedAccessToken = decrypt(cloudPlatform.getAccessToken());
+            try {
+                JsonNode jsonNode = driveInformationService.fetchAllGoogleDriveFiles(decryptedRefreshToken, decryptedAccessToken);
+                return ResponseEntity.ok(jsonNode);
+            } catch (Exception e) {
+                return ResponseEntity.badRequest().build();
+            }
+        } else {
+            return ResponseEntity.badRequest().build();
         }
-
-        return ResponseEntity.badRequest().build();
-    }
+        }
 
     @PostMapping("/recommend-deletions")
     public ResponseEntity<JsonNode> getRecommendedDeletions(@RequestParam("email") String email,

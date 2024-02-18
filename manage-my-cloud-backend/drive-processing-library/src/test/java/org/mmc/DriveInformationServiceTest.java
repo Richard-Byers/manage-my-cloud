@@ -124,18 +124,19 @@ public class DriveInformationServiceTest {
         com.google.api.services.drive.Drive.About.Get get = mock(com.google.api.services.drive.Drive.About.Get.class);
         About aboutResponse = generateGoogleDriveAbout();
         String email = "johndoe@gmail.com";
+        String accessToken = "testAccessToken";
         String refreshToken = "testRefreshToken";
         DriveInformationReponse expectedDriveInformationReponse = generateGoogleDriveInformationResponseWithEmail(aboutResponse, email);
 
         try (MockedStatic<DriveAuthManager> driveAuthManagerMockedStatic = Mockito.mockStatic(DriveAuthManager.class)) {
             //when
-            driveAuthManagerMockedStatic.when(() -> DriveAuthManager.getGoogleClient(anyString())).thenReturn(mockDrive);
+            driveAuthManagerMockedStatic.when(() -> DriveAuthManager.getGoogleClient(anyString(), anyString())).thenReturn(mockDrive);
             when(mockDrive.about()).thenReturn(about);
             when(about.get()).thenReturn(get);
             when(get.setFields(anyString())).thenReturn(get);
             when(get.execute()).thenReturn(aboutResponse);
 
-            DriveInformationReponse driveInformationReponse = driveInformationService.getGoogleDriveInformation(email, refreshToken);
+            DriveInformationReponse driveInformationReponse = driveInformationService.getGoogleDriveInformation(email, refreshToken, accessToken);
 
             //then
             assertEquals(expectedDriveInformationReponse.getEmail(), driveInformationReponse.getEmail());
