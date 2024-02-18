@@ -341,6 +341,143 @@ public class DriveInformationService implements IDriveInformationService {
         return jsonNode;
     }
 
+    public JsonNode performFetchAllOneDriveFilesBreakdown(String userAccessToken, Date expiryDate) throws JsonProcessingException {
+        OffsetDateTime expiryTime = expiryDate.toInstant().atZone(ZoneId.systemDefault()).toOffsetDateTime();
+        UserAccessTokenCredential userAccessTokenCredential = new UserAccessTokenCredential(userAccessToken, expiryTime);
+        TokenCredentialAuthProvider authProvider = new TokenCredentialAuthProvider(userAccessTokenCredential);
+        this.graphClient = GraphServiceClient.builder().authenticationProvider(authProvider).buildClient();
+
+        List<CustomDriveItem> allImages = new ArrayList<>();
+        List<CustomDriveItem> allDocuments = new ArrayList<>();
+        List<CustomDriveItem> allOthers = new ArrayList<>();
+        List<CustomDriveItem> allAudios = new ArrayList<>(); // New list for audio files
+        List<CustomDriveItem> allVideos = new ArrayList<>(); // New list for video files
+        List<CustomDriveItem> allEbooks = new ArrayList<>(); // New list for ebook files
+
+        DriveItemCollectionPage driveItems = graphClient.me().drive().root().children().buildRequest().get();
+
+        CustomDriveItem root = new CustomDriveItem();
+        root.setName("root");
+        root.setType("Folder");
+        root.setChildren(Collections.synchronizedList(new ArrayList<>()));
+
+        driveItems.getCurrentPage().parallelStream().forEach(item -> {
+            CustomDriveItem customItem = new CustomDriveItem();
+            customItem.setName(item.name);
+            customItem.setType(item.folder == null ? getMimeType(item.name) : "Folder");
+            customItem.setCreatedDateTime(item.createdDateTime);
+            customItem.setWebUrl(item.webUrl);
+            customItem.setChildren(Collections.synchronizedList(new ArrayList<>()));
+
+            // Categorize the files based on their mime types
+            if (item.file != null) {
+                String mimeType = getMimeType(item.name);
+                if (mimeType.startsWith("image/")) {
+                    allImages.add(customItem);
+                } else if (mimeType.equals("application/pdf") || mimeType.equals("application/vnd.openxmlformats-officedocument.wordprocessingml.document")) {
+                    allDocuments.add(customItem);
+                } else if (mimeType.startsWith("audio/")) {
+                    allAudios.add(customItem); // Add audio files to the allAudios list
+                } else if (mimeType.startsWith("video/")) {
+                    allVideos.add(customItem); // Add video files to the allVideos list
+                } else if (mimeType.equals("application/epub+zip")) {
+                    allEbooks.add(customItem); // Add ebook files to the allEbooks list
+                } else {
+                    allOthers.add(customItem);
+                }
+            }
+
+            if (item.folder != null) {
+                listAllSubItemsOneDrivePieChart(item.id, customItem, allImages, allDocuments, allOthers, allAudios, allVideos, allEbooks);
+            }
+        });
+
+        Map<String, List<CustomDriveItem>> categorisedFiles = new HashMap<>();
+        categorisedFiles.put("Images", allImages);
+        categorisedFiles.put("Documents", allDocuments);
+        categorisedFiles.put("Others", allOthers);
+        categorisedFiles.put("Audios", allAudios);
+        categorisedFiles.put("Videos", allVideos);
+        categorisedFiles.put("Ebooks", allEbooks);
+
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode jsonNode = mapper.valueToTree(calculateFileTypePercentages(categorisedFiles));
+
+        return jsonNode;
+    }
+
+    private void listAllSubItemsOneDrivePieChart(String itemId, CustomDriveItem parent, List<CustomDriveItem> allImages, List<CustomDriveItem> allDocuments, List<CustomDriveItem> allOthers, List<CustomDriveItem> allAudios, List<CustomDriveItem> allVideos, List<CustomDriveItem> allEbooks) {
+        DriveItemCollectionPage subItems = graphClient.me().drive().items(itemId).children().buildRequest().get();
+
+        subItems.getCurrentPage().forEach(subItem -> {
+            CustomDriveItem customSubItem = new CustomDriveItem();
+            customSubItem.setName(subItem.name);
+            customSubItem.setType(subItem.folder == null ? getMimeType(subItem.name) : "Folder");
+            customSubItem.setCreatedDateTime(subItem.createdDateTime);
+            customSubItem.setWebUrl(subItem.webUrl);
+            customSubItem.setChildren(new ArrayList<>());
+
+            // Categorize the files based on their mime types
+            if (subItem.file != null) {
+                String mimeType = getMimeType(subItem.name);
+                if (mimeType.startsWith("image/")) {
+                    allImages.add(customSubItem);
+                } else if (mimeType.equals("application/pdf") || mimeType.equals("application/vnd.openxmlformats-officedocument.wordprocessingml.document")) {
+                    allDocuments.add(customSubItem);
+                } else if (mimeType.startsWith("audio/")) {
+                    allAudios.add(customSubItem); // Add audio files to the allAudios list
+                } else if (mimeType.startsWith("video/")) {
+                    allVideos.add(customSubItem); // Add video files to the allVideos list
+                } else if (mimeType.equals("application/epub+zip")) {
+                    allEbooks.add(customSubItem); // Add ebook files to the allEbooks list
+                } else {
+                    allOthers.add(customSubItem);
+                }
+            }
+
+            if (subItem.folder != null) {
+                listAllSubItemsOneDrivePieChart(subItem.id, customSubItem, allImages, allDocuments, allOthers, allAudios, allVideos, allEbooks);
+            }
+
+            parent.getChildren().add(customSubItem);
+        });
+    }
+
+    private String getMimeType(String fileName) {
+        String extension = "";
+
+        int i = fileName.lastIndexOf('.');
+        if (i > 0) {
+            extension = fileName.substring(i+1);
+        }
+
+        switch(extension.toLowerCase()) {
+            case "jpg":
+            case "jpeg":
+                return "image/jpeg";
+            case "png":
+                return "image/png";
+            case "gif":
+                return "image/gif";
+            case "pdf":
+                return "application/pdf";
+            case "mov":
+                return "video/mov";
+            case "mp4":
+                return "video/mp4";
+            case "mp3":
+                return "audio/mp3";
+            case "wav":
+                return "audio/wav";
+            case "flac":
+                return "audio/flac";
+            case "epub":
+                return "application/epub+zip";
+            default:
+                return "application/octet-stream";
+        }
+    }
+
     private Map<String, Double> calculateFileTypePercentages(Map<String, List<CustomDriveItem>> categorisedFiles) {
         int totalFiles = categorisedFiles.get("Images").size() + categorisedFiles.get("Documents").size() + categorisedFiles.get("Others").size() + categorisedFiles.get("Audios").size() + categorisedFiles.get("Videos").size() + categorisedFiles.get("Ebooks").size();
 
