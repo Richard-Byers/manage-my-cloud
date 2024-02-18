@@ -36,10 +36,7 @@ import java.text.DecimalFormat;
 import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 public class DriveInformationService implements IDriveInformationService {
 
@@ -267,6 +264,104 @@ public class DriveInformationService implements IDriveInformationService {
         } while (fileList.getNextPageToken() != null && fileList.getNextPageToken().length() > 0);
 
         return allFiles;
+    }
+
+    public JsonNode performFetchAllGoogleDriveFilesBreakdown(String accessToken, String refreshToken) throws IOException {
+
+        //Check if access token is expired or not, no point generating new one if one in the DB works
+        try {
+            if (isGoogleAccessTokenExpired(accessToken)) {
+                accessToken = generateNewGoogleAccessToken(refreshToken).getAccessToken();
+            }
+        } catch (GeneralSecurityException e) {
+            System.out.println(e);
+        }
+
+        com.google.api.services.drive.Drive service = new com.google.api.services.drive.Drive.Builder(new NetHttpTransport(), GsonFactory.getDefaultInstance(), getHttpRequestInitializer(accessToken))
+                .setApplicationName("Manage My Cloud")
+                .build();
+
+        List<CustomDriveItem> allImages = new ArrayList<>();
+        List<CustomDriveItem> allDocuments = new ArrayList<>();
+        List<CustomDriveItem> allOthers = new ArrayList<>();
+        List<CustomDriveItem> allAudios = new ArrayList<>(); // New list for audio files
+        List<CustomDriveItem> allVideos = new ArrayList<>(); // New list for video files
+        List<CustomDriveItem> allEbooks = new ArrayList<>(); // New list for ebook files
+
+        // Define the fields included in the response
+        String fields = "nextPageToken, files(id, name, mimeType, createdTime, webViewLink)";
+
+        // Make the request, get the fields for each file and ignore folders
+        com.google.api.services.drive.Drive.Files.List request = service.files().list().setFields(fields).setQ("mimeType != 'application/vnd.google-apps.folder'");
+
+        FileList fileList;
+        do {
+            fileList = request.execute();
+            for (File file : fileList.getFiles()) {
+
+                // Convert the Google DateTime to Java OffsetDateTime
+                DateTime googleDateTime = file.getCreatedTime();
+                OffsetDateTime offsetDateTime = OffsetDateTime.ofInstant(Instant.ofEpochSecond(googleDateTime.getValue()), ZoneId.systemDefault());
+
+                CustomDriveItem customItem = new CustomDriveItem();
+                customItem.setName(file.getName());
+                customItem.setType(file.getMimeType());
+                customItem.setCreatedDateTime(offsetDateTime);
+                customItem.setWebUrl(file.getWebViewLink());
+
+                // Categorize the files based on their mime types
+                if (file.getMimeType().startsWith("image/")) {
+                    allImages.add(customItem);
+                } else if (file.getMimeType().equals("application/pdf") || file.getMimeType().equals("application/vnd.openxmlformats-officedocument.wordprocessingml.document")) {
+                    allDocuments.add(customItem);
+                } else if (file.getMimeType().startsWith("audio/")) {
+                    allAudios.add(customItem); // Add audio files to the allAudios list
+                } else if (file.getMimeType().startsWith("video/")) {
+                    allVideos.add(customItem); // Add video files to the allVideos list
+                } else if (file.getMimeType().equals("application/epub+zip")) {
+                    allEbooks.add(customItem); // Add ebook files to the allEbooks list
+                } else {
+                    allOthers.add(customItem);
+                }
+            }
+            request.setPageToken(fileList.getNextPageToken());
+        } while (fileList.getNextPageToken() != null && fileList.getNextPageToken().length() > 0);
+
+        Map<String, List<CustomDriveItem>> categorisedFiles = new HashMap<>();
+        categorisedFiles.put("Images", allImages);
+        categorisedFiles.put("Documents", allDocuments);
+        categorisedFiles.put("Others", allOthers);
+        categorisedFiles.put("Audios", allAudios);
+        categorisedFiles.put("Videos", allVideos);
+        categorisedFiles.put("Ebooks", allEbooks);
+
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode jsonNode = mapper.valueToTree(calculateFileTypePercentages(categorisedFiles));
+
+        return jsonNode;
+    }
+
+    private Map<String, Double> calculateFileTypePercentages(Map<String, List<CustomDriveItem>> categorisedFiles) {
+        int totalFiles = categorisedFiles.get("Images").size() + categorisedFiles.get("Documents").size() + categorisedFiles.get("Others").size() + categorisedFiles.get("Audios").size() + categorisedFiles.get("Videos").size() + categorisedFiles.get("Ebooks").size();
+
+        DecimalFormat df = new DecimalFormat("#.##"); // 2 decimal places
+
+        double imagePercentage = Double.parseDouble(df.format(((double) categorisedFiles.get("Images").size() / totalFiles) * 100));
+        double documentPercentage = Double.parseDouble(df.format(((double) categorisedFiles.get("Documents").size() / totalFiles) * 100));
+        double otherPercentage = Double.parseDouble(df.format(((double) categorisedFiles.get("Others").size() / totalFiles) * 100));
+        double audioPercentage = Double.parseDouble(df.format(((double) categorisedFiles.get("Audios").size() / totalFiles) * 100)); // Calculate the percentage of audio files
+        double videoPercentage = Double.parseDouble(df.format(((double) categorisedFiles.get("Videos").size() / totalFiles) * 100)); // Calculate the percentage of video files
+        double ebookPercentage = Double.parseDouble(df.format(((double) categorisedFiles.get("Ebooks").size() / totalFiles) * 100)); // Calculate the percentage of ebook files
+
+        Map<String, Double> fileTypePercentages = new HashMap<>();
+        fileTypePercentages.put("Images", imagePercentage);
+        fileTypePercentages.put("Documents", documentPercentage);
+        fileTypePercentages.put("Others", otherPercentage);
+        fileTypePercentages.put("Audio", audioPercentage);
+        fileTypePercentages.put("Video", videoPercentage);
+        fileTypePercentages.put("Ebooks", ebookPercentage);
+
+        return fileTypePercentages;
     }
 
     private HttpRequestInitializer getHttpRequestInitializer(String accessToken) {

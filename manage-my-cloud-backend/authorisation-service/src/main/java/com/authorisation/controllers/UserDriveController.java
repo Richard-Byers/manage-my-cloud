@@ -89,5 +89,25 @@ public class UserDriveController {
         }
     }
 
+    @GetMapping("/drive-breakdown")
+    public ResponseEntity<JsonNode> getUserDriveBreakdown(@RequestParam("email") String email, @RequestParam("provider") String connectionProvider) {
+
+        UserEntity userEntity = userService.findUserByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
+        CloudPlatform cloudPlatform = cloudPlatformService.getUserCloudPlatform(userEntity.getEmail(), connectionProvider);
+
+        if (cloudPlatform == null) {
+            throw new RuntimeException(String.format("Cloud platform not found %s", connectionProvider));
+        }
+
+            String decryptedRefreshToken= decrypt(cloudPlatform.getRefreshToken());
+            String decryptedAccessToken = decrypt(cloudPlatform.getAccessToken());
+            try {
+                JsonNode googlePercentageBreakDown = driveInformationService.performFetchAllGoogleDriveFilesBreakdown(decryptedAccessToken, decryptedRefreshToken);
+                return ResponseEntity.ok(googlePercentageBreakDown);
+            } catch (Exception e) {
+                return ResponseEntity.badRequest().build();
+            }
+    }
+
 
 }
