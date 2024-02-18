@@ -5,39 +5,28 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.google.api.client.auth.oauth2.TokenResponse;
-import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
-import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
-import com.google.api.client.googleapis.auth.oauth2.GoogleRefreshTokenRequest;
-import com.google.api.client.googleapis.auth.oauth2.GoogleTokenResponse;
-import com.google.api.client.http.javanet.NetHttpTransport;
-import com.google.api.client.json.jackson2.JacksonFactory;
-import com.google.api.services.drive.Drive.Builder;
 import com.google.api.services.drive.model.About;
-import com.microsoft.graph.authentication.TokenCredentialAuthProvider;
 import com.microsoft.graph.models.Drive;
 import com.microsoft.graph.requests.DriveItemCollectionPage;
 import com.microsoft.graph.requests.GraphServiceClient;
 import com.microsoft.graph.serializer.AdditionalDataManager;
 import okhttp3.Request;
-import org.mmc.Constants;
-import org.mmc.implementations.UserAccessTokenCredential;
 import org.mmc.pojo.UserPreferences;
 import org.mmc.response.CustomDriveItem;
 import org.mmc.response.DriveInformationReponse;
 import org.mmc.response.FilesDeletedResponse;
 
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.text.DecimalFormat;
 import java.time.OffsetDateTime;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static org.mmc.auth.DriveAuthManager.getGoogleClient;
+import static org.mmc.auth.DriveAuthManager.getOneDriveClient;
 import static org.mmc.enumerations.ItemTypeChecker.DocumentType.isDocumentType;
 import static org.mmc.enumerations.ItemTypeChecker.ImageType.isImageType;
 import static org.mmc.enumerations.ItemTypeChecker.OtherType.isOtherType;
@@ -53,10 +42,7 @@ public class DriveInformationService implements IDriveInformationService {
 
     public DriveInformationReponse getOneDriveInformation(String userAccessToken, Date expiryDate) {
 
-        OffsetDateTime expiryTime = expiryDate.toInstant().atZone(ZoneId.systemDefault()).toOffsetDateTime();
-        UserAccessTokenCredential userAccessTokenCredential = new UserAccessTokenCredential(userAccessToken, expiryTime);
-        TokenCredentialAuthProvider authProvider = new TokenCredentialAuthProvider(userAccessTokenCredential);
-        this.graphClient = GraphServiceClient.builder().authenticationProvider(authProvider).buildClient();
+        this.graphClient = getOneDriveClient(userAccessToken, expiryDate);
 
         Drive drive = graphClient.me().drive().buildRequest().get();
 
@@ -85,29 +71,7 @@ public class DriveInformationService implements IDriveInformationService {
 
     public DriveInformationReponse getGoogleDriveInformation(String email, String refreshToken) {
 
-        TokenResponse response = new GoogleTokenResponse();
-
-        try {
-            GoogleClientSecrets clientSecrets =
-                    GoogleClientSecrets.load(
-                            JacksonFactory.getDefaultInstance(), new InputStreamReader(getClass().getResourceAsStream(Constants.GOOGLE_CREDENTIALS_FILE_PATH)));
-            response = new GoogleRefreshTokenRequest(
-                    new NetHttpTransport(),
-                    new JacksonFactory(),
-                    refreshToken,
-                    clientSecrets.getDetails().getClientId(),
-                    clientSecrets.getDetails().getClientSecret())
-                    .execute();
-        } catch (IOException e) {
-            System.out.println(e);
-        }
-        // Create a Credential instance with the access token
-        GoogleCredential credential = new GoogleCredential().setAccessToken(response.getAccessToken());
-
-        // Create a Drive service
-        com.google.api.services.drive.Drive service = new Builder(new NetHttpTransport(), new JacksonFactory(), credential)
-                .setApplicationName("Manage My Cloud")
-                .build();
+        com.google.api.services.drive.Drive service = getGoogleClient(refreshToken);
 
         // Create About objects for the storage and user
         About aboutStorage = null;
@@ -115,7 +79,7 @@ public class DriveInformationService implements IDriveInformationService {
         try {
             aboutStorage = service.about().get().setFields("storageQuota").execute();
             aboutUser = service.about().get().setFields("user").execute();
-        } catch (IOException e) {
+        } catch (Exception e) {
             System.out.println(e);
         }
 
@@ -133,10 +97,7 @@ public class DriveInformationService implements IDriveInformationService {
     }
 
     public JsonNode listAllItemsInOneDrive(String userAccessToken, Date expiryDate) throws JsonProcessingException {
-        OffsetDateTime expiryTime = expiryDate.toInstant().atZone(ZoneId.systemDefault()).toOffsetDateTime();
-        UserAccessTokenCredential userAccessTokenCredential = new UserAccessTokenCredential(userAccessToken, expiryTime);
-        TokenCredentialAuthProvider authProvider = new TokenCredentialAuthProvider(userAccessTokenCredential);
-        this.graphClient = GraphServiceClient.builder().authenticationProvider(authProvider).buildClient();
+        this.graphClient = getOneDriveClient(userAccessToken, expiryDate);
 
         DriveItemCollectionPage driveItems = graphClient.me().drive().root().children().buildRequest().get();
 
@@ -160,7 +121,7 @@ public class DriveInformationService implements IDriveInformationService {
             customItem.setChildren(Collections.synchronizedList(new ArrayList<>()));
 
             if (item.folder != null) {
-                listAllSubItemsOneDrive(item.id, customItem, root);
+                listAllSubItemsOneDrive(item.id, root);
             }
 
             root.getChildren().add(customItem);
@@ -211,10 +172,7 @@ public class DriveInformationService implements IDriveInformationService {
     }
 
     public FilesDeletedResponse deleteRecommendedOneDriveFiles(JsonNode filesToDelete, String userAccessToken, Date expiryDate) throws JsonProcessingException {
-        OffsetDateTime expiryTime = expiryDate.toInstant().atZone(ZoneId.systemDefault()).toOffsetDateTime();
-        UserAccessTokenCredential userAccessTokenCredential = new UserAccessTokenCredential(userAccessToken, expiryTime);
-        TokenCredentialAuthProvider authProvider = new TokenCredentialAuthProvider(userAccessTokenCredential);
-        this.graphClient = GraphServiceClient.builder().authenticationProvider(authProvider).buildClient();
+        this.graphClient = getOneDriveClient(userAccessToken, expiryDate);
         CustomDriveItem filesInUserDrive = mapper.treeToValue(filesToDelete, CustomDriveItem.class);
         AtomicInteger filesDeleted = new AtomicInteger();
 
@@ -231,7 +189,7 @@ public class DriveInformationService implements IDriveInformationService {
         return filesDeletedResponse;
     }
 
-    private void listAllSubItemsOneDrive(String itemId, CustomDriveItem parent, CustomDriveItem root) {
+    private void listAllSubItemsOneDrive(String itemId, CustomDriveItem root) {
         DriveItemCollectionPage subItems = graphClient.me().drive().items(itemId).children().buildRequest().get();
 
         if (subItems == null) {
@@ -249,7 +207,7 @@ public class DriveInformationService implements IDriveInformationService {
             customSubItem.setChildren(new ArrayList<>());
 
             if (subItem.folder != null) {
-                listAllSubItemsOneDrive(subItem.id, customSubItem, root);
+                listAllSubItemsOneDrive(subItem.id, root);
             }
 
             root.getChildren().add(customSubItem);

@@ -14,7 +14,7 @@ public interface IDriveInformationService {
 
     DriveInformationReponse getOneDriveInformation(String userAccessToken, Date expiryDate);
 
-    DriveInformationReponse getGoogleDriveInformation(String email, String refreshToken);
+    DriveInformationReponse getGoogleDriveInformation(String email, String refreshToken) throws IOException;
 
     JsonNode listAllItemsInOneDrive(String userAccessToken, Date expiryDate) throws JsonProcessingException;
 

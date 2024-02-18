@@ -48,8 +48,12 @@ public class UserDriveController {
             }
         } else if (connectionProvider.equals(GOOGLEDRIVE)) {
             String decryptedRefreshToken = decrypt(cloudPlatform.getRefreshToken());
-            DriveInformationReponse drive = driveInformationService.getGoogleDriveInformation(email, decryptedRefreshToken);
-            return ResponseEntity.ok(drive);
+            try {
+                DriveInformationReponse drive = driveInformationService.getGoogleDriveInformation(email, decryptedRefreshToken);
+                return ResponseEntity.ok(drive);
+            } catch (Exception e) {
+                return ResponseEntity.badRequest().build();
+            }
         }
 
         return ResponseEntity.badRequest().build();
@@ -97,8 +101,8 @@ public class UserDriveController {
 
     @PostMapping("/delete-recommended")
     public ResponseEntity<FilesDeletedResponse> deleteRecommendedFiles(@RequestParam("email") String email,
-                                                       @RequestParam("provider") String connectionProvider,
-                                                       @RequestBody JsonNode filesToDelete) {
+                                                                       @RequestParam("provider") String connectionProvider,
+                                                                       @RequestBody JsonNode filesToDelete) {
 
         UserEntity userEntity = userService.findUserByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
         CloudPlatform cloudPlatform = cloudPlatformService.getUserCloudPlatform(userEntity.getEmail(), connectionProvider);
