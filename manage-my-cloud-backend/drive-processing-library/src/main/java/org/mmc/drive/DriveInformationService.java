@@ -284,9 +284,9 @@ public class DriveInformationService implements IDriveInformationService {
         List<CustomDriveItem> allImages = new ArrayList<>();
         List<CustomDriveItem> allDocuments = new ArrayList<>();
         List<CustomDriveItem> allOthers = new ArrayList<>();
-        List<CustomDriveItem> allAudios = new ArrayList<>(); // New list for audio files
-        List<CustomDriveItem> allVideos = new ArrayList<>(); // New list for video files
-        List<CustomDriveItem> allEbooks = new ArrayList<>(); // New list for ebook files
+        List<CustomDriveItem> allAudios = new ArrayList<>();
+        List<CustomDriveItem> allVideos = new ArrayList<>();
+        List<CustomDriveItem> allEbooks = new ArrayList<>();
 
         // Define the fields included in the response
         String fields = "nextPageToken, files(id, name, mimeType, createdTime, webViewLink)";
@@ -315,11 +315,11 @@ public class DriveInformationService implements IDriveInformationService {
                 } else if (file.getMimeType().equals("application/pdf") || file.getMimeType().equals("application/vnd.openxmlformats-officedocument.wordprocessingml.document")) {
                     allDocuments.add(customItem);
                 } else if (file.getMimeType().startsWith("audio/")) {
-                    allAudios.add(customItem); // Add audio files to the allAudios list
+                    allAudios.add(customItem);
                 } else if (file.getMimeType().startsWith("video/")) {
-                    allVideos.add(customItem); // Add video files to the allVideos list
+                    allVideos.add(customItem);
                 } else if (file.getMimeType().equals("application/epub+zip")) {
-                    allEbooks.add(customItem); // Add ebook files to the allEbooks list
+                    allEbooks.add(customItem);
                 } else {
                     allOthers.add(customItem);
                 }
@@ -350,9 +350,9 @@ public class DriveInformationService implements IDriveInformationService {
         List<CustomDriveItem> allImages = new ArrayList<>();
         List<CustomDriveItem> allDocuments = new ArrayList<>();
         List<CustomDriveItem> allOthers = new ArrayList<>();
-        List<CustomDriveItem> allAudios = new ArrayList<>(); // New list for audio files
-        List<CustomDriveItem> allVideos = new ArrayList<>(); // New list for video files
-        List<CustomDriveItem> allEbooks = new ArrayList<>(); // New list for ebook files
+        List<CustomDriveItem> allAudios = new ArrayList<>();
+        List<CustomDriveItem> allVideos = new ArrayList<>();
+        List<CustomDriveItem> allEbooks = new ArrayList<>();
 
         DriveItemCollectionPage driveItems = graphClient.me().drive().root().children().buildRequest().get();
 
@@ -377,11 +377,11 @@ public class DriveInformationService implements IDriveInformationService {
                 } else if (mimeType.equals("application/pdf") || mimeType.equals("application/vnd.openxmlformats-officedocument.wordprocessingml.document")) {
                     allDocuments.add(customItem);
                 } else if (mimeType.startsWith("audio/")) {
-                    allAudios.add(customItem); // Add audio files to the allAudios list
+                    allAudios.add(customItem);
                 } else if (mimeType.startsWith("video/")) {
-                    allVideos.add(customItem); // Add video files to the allVideos list
+                    allVideos.add(customItem);
                 } else if (mimeType.equals("application/epub+zip")) {
-                    allEbooks.add(customItem); // Add ebook files to the allEbooks list
+                    allEbooks.add(customItem);
                 } else {
                     allOthers.add(customItem);
                 }
