@@ -1,9 +1,11 @@
 package com.authorisation.controllers;
 
+import com.authorisation.controllers.UserDriveController;
 import com.authorisation.entities.CloudPlatform;
 import com.authorisation.entities.UserEntity;
 import com.authorisation.services.CloudPlatformService;
 import com.authorisation.services.UserService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
@@ -12,17 +14,21 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mmc.drive.DriveInformationService;
 import org.mmc.response.DriveInformationReponse;
+import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import java.io.IOException;
+import java.util.Date;
 import java.util.Optional;
 
 import static com.authorisation.givens.CloudPlatformGivens.generateCloudPlatformEncryptedTokens;
@@ -50,11 +56,20 @@ class UserDriveControllerTest {
     private WebApplicationContext context;
     @MockBean
     private UserService userService;
+
     @MockBean
     private CloudPlatformService cloudPlatformService;
+
     @MockBean
     private DriveInformationService driveInformationService;
+
+    @Autowired
+    private UserDriveController userDriveController;
     ObjectMapper objectMapper = new ObjectMapper();
+
+    private UserEntity userEntity;
+    private CloudPlatform cloudPlatform;
+    private JsonNode jsonNode;
 
     @BeforeEach
     public void setup() {
@@ -62,6 +77,8 @@ class UserDriveControllerTest {
                 .webAppContextSetup(context)
                 .apply(springSecurity())
                 .build();
+
+        jsonNode = new ObjectMapper().createObjectNode();
     }
 
     @Test
@@ -262,6 +279,36 @@ class UserDriveControllerTest {
                         .param("provider", "random").with(csrf()))
                 //then
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void testGetUserDriveBreakdown_OneDrive() throws JsonProcessingException {
+        UserEntity userEntity = generateUserEntityEnabled();
+        String email = userEntity.getEmail();
+        CloudPlatform cloudPlatform = generateCloudPlatformEncryptedTokens();
+
+        when(userService.findUserByEmail(email)).thenReturn(Optional.of(userEntity));
+        when(cloudPlatformService.getUserCloudPlatform(userEntity.getEmail(), "OneDrive")).thenReturn(cloudPlatform);
+        when(driveInformationService.performFetchAllOneDriveFilesBreakdown(any(), any())).thenReturn(jsonNode);
+
+        ResponseEntity<JsonNode> response = userDriveController.getUserDriveBreakdown(userEntity.getEmail(), "OneDrive");
+
+        assertEquals(ResponseEntity.ok(jsonNode), response);
+    }
+
+    @Test
+    public void testGetUserDriveBreakdown_GoogleDrive() throws IOException {
+        UserEntity userEntity = generateUserEntityEnabled();
+        String email = userEntity.getEmail();
+        CloudPlatform cloudPlatform = generateCloudPlatformEncryptedTokens();
+
+        when(userService.findUserByEmail(email)).thenReturn(Optional.of(userEntity));
+        when(cloudPlatformService.getUserCloudPlatform(userEntity.getEmail(), "GoogleDrive")).thenReturn(cloudPlatform);
+        when(driveInformationService.performFetchAllGoogleDriveFilesBreakdown(any(), any())).thenReturn(jsonNode);
+
+        ResponseEntity<JsonNode> response = userDriveController.getUserDriveBreakdown(userEntity.getEmail(), "GoogleDrive");
+
+        assertEquals(ResponseEntity.ok(jsonNode), response);
     }
 
     //Helper
