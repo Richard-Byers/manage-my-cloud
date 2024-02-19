@@ -217,7 +217,7 @@ const DashboardCardModal: React.FC<DashboardCardModalProps> = ({
                                 <span>{email}</span>
                                 <span>{t('main.dashboard.dashboardCardModal.driveInformation.usedStorage')} {usedStorage > 0.0 ? usedStorage : "< 0"}/GB</span>
                                 <span>{t('main.dashboard.dashboardCardModal.driveInformation.totalStorage')} {totalStorage}/GB</span>
-                                <PieChart width={200} height={200}>
+                                <PieChart className="dashboard-card-modal-pie-chart" width={200} height={200}>
                                     <Pie
                                         data={pieChartData}
                                         cx="50%"
