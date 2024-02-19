@@ -47,27 +47,32 @@ const ManageConnectionsPage = () => {
                     {t('main.manageConnectionsPage.title')}
                 </div>
 
-                {user?.linkedAccounts.linkedAccountsCount === 0 ? (
-                    <>
-                        <div className={linkAccountsClassname}>
-                            <div className={"manage-connections-page-link-text"}>
-                                To link an account press the button below
-                            </div>
-                            <AddConnectionsModal oneDrive={user?.linkedAccounts.oneDrive}
-                                                 googleDrive={user?.linkedAccounts.googleDrive}/>
+                {user?.linkedAccounts.linkedAccountsCount === 0 ?
+
+                    <div className={linkAccountsClassname}>
+                        <div className={"manage-connections-page-link-text"}>
+                            To link an account press the button below
                         </div>
-                    </>) : linkedAccountsArray.filter(({value}) => value).map(({
-                                                                                   key,
-                                                                                   value
-                                                                               }) => (
-                    <Connection key={key} connectionProvider={key} isConnected={value}/>
-                ))}
+                        <AddConnectionsModal oneDrive={user?.linkedAccounts.oneDrive}
+                                             googleDrive={user?.linkedAccounts.googleDrive}/>
+                    </div>
+                    : null
+                }
+
+                <div className="overflow-container">
+                    {user?.linkedAccounts.linkedAccountsCount === 0 ? null
+                        :
+                        linkedAccountsArray.filter(({value}) => value).map(({key, value}) => (
+                            <Connection key={key} connectionProvider={key} isConnected={value}/>
+                        ))}
+                </div>
 
                 {user?.linkedAccounts.linkedAccountsCount !== undefined && user?.linkedAccounts.linkedAccountsCount >= 1 ? (
                     <div className={"manage-connections-page-link-button-container"}>
                         <AddConnectionsModal oneDrive={user?.linkedAccounts.oneDrive}
                                              googleDrive={user?.linkedAccounts.googleDrive}/>
                     </div>) : null}
+
             </div>
         </div>
     )

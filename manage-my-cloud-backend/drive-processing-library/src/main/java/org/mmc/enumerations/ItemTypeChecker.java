@@ -98,10 +98,7 @@ public class ItemTypeChecker {
 
         public static boolean isOtherType(String itemName) {
             int lastIndexOfDot = itemName.lastIndexOf(".");
-            if (lastIndexOfDot == -1) {
-                return false;
-            }
-            String otherFileExtension = itemName.substring(lastIndexOfDot + 1).toUpperCase();
+            String otherFileExtension = lastIndexOfDot == -1 ? "" : itemName.substring(lastIndexOfDot + 1).toUpperCase();
             return !ImageType.IMAGE_TYPES.contains(otherFileExtension) && !DocumentType.DOCUMENT_TYPES.contains(otherFileExtension) && !VideoType.VIDEO_TYPES.contains(otherFileExtension);
         }
     }

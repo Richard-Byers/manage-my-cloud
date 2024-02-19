@@ -76,6 +76,8 @@ export const SignUpModal: React.FC<SignUpProps> = ({
     };
 
     const handleSignupSubmission = (e: React.FormEvent) => {
+        setShowError(() => ({errorMessage: null}));
+        setShowEmailConfirmation(() => ({successMessage: null}));
         const {firstName, lastName, email, password} = signupInput;
         e.preventDefault();
 

@@ -149,29 +149,33 @@ public class DriveInformationService implements IDriveInformationService {
         recommendations.setType("Folder");
         recommendations.setChildren(Collections.synchronizedList(new ArrayList<>()));
 
-        filesInUserDrive.getChildren().parallelStream().forEach(item -> {
-            // Won't delete folders, potential future improvement would be to delete empty folders and add it as another preference option
-            if (!Objects.equals(item.getType(), "Folder")) {
-                String itemName = item.getName();
-                OffsetDateTime createdDateTime = item.getCreatedDateTime();
-                OffsetDateTime lastModifiedDateTime = item.getLastModifiedDateTime();
-                if (recommendImages && isImageType(itemName) && compareDates(createdDateTime, lastModifiedDateTime, recommendItemsCreatedDaysAgo, recommendItemsNotChangedDaysAgo)) {
-                    // if item is an image and falls outside the date range
-                    recommendations.getChildren().add(item);
-                } else if (recommendVideos && isVideoType(itemName) && compareDates(createdDateTime, lastModifiedDateTime, recommendItemsCreatedDaysAgo, recommendItemsNotChangedDaysAgo)) {
-                    // if item is a video and falls outside the date range
-                    recommendations.getChildren().add(item);
-                } else if (recommendDocuments && isDocumentType(itemName) && compareDates(createdDateTime, lastModifiedDateTime, recommendItemsCreatedDaysAgo, recommendItemsNotChangedDaysAgo)) {
-                    // if item is a document and falls outside the date range
-                    recommendations.getChildren().add(item);
-                } else if (isOtherType(itemName) && compareDates(createdDateTime, lastModifiedDateTime, recommendItemsCreatedDaysAgo, recommendItemsNotChangedDaysAgo)) {
-                    // if item is not an image, video, or document and falls outside the date range
-                    recommendations.getChildren().add(item);
+        try {
+            filesInUserDrive.getChildren().parallelStream().forEach(item -> {
+                // Won't delete folders, potential future improvement would be to delete empty folders and add it as another preference option
+                if (!Objects.equals(item.getType(), "Folder")) {
+                    String itemName = item.getName();
+                    OffsetDateTime createdDateTime = item.getCreatedDateTime();
+                    OffsetDateTime lastModifiedDateTime = item.getLastModifiedDateTime();
+                    if (recommendImages && isImageType(itemName) && compareDates(createdDateTime, lastModifiedDateTime, recommendItemsCreatedDaysAgo, recommendItemsNotChangedDaysAgo)) {
+                        // if item is an image and falls outside the date range
+                        recommendations.getChildren().add(item);
+                    } else if (recommendVideos && isVideoType(itemName) && compareDates(createdDateTime, lastModifiedDateTime, recommendItemsCreatedDaysAgo, recommendItemsNotChangedDaysAgo)) {
+                        // if item is a video and falls outside the date range
+                        recommendations.getChildren().add(item);
+                    } else if (recommendDocuments && isDocumentType(itemName) && compareDates(createdDateTime, lastModifiedDateTime, recommendItemsCreatedDaysAgo, recommendItemsNotChangedDaysAgo)) {
+                        // if item is a document and falls outside the date range
+                        recommendations.getChildren().add(item);
+                    } else if (isOtherType(itemName) && compareDates(createdDateTime, lastModifiedDateTime, recommendItemsCreatedDaysAgo, recommendItemsNotChangedDaysAgo)) {
+                        // if item is not an image, video, or document and falls outside the date range
+                        recommendations.getChildren().add(item);
+                    }
                 }
-            }
-        });
+            });
 
-        return mapper.readTree(mapper.writeValueAsString(recommendations));
+            return mapper.readTree(mapper.writeValueAsString(recommendations));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public FilesDeletedResponse deleteRecommendedOneDriveFiles(JsonNode filesToDelete, String userAccessToken, Date expiryDate) throws JsonProcessingException {
@@ -184,7 +188,7 @@ public class DriveInformationService implements IDriveInformationService {
                 graphClient.me().drive().items(item.getId()).buildRequest().delete();
                 filesDeleted.getAndIncrement();
             } catch (Exception e) {
-                throw new RuntimeException("Error deleting file");
+                throw new RuntimeException("Error deleting OneDrive files");
             }
         });
         FilesDeletedResponse filesDeletedResponse = new FilesDeletedResponse();
@@ -239,10 +243,10 @@ public class DriveInformationService implements IDriveInformationService {
         List<CustomDriveItem> allFiles = new ArrayList<>();
 
         // Define the fields included in the response
-        String fields = "nextPageToken, files(id, name, mimeType, createdTime, webViewLink)";
+        String fields = "nextPageToken, files(id, name, mimeType, createdTime, modifiedTime, webViewLink)";
 
         // Make the request, get the fields for each file and ignore folders
-        com.google.api.services.drive.Drive.Files.List request = service.files().list().setFields(fields).setQ("mimeType != 'application/vnd.google-apps.folder'");
+        com.google.api.services.drive.Drive.Files.List request = service.files().list().setFields(fields).setQ("mimeType != 'application/vnd.google-apps.folder' and 'me' in owners");
 
         FileList fileList;
         do {
@@ -250,13 +254,15 @@ public class DriveInformationService implements IDriveInformationService {
             for (File file : fileList.getFiles()) {
 
                 // Convert the Google DateTime to Java OffsetDateTime
-                DateTime googleDateTime = file.getCreatedTime();
-                OffsetDateTime offsetDateTime = OffsetDateTime.ofInstant(Instant.ofEpochSecond(googleDateTime.getValue()), ZoneId.systemDefault());
+                OffsetDateTime googleCreatedDateTime = OffsetDateTime.ofInstant(Instant.ofEpochMilli(file.getCreatedTime().getValue()), ZoneId.systemDefault());
+                OffsetDateTime googleModifiedDateTime = OffsetDateTime.ofInstant(Instant.ofEpochMilli(file.getModifiedTime().getValue()), ZoneId.systemDefault());
 
                 CustomDriveItem customItem = new CustomDriveItem();
+                customItem.setId(file.getId());
                 customItem.setName(file.getName());
                 customItem.setType(file.getMimeType());
-                customItem.setCreatedDateTime(offsetDateTime);
+                customItem.setCreatedDateTime(googleCreatedDateTime);
+                customItem.setLastModifiedDateTime(googleModifiedDateTime);
                 customItem.setWebUrl(file.getWebViewLink());
 
                 allFiles.add(customItem);
@@ -265,6 +271,26 @@ public class DriveInformationService implements IDriveInformationService {
         } while (fileList.getNextPageToken() != null && fileList.getNextPageToken().length() > 0);
 
         return allFiles;
+    }
+
+    public FilesDeletedResponse deleteRecommendedGoogleDriveFiles(JsonNode filesToDelete, String refreshToken, String accessToken) throws JsonProcessingException {
+        AtomicInteger filesDeleted = new AtomicInteger();
+        com.google.api.services.drive.Drive service = getGoogleClient(refreshToken, accessToken);
+        CustomDriveItem filesInUserDrive = mapper.treeToValue(filesToDelete, CustomDriveItem.class);
+
+        filesInUserDrive.getChildren().parallelStream().forEach(item -> {
+            try {
+                service.files().delete(item.getId()).execute();
+                filesDeleted.getAndIncrement();
+            } catch (Exception e) {
+                throw new RuntimeException("Error deleting Google Drive files");
+            }
+        });
+
+
+        FilesDeletedResponse filesDeletedResponse = new FilesDeletedResponse();
+        filesDeletedResponse.setFilesDeleted(filesDeleted.get());
+        return filesDeletedResponse;
     }
 
     public DriveInformationReponse mapToDriveInformationResponse(String displayName, String email, Double total, Double used) {

@@ -23,34 +23,33 @@ const DashboardPage = () => {
     }
 
     return (
-        <div>
+        <>
             <Navbar/>
             <div className={"dashboard-page-content-grid"}>
                 <div className="dashboard-page-title-container">
                     {t('main.dashboard.title')}
                 </div>
 
-                {
-                    linkedAccountsArray.map(({
-                                                 key,
-                                                 value
-                                             }) => (
-                        <div className={"connected-drives-container"}><ConnectedDrivesCard key={key}
-                                                                                           connectionProvider={key}/>
-                        </div>
-                    ))}
-                <div className={"connect-drives-container"}>
-                    <div className="text-under-line">
-                        <p>
-                            {t('main.dashboard.manageConnectionsTextBeforeLink')}
-                            <button className={'manage-connections-hyperlink'} onClick={navigateToManageConnections}>
-                                {t('main.dashboard.manageConnectionsLink')}
-                            </button>
-                        </p>
-                    </div>
+                <div className={"connected-drives-overflow-container"}>
+                    {
+                        linkedAccountsArray.map(({
+                                                     key,
+                                                     value
+                                                 }) => (
+                                <ConnectedDrivesCard key={key} connectionProvider={key}/>
+                        ))}
+                </div>
+
+                <div className="text-under-line">
+                    <p>
+                        {t('main.dashboard.manageConnectionsTextBeforeLink')}
+                        <button className={'manage-connections-hyperlink'} onClick={navigateToManageConnections}>
+                            {t('main.dashboard.manageConnectionsLink')}
+                        </button>
+                    </p>
                 </div>
             </div>
-        </div>
+        </>
 
     )
 };

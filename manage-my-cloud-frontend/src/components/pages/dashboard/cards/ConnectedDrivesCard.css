@@ -1,100 +1,136 @@
 
 .dashboard-connection-item {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  width: auto;
-  height: 34vh;
-  background-color: rgb(254, 254, 254);
-  padding: 1em;
-  font-weight: 700;
-  text-align: center;
-  border-radius: 10px;
-  box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.18);
-  -webkit-box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.18);
-  -moz-box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.18);
-  cursor: pointer;
-  transition: transform 0.2s ease-in-out;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 23%;
+    height: 34vh;
+    background-color: rgb(254, 254, 254);
+    padding: 1em;
+    font-weight: 700;
+    text-align: center;
+    border-radius: 10px;
+    box-shadow: 10px 10px 5px 0px rgba(0, 0, 0, 0.18);
+    -webkit-box-shadow: 10px 10px 5px 0px rgba(0, 0, 0, 0.18);
+    -moz-box-shadow: 10px 10px 5px 0px rgba(0, 0, 0, 0.18);
+    cursor: pointer;
+    transition: transform 0.2s ease-in-out;
 }
 
-.dashboard-connection-item h2{
-  margin: 0.4em;
-  padding: 0;
+.dashboard-connection-item h2 {
+    margin: 0.4em;
+    padding: 0;
 }
 
 .dashboard-connection-item:hover {
-  transform: scale(1.01);
+    transform: scale(1.01);
 }
 
-.dashboard-connection-item img{
-  width: 50%;
-  height: 50%;
-  object-fit: contain;
+.dashboard-connection-item img {
+    width: 50%;
+    height: 50%;
+    object-fit: contain;
 }
 
 .g-drive-logo {
-  display:flex;
+    display: flex;
     color: #fff;
     width: 8vw;
-    height:14vh;
+    height: 14vh;
     margin: auto;
 }
 
 .item-drive-name {
-  display: flex;
-  justify-content: center;
-  width: 100%;
-  font-size: 0.8vw;
-  font-family: MontserratLight, serif;
-  line-height: normal;
-  font-style: normal;
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    font-size: 0.9rem;
+    font-family: MontserratLight, serif;
+    line-height: normal;
+    font-style: normal;
 }
 
 .item-storage-used {
-  display: flex;
-  justify-content: center;
-  width: 100%;
-  font-size: 0.8vw;
-  font-family: MontserratLight, serif;
-  line-height: normal;
-  font-weight: 400;
-  font-style: normal;
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    font-size: 0.9rem;
+    font-family: MontserratLight, serif;
+    line-height: normal;
+    font-weight: 400;
+    font-style: normal;
 }
 
 .dropbox-logo {
-  display:flex;
+    display: flex;
     color: #fff;
     width: 8vw;
-    height:14vh;
+    height: 14vh;
     margin: auto;
 
 }
 
 .onedrive-logo {
-  display:flex;
+    display: flex;
     color: #fff;
     width: 10vw;
-    height:14vh;
+    height: 14vh;
     margin: auto;
 
 }
 
 .head-to-manage-text {
-  margin-top:-4vh;
-  margin-right:3vw;
+    margin-top: -4vh;
+    margin-right: 3vw;
 }
 
 
 hr {
-  border: none;
-  border-top: 1px solid black; /* Adjust this value to change the color and thickness of the line */
-  width: 100%; /* Adjust this value to change the width of the line */
-  margin: 10px 0; /* Adjust this value to change the space above and below the line */
+    border: none;
+    border-top: 1px solid black; /* Adjust this value to change the color and thickness of the line */
+    width: 100%; /* Adjust this value to change the width of the line */
+    margin: 10px 0; /* Adjust this value to change the space above and below the line */
 }
 
 @font-face {
-  font-family: 'MontserratLight';
-  src: local('MontserratLight'),
-  url('../../../fonts/Montserrat-Light.ttf') format('truetype');
+    font-family: 'MontserratLight';
+    src: local('MontserratLight'),
+    url('../../../fonts/Montserrat-Light.ttf') format('truetype');
+}
+
+@media only screen and (max-width: 1440px) {
+    .item-storage-used,
+    .item-drive-name {
+        font-size: 0.8rem;
+    }
+}
+
+@media only screen and (max-width: 940px) {
+    .dashboard-connection-item {
+        height: auto;
+        width: 70%;
+    }
+}
+
+@media only screen and (max-width: 768px) {
+
+    .dashboard-connection-item img {
+        width: 35%;
+        height: 35%;
+        object-fit: contain;
+    }
+
+    .item-storage-used,
+    .item-drive-name {
+        font-size: 0.8rem;
+    }
+}
+
+/* For mobile screens */
+@media only screen and (max-width: 500px) {
+    .item-storage-used,
+    .item-drive-name {
+        font-size: 0.6rem;
+    }
 }
