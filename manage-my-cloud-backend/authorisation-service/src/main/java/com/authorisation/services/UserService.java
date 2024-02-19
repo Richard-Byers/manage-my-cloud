@@ -229,6 +229,9 @@ public class UserService implements IUserService {
         UserEntity user = findUserByEmail(credentialsDto.getEmail())
                 .orElseThrow(() -> new RuntimeException("User not found"));
         if (passwordEncoder.matches(credentialsDto.getPassword(), user.getPassword())) {
+            // Delete the RecommendationSettings associated with the user
+            recommendationSettingsRepository.deleteByUserEntityEmail(user.getEmail());
+
             // Check if the user has a OneDrive account linked and delete it if it exists
             CloudPlatform oneDriveAccount = cloudPlatformRepository.findByUserEntityEmailAndPlatformName(user.getEmail(), "OneDrive");
             if (oneDriveAccount != null) {

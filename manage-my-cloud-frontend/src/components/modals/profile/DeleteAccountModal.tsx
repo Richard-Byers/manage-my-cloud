@@ -11,17 +11,23 @@ function DeleteAccountModal() {
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
+    const [successMessage, setSuccessMessage] = useState("");
+    const [isDeleting, setIsDeleting] = useState(false);
     const { t } = useTranslation();
 
     const resetModal = () => {
         setPassword("");
         setConfirmPassword("");
         setErrorMessage("");
+        setSuccessMessage("");
+        setIsDeleting(false);
         setShowModal(false);
     };
 
+
     const handleDeleteAccount = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+        setIsDeleting(true);
         if (password === "" && confirmPassword === "") {
             setErrorMessage(t('main.deleteAccountModal.errorMessage.enterBothPasswords'));
             return;
@@ -43,9 +49,12 @@ function DeleteAccountModal() {
                     Authorization: `Bearer ${user.token}`
                 }
                 await buildAxiosRequestWithHeaders("DELETE", "/delete-user", headers, {email: user.email, password: password});
-                alert(t('main.deleteAccountModal.errorMessage.accountDeletedSuccessfully'));
-                logout();
-                setShowModal(false);
+                setSuccessMessage(t('main.deleteAccountModal.errorMessage.accountDeletedSuccessfully'));
+
+                setTimeout(() => {
+                    logout();
+                    resetModal();
+                }, 2000);
             } catch (error) {
                 const err = error as any;
                 if (err.response && err.response.data === 'Invalid password') {
@@ -84,6 +93,7 @@ function DeleteAccountModal() {
                                                placeholder={t('main.deleteAccountModal.enterPassword')}
                                                value={password}
                                                onChange={(e) => setPassword(e.target.value)}
+                                               disabled={isDeleting}
                                         />
                                     </label>
                                 </div>
@@ -94,19 +104,24 @@ function DeleteAccountModal() {
                                                placeholder={t('main.deleteAccountModal.confirmPassword')}
                                                value={confirmPassword}
                                                onChange={(e) => setConfirmPassword(e.target.value)}
+                                               disabled={isDeleting}
                                         />
                                     </label>
                                 </div>
                                 {errorMessage && <div className="modal-form-message" style={{color: '#ea1818'}}>{errorMessage}</div>}
+                                {successMessage && <div className="modal-form-message" style={{color: '#4caf50'}}>{successMessage}</div>}
                                 <div className="button-container">
                                     <button
-                                        className="modal-form-submit-button"
+                                        className="delete-modal-form-submit-button"
                                         type="submit"
+                                        disabled={isDeleting}
                                     >{t('main.deleteAccountModal.confirm')}
                                     </button>
                                     <button
-                                        className="modal-form-submit-button"
-                                        onClick={() => setShowModal(false)}>{t('main.deleteAccountModal.cancel')}</button>
+                                        className="delete-modal-form-submit-button"
+                                        onClick={() => setShowModal(false)}
+                                        disabled={isDeleting}
+                                    >{t('main.deleteAccountModal.cancel')}</button>
                                 </div>
                             </form>
                         </div>

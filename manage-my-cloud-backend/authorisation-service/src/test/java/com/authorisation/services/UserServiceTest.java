@@ -13,6 +13,7 @@ import com.authorisation.mappers.UserMapper;
 import com.authorisation.mappers.UserPreferencesMapper;
 import com.authorisation.registration.RegistrationRequest;
 import com.authorisation.registration.password.PasswordResetRequest;
+import com.authorisation.repositories.CloudPlatformRepository;
 import com.authorisation.repositories.RecommendationSettingsRepository;
 import com.authorisation.repositories.UserEntityRepository;
 import com.authorisation.repositories.VerificationTokenRepository;
@@ -54,6 +55,8 @@ class UserServiceTest {
     private VerificationTokenRepository verificationTokenRepository;
     @MockBean
     private RecommendationSettingsRepository recommendationSettingsRepository;
+    @MockBean
+    private CloudPlatformRepository cloudPlatformRepository;
     @Autowired
     private PasswordEncoder passwordEncoder;
     @MockBean
