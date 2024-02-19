@@ -47,16 +47,17 @@ const DashboardCardModal: React.FC<DashboardCardModalProps> = ({
   const { user } = AuthData();
   const { t } = useTranslation();
   const [driveData, setDriveData] = React.useState<Node>();
+  const [pieChartData, setPieChartData] = React.useState<{ name: string; value: number; }[]>([]);
   const [loading, setLoading] = React.useState(false);
-  const [breakdownData, setBreakdownData] = React.useState<any>();
   const COLOURS = ["blue", "brown", "red", "orange", "purple", "green"];
 
-  const data = breakdownData
-    ? Object.entries(breakdownData).map(([name, value]) => ({
-        name,
-        value: Number(value),
-      }))
-    : [];
+  let categories = {
+    Images: 0,
+    Audio: 0,
+    Video: 0,
+    Documents: 0,
+    Others: 0
+  };
 
   const CustomTooltip = ({ active, payload }: TooltipProps<any, any>) => {
     if (active && payload && payload.length) {
@@ -84,8 +85,53 @@ const DashboardCardModal: React.FC<DashboardCardModalProps> = ({
       const info = await getDriveItems(user, connectionProvider);
       console.log(info);
       setDriveData(info);
+      
+      if (connectionProvider === "googleDrive") {
+      info.children.forEach((item: Node) => {
+        if (item.type.startsWith('image')) {
+          categories.Images += 1;
+        } else if (item.type.startsWith('audio')) {
+          categories.Audio += 1;
+        } else if (item.type.startsWith('video')) {
+          categories.Video += 1;
+        } else if (item.type.startsWith('text') || item.type.includes('document')) {
+          categories.Documents += 1;
+        } else {
+          categories.Others += 1;
+        }
+      });
+    } else if (connectionProvider === "oneDrive") {
+      const processNode = (node: Node) => {
+        if (node.type.startsWith('image')) {
+          categories.Images += 1;
+        } else if (node.type.startsWith('audio')) {
+          categories.Audio += 1;
+        } else if (node.type.startsWith('video')) {
+          categories.Video += 1;
+        } else if (node.type.startsWith('text') || node.type.includes('document') || node.type.includes('presentation') || node.type.includes('spreadsheet') || node.type.includes('pdf')) {
+          categories.Documents += 1;
+        } else if (!node.type.startsWith('Folder')){
+          categories.Others += 1;
+        }
+  
+        node.children.forEach(processNode);
+      };
+  
+      info.children.forEach(processNode);
+    }
+  
+      const totalCount = Object.values(categories).reduce((a, b) => a + b, 0);
+  
+      const pieChartData = Object.entries(categories).map(([name, value]) => ({
+        name,
+        value: parseFloat(((value / totalCount) * 100).toFixed(2)),
+      }));
+  
+      // Now you can use the data array in your PieChart
+      // You might want to save it in the component's state so you can use it in your render method
+      setPieChartData(pieChartData);
     };
-
+  
     fetchDriveData();
   }, []);
 
@@ -154,40 +200,6 @@ const DashboardCardModal: React.FC<DashboardCardModalProps> = ({
     return response.data;
   }
 
-  React.useEffect(() => {
-    const fetchBreakdownData = async () => {
-      const info = await getDriveBreakdown(user, connectionProvider);
-      setBreakdownData(info);
-    };
-
-    fetchBreakdownData();
-  }, []);
-
-  async function getDriveBreakdown(
-    user: any,
-    connectionProvider: string
-  ): Promise<any> {
-    const headers = {
-      Authorization: `Bearer ${user.token}`,
-    };
-
-    const connectionProviderTitle = CONNECTION_TITLE[connectionProvider];
-    setLoading(true);
-    const response = await buildAxiosRequestWithHeaders(
-      "GET",
-      `/drive-breakdown?email=${user.email}&provider=${connectionProviderTitle}`,
-      headers,
-      {}
-    );
-
-    if (!response.data) {
-      setLoading(false);
-      throw new Error("Invalid response data");
-    }
-    setLoading(false);
-    return response.data;
-  }
-
   return (
     <div className={"modal-overlay"} onClick={toggleModal}>
       {loading ? (
@@ -218,32 +230,23 @@ const DashboardCardModal: React.FC<DashboardCardModalProps> = ({
                 )}{" "}
                 {totalStorage}/GB
               </span>
-              {breakdownData && (
-                <PieChart
-                  width={200}
-                  height={200}
-                  style={{ visibility: breakdownData ? "visible" : "hidden" }}
+                <PieChart width={200} height={200}>
+                <Pie
+                  data={pieChartData}
+                  cx="50%"
+                  cy="50%"
+                  labelLine={false}
+                  outerRadius={80}
+                  fill="#8884d8"
+                  dataKey="value"
+                  isAnimationActive={false}
                 >
-                  <Pie
-                    data={data}
-                    cx="50%"
-                    cy="50%"
-                    labelLine={false}
-                    outerRadius={80}
-                    fill="#8884d8"
-                    dataKey="value"
-                    isAnimationActive={false}
-                  >
-                    {data.map((entry, index) => (
-                      <Cell
-                        key={`cell-${index}`}
-                        fill={COLOURS[index % COLOURS.length]}
-                      />
-                    ))}
-                  </Pie>
-                  <Tooltip content={<CustomTooltip />} />
-                </PieChart>
-              )}
+                  {pieChartData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={COLOURS[index % COLOURS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip content={<CustomTooltip />} />
+              </PieChart>
             </div>
             <div className={"dashboard-card-modal-drive-files-container"}>
               <div className={"dashboard-card-modal-drive-files-grid"}>
