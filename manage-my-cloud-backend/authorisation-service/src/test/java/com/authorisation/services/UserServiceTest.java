@@ -2,6 +2,7 @@ package com.authorisation.services;
 
 import com.authorisation.dto.CredentialsDto;
 import com.authorisation.dto.UserDto;
+import com.authorisation.entities.RecommendationSettings;
 import com.authorisation.entities.UserEntity;
 import com.authorisation.entities.VerificationToken;
 import com.authorisation.exception.InvalidPasswordException;
@@ -9,12 +10,15 @@ import com.authorisation.exception.UserAlreadyExistsException;
 import com.authorisation.exception.UserNotFoundException;
 import com.authorisation.exception.UserNotVerifiedException;
 import com.authorisation.mappers.UserMapper;
+import com.authorisation.mappers.UserPreferencesMapper;
 import com.authorisation.registration.RegistrationRequest;
 import com.authorisation.registration.password.PasswordResetRequest;
+import com.authorisation.repositories.RecommendationSettingsRepository;
 import com.authorisation.repositories.UserEntityRepository;
 import com.authorisation.repositories.VerificationTokenRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mmc.pojo.UserPreferences;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -28,6 +32,7 @@ import java.util.Date;
 import java.util.Optional;
 
 import static com.authorisation.givens.CredentialsGivens.generateCredentialsDto;
+import static com.authorisation.givens.RecommendationSettingsGivens.generateRecommendationSettings;
 import static com.authorisation.givens.RegistrationRequestGivens.generateRegistrationRequest;
 import static com.authorisation.givens.UserEntityGivens.generateUserEntity;
 import static com.authorisation.givens.UserEntityGivens.generateUserEntityEnabled;
@@ -47,13 +52,16 @@ class UserServiceTest {
     private UserEntityRepository userEntityRepository;
     @MockBean
     private VerificationTokenRepository verificationTokenRepository;
+    @MockBean
+    private RecommendationSettingsRepository recommendationSettingsRepository;
     @Autowired
     private PasswordEncoder passwordEncoder;
     @MockBean
     private PasswordResetTokenService passwordResetTokenService;
-    @MockBean
+    @Autowired
     private UserMapper userMapper;
-
+    @Autowired
+    private UserPreferencesMapper userPreferencesMapper;
     @Autowired
     private UserService userService;
 
@@ -325,6 +333,27 @@ class UserServiceTest {
         //then
         assertTrue(passwordEncoder.matches(newPassword, userEntity.getPassword()));
         verify(userEntityRepository).save(userEntity);
+    }
+
+    @Test
+    void getUserRecommendationSettings_returnsRecommendationSettings() {
+        //given
+        UserEntity userEntity = generateUserEntityEnabled();
+        RecommendationSettings recommendationSettings = generateRecommendationSettings(userEntity);
+        UserPreferences expectedUserPreferences = userPreferencesMapper.toUserPreferences(recommendationSettings);
+
+        //when
+        given(userEntityRepository.findByEmail(userEntity.getEmail())).willReturn(Optional.of(userEntity));
+        given(recommendationSettingsRepository.findByUserEntityEmail(userEntity.getEmail())).willReturn(recommendationSettings);
+        UserPreferences userPreferences = userService.getUserRecommendationSettings(userEntity.getEmail());
+
+        //then
+        assertEquals(expectedUserPreferences.isDeleteDocuments(), userPreferences.isDeleteDocuments());
+        assertEquals(expectedUserPreferences.isDeleteImages(), userPreferences.isDeleteImages());
+        assertEquals(expectedUserPreferences.isDeleteVideos(), userPreferences.isDeleteVideos());
+        assertEquals(expectedUserPreferences.isDeleteEmails(), userPreferences.isDeleteEmails());
+        assertEquals(expectedUserPreferences.getDeleteItemsNotChangedSinceDays(), userPreferences.getDeleteItemsNotChangedSinceDays());
+        assertEquals(expectedUserPreferences.getDeleteItemsCreatedAfterDays(), userPreferences.getDeleteItemsCreatedAfterDays());
     }
 
 

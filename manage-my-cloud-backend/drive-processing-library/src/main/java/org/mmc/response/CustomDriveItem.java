@@ -13,9 +13,11 @@ import java.util.List;
 @Getter
 @Setter
 public class CustomDriveItem {
+    private String id;
     private String name;
     private String type;
     private OffsetDateTime createdDateTime;
+    private OffsetDateTime lastModifiedDateTime;
     private String webUrl;
     private List<CustomDriveItem> children;
 }
