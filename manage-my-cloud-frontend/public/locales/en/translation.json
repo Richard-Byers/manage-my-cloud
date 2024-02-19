@@ -18,6 +18,16 @@
       "dashboardPageButtons": {
         "deleteDuplicates": "Delete Duplicates",
         "deleteRecommended": "Delete Recommended"
+      },
+      "deletionModals": {
+        "deleteRecommended": {
+          "title": "File(s) have been recommended for deletion",
+          "mainText": "Select the file(s) you would like to delete and click delete.",
+          "noFiles": "You do not have any files that have been recommended for deletion.",
+          "deleteButton": "Delete",
+          "closeRecommendation": "Done",
+          "closeRecommendationTryAgain": "Try Again"
+        }
       }
     },
     "landingPage": {

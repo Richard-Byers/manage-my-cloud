@@ -19,7 +19,7 @@ export const FILES_TYPES: FilesTypeProp = {
     "pdf": PDF,
     "docx": DOCX,
     "pptx": PPTX,
-    "jpeg": JPEG,
+    "jpg": JPEG,
     "png": PNG,
     "xlsx": EXCEL,
     "mp4": MP4,
@@ -30,5 +30,5 @@ export const FILES_TYPES: FilesTypeProp = {
 }
 
 export function getFileType(key: string): string {
-    return FILES_TYPES[key] || FILES_TYPES["other"];
+    return FILES_TYPES[key.toLowerCase()] || FILES_TYPES["other"];
 }
