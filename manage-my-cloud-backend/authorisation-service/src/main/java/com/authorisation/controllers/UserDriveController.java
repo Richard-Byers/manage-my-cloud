@@ -7,11 +7,11 @@ import com.authorisation.services.UserService;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.RequiredArgsConstructor;
 import org.mmc.drive.DriveInformationService;
+import org.mmc.pojo.UserPreferences;
 import org.mmc.response.DriveInformationReponse;
+import org.mmc.response.FilesDeletedResponse;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
 
@@ -49,8 +49,12 @@ public class UserDriveController {
         } else if (connectionProvider.equals(GOOGLEDRIVE)) {
             String decryptedRefreshToken = decrypt(cloudPlatform.getRefreshToken());
             String decryptedAccessToken = decrypt(cloudPlatform.getAccessToken());
-            DriveInformationReponse drive = driveInformationService.getGoogleDriveInformation(email, decryptedRefreshToken, decryptedAccessToken);
-            return ResponseEntity.ok(drive);
+            try {
+                DriveInformationReponse drive = driveInformationService.getGoogleDriveInformation(email, decryptedRefreshToken, decryptedAccessToken);
+                return ResponseEntity.ok(drive);
+            } catch (Exception e){
+                return ResponseEntity.badRequest().build();
+            }
         }
 
         return ResponseEntity.badRequest().build();
@@ -87,5 +91,47 @@ public class UserDriveController {
         } else {
             return ResponseEntity.badRequest().build();
         }
+        }
+
+    @PostMapping("/recommend-deletions")
+    public ResponseEntity<JsonNode> getRecommendedDeletions(@RequestParam("email") String email,
+                                                            @RequestBody JsonNode filesInDrive) {
+
+        UserEntity userEntity = userService.findUserByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
+
+        UserPreferences userPreferences = userService.getUserRecommendationSettings(userEntity.getEmail());
+
+        try {
+            JsonNode recommendedFiles = driveInformationService.returnItemsToDelete(filesInDrive, userPreferences);
+            return ResponseEntity.ok(recommendedFiles);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @PostMapping("/delete-recommended")
+    public ResponseEntity<FilesDeletedResponse> deleteRecommendedFiles(@RequestParam("email") String email,
+                                                                       @RequestParam("provider") String connectionProvider,
+                                                                       @RequestBody JsonNode filesToDelete) {
+
+        UserEntity userEntity = userService.findUserByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
+        CloudPlatform cloudPlatform = cloudPlatformService.getUserCloudPlatform(userEntity.getEmail(), connectionProvider);
+
+        if (cloudPlatform == null) {
+            throw new RuntimeException(String.format("Cloud platform not found %s", connectionProvider));
+        }
+
+        if (connectionProvider.equals(ONEDRIVE)) {
+            String accessToken = decrypt(cloudPlatform.getAccessToken());
+            Date accessTokenExpiryDate = cloudPlatform.getAccessTokenExpiryDate();
+            try {
+                FilesDeletedResponse filesDeleted = driveInformationService.deleteRecommendedOneDriveFiles(filesToDelete, accessToken, accessTokenExpiryDate);
+                return ResponseEntity.ok().body(filesDeleted);
+            } catch (Exception e) {
+                return ResponseEntity.badRequest().build();
+            }
+        }
+
+        return ResponseEntity.badRequest().build();
     }
 }

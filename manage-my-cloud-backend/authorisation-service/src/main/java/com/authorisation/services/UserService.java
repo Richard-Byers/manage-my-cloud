@@ -4,6 +4,7 @@ import com.authorisation.dto.CredentialsDto;
 import com.authorisation.dto.EmailDto;
 import com.authorisation.dto.UserDto;
 import com.authorisation.entities.LinkedAccounts;
+import com.authorisation.entities.RecommendationSettings;
 import com.authorisation.entities.UserEntity;
 import com.authorisation.entities.VerificationToken;
 import com.authorisation.exception.InvalidPasswordException;
@@ -11,12 +12,15 @@ import com.authorisation.exception.UserAlreadyExistsException;
 import com.authorisation.exception.UserNotFoundException;
 import com.authorisation.exception.UserNotVerifiedException;
 import com.authorisation.mappers.UserMapper;
+import com.authorisation.mappers.UserPreferencesMapper;
 import com.authorisation.registration.RegistrationRequest;
 import com.authorisation.registration.password.PasswordResetRequest;
+import com.authorisation.repositories.RecommendationSettingsRepository;
 import com.authorisation.repositories.UserEntityRepository;
 import com.authorisation.repositories.VerificationTokenRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.mmc.pojo.UserPreferences;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -34,9 +38,11 @@ public class UserService implements IUserService {
 
     private final UserEntityRepository userEntityRepository;
     private final VerificationTokenRepository verificationTokenRepository;
+    private final RecommendationSettingsRepository recommendationSettingsRepository;
     private final PasswordEncoder passwordEncoder;
     private final PasswordResetTokenService passwordResetTokenService;
     private final UserMapper userMapper;
+    private final UserPreferencesMapper userPreferencesMapper;
 
     @Override
     public UserEntity registerUser(RegistrationRequest registrationRequest) {
@@ -130,7 +136,8 @@ public class UserService implements IUserService {
     }
 
     @Override
-    @Transactional // to avoid LazyInitializationException, If an error occurs during the execution of this method, all database operations within the transaction will be rolled back.
+    @Transactional
+    // to avoid LazyInitializationException, If an error occurs during the execution of this method, all database operations within the transaction will be rolled back.
     public String validateToken(String verificationToken) {
         VerificationToken token = verificationTokenRepository.findByToken(verificationToken);
 
@@ -146,6 +153,9 @@ public class UserService implements IUserService {
             return "Verification token has expired";
         }
 
+        RecommendationSettings recommendationSettings = new RecommendationSettings();
+        recommendationSettings.setUserEntity(userEntity);
+        recommendationSettingsRepository.save(recommendationSettings);
         //set user as verified
         userEntity.setEnabled(true);
         userEntityRepository.save(userEntity);
@@ -192,6 +202,7 @@ public class UserService implements IUserService {
         userEntity.setPassword(passwordEncoder.encode(newPassword));
         userEntityRepository.save(userEntity);
     }
+
     private byte[] loadDefaultProfileImage() {
         // Load the default profile image from the classpath
         try {
@@ -206,5 +217,11 @@ public class UserService implements IUserService {
     public void updateProfileImage(UserEntity user, byte[] newImage) {
         user.setProfileImage(newImage);
         userEntityRepository.save(user);
+    }
+
+    public UserPreferences getUserRecommendationSettings(String email) {
+        UserEntity userEntity = userEntityRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException("User not found"));
+        RecommendationSettings recommendationSettings = recommendationSettingsRepository.findByUserEntityEmail(userEntity.getEmail());
+        return userPreferencesMapper.toUserPreferences(recommendationSettings);
     }
 }
