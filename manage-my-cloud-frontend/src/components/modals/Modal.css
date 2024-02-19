@@ -21,7 +21,7 @@
     justify-content: center;
     align-items: center;
     font-family: MontserratRegular, serif;
-    z-index: 1;
+    z-index: 3;
 }
 
 .modal-description {
@@ -227,7 +227,7 @@
 
     .modal-close-button{
         display: flex;
-        background-color: white;
+        background: transparent;
         align-self: flex-end;
         border: none;
         font-size: 1.6rem;

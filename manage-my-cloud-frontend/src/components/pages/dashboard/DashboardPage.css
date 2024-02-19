@@ -7,7 +7,6 @@
     margin: 0 2%;
 }
 
-
 .dashboard-page-title-container {
     font-family: MontserratBold, serif;
     font-size: 2.5rem;
@@ -16,12 +15,11 @@
     grid-column: 1 / 1;
 }
 
-.connected-drives-container {
-    grid-row: 2 / span 1;
-    grid-column: span 1;
-}
-
 .connect-drives-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    align-content: center;
     border-top: 3px solid white;
     text-align: center;
     width: 50%;
@@ -31,13 +29,25 @@
 }
 
 .text-under-line {
+    margin-top: 5vh;
     display: flex;
     font-family: MontserratLight, serif;
     color: #FFFFFF;
-    font-size: 1.2rem;
+    font-size: 1.4rem;
     width: 100%;
     text-align: center;
     flex-direction: column;
+    grid-column: span 4;
+    height: fit-content;
+}
+
+.text-under-line p {
+    display: flex;
+    justify-content: center;
+    align-self: center;
+    width: 50%;
+    padding-top: 2vh;
+    border-top: 2px solid white;
 }
 
 .manage-connections-hyperlink {
@@ -51,4 +61,76 @@
 .manage-connections-hyperlink:hover {
     cursor: pointer;
     border-bottom: 1px solid #ffffff;
+}
+
+.connected-drives-overflow-container{
+    display: flex;
+    grid-row: span 1;
+    grid-column: span 4;
+    gap: 1em;
+}
+
+@media only screen and (max-width: 1420px) {
+    .text-under-line p {
+        flex-direction: column;
+    }
+}
+
+@media only screen and (max-width: 940px) {
+
+    .dashboard-page-content-grid {
+        justify-content: center;
+        display: grid;
+        grid-template-rows: 4vh 60vh 18vh;
+        grid-template-columns: 90%;
+        margin: 0;
+    }
+
+    .connected-drives-overflow-container{
+        display: flex;
+        align-items: center;
+        align-content: center;
+        flex-direction: column;
+        grid-row: span 1;
+        grid-column: span 4;
+        height: 100%;
+        overflow-y: auto;
+        width: fit-content;
+        gap: 10px;
+    }
+
+    .dashboard-page-title-container{
+        font-size: 1.8rem;
+        display: flex;
+        align-items: center;
+        text-align: center;
+        justify-content: center;
+        grid-column: span 4;
+        width: 100%;
+    }
+
+    .connect-drives-container {
+        grid-row: span 1;
+        grid-column: span 4;
+    }
+
+    .text-under-line {
+        margin: 0;
+        justify-self: center;
+        color: #FFFFFF;
+        font-size: 1.1rem;
+        width: 80%;
+        text-align: center;
+        flex-direction: column;
+        grid-row: span 1;
+        grid-column: span 4;
+    }
+
+    .text-under-line p {
+        display: flex;
+        justify-content: center;
+        align-self: center;
+        width: 100%;
+        padding-top: 2vh;
+    }
 }
