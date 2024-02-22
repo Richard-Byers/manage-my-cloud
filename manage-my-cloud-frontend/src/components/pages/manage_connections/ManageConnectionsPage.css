@@ -1,8 +1,8 @@
 .manage-connections-page-content-grid {
     justify-content: center;
     display: grid;
-    grid-template-columns: repeat(4, 24%);
-    grid-template-rows: repeat(4, auto);
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 60vh auto;
     grid-gap: 1em;
     margin: 0 2%;
 }
@@ -11,16 +11,16 @@
     font-family: MontserratBold, serif;
     font-size: 2.5rem;
     color: white;
-    grid-row: 1 / 1;
-    grid-column: 1 / -1;
+    grid-row: 1;
+    grid-column: 1;
 }
 
 .manage-connections-page-link-button-container{
     display:flex;
     justify-content: center;
     align-items: center;
-    grid-column: 1/ span 4;
-    padding-top: 3vh;
+    grid-column: 1;
+    padding-bottom: 3vh;
 }
 
 .manage-connections-page-link-accounts-container-center {
@@ -30,7 +30,7 @@
     align-items: center;
     font-size: 1.6rem;
     color: white;
-    grid-column: 1 / span 4;
+    grid-column: 1;
 }
 
 .manage-connections-page-link-accounts-container {
@@ -50,19 +50,37 @@
 
 .overflow-container {
     display: flex;
+    justify-content: space-evenly;
     gap: 1em;
-    grid-column: 1 / span 4;
+    grid-column: 1;
     width: auto;
+    height: 100%;
+    overflow-y: scroll;
+    flex-wrap: wrap;
 }
 
-@media only screen and (max-width: 768px) {
+.overflow-container > * {
+    flex: 0 0 20%; /* 100% / 5 = 20% */
+}
+
+@media only screen and (max-width: 940px) {
 
     .manage-connections-page-title-container {
         display: flex;
         justify-content: center;
         font-size: 1.8rem;
-        grid-column: 1 / -1;
-        grid-row: 1 / 1;
+        grid-column: 1 ;
+        grid-row: 1;
+    }
+
+    .manage-connections-page-content-grid {
+        justify-content: center;
+        justify-items: center;
+        display: grid;
+        grid-template-columns: 100%;
+        grid-template-rows: 4vh 60vh 10vh;
+        grid-gap: 1em;
+        margin: 0;
     }
 
     .manage-connections-page-link-text{
@@ -71,9 +89,16 @@
 
     .overflow-container {
         display: flex;
-        justify-content: center;
         align-items: center;
-        width: 100%;
+        align-content: center;
+        flex-direction: column;
+        grid-row: span 1;
+        grid-column: 1;
+        height: 100%;
+        overflow-y: auto;
+        width: fit-content;
+        gap: 10px;
+        flex-wrap: nowrap;
     }
 
 }
@@ -83,30 +108,19 @@
 
     .overflow-container {
         display: flex;
+        justify-content: normal;
         flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        overflow: auto;
+        overflow-y: auto;
         gap: 1em;
-        grid-column: 1 / span 4;
-        grid-row: 2 / 2;
-        height: 100%; /* Adjust this value according to your needs */
-    }
-
-    .manage-connections-page-content-grid {
-        justify-content: center;
-        justify-items: center;
-        display: grid;
-        grid-template-columns: 1fr;
-        grid-template-rows: repeat(4, auto);
-        grid-gap: 1em;
-        margin: 1em;
+        grid-column: 1;
+        grid-row: 2;
+        width: 100%;
     }
 
     .manage-connections-page-link-text{
         text-align: center;
         font-size: 1rem;
-        grid-column: 1 / span 4;
+        grid-column: 1;
         word-break: normal;
     }
 
@@ -114,7 +128,7 @@
         display: flex;
         justify-content: center;
         font-size: 1.8rem;
-        grid-column: 1 / span 4;
+        grid-column: 1;
         grid-row: 1 / 1;
     }
 

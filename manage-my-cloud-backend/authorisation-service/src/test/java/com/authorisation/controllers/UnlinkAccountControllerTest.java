@@ -49,14 +49,15 @@ class UnlinkAccountControllerTest {
     @WithMockUser
     void unlinkAccountTest() throws Exception {
         String email = "email@example.com";
+        String driveEmail = "email2@example.com";
 
-        doNothing().when(oneDriveService).unlinkOneDrive(email);
+        doNothing().when(oneDriveService).unlinkOneDrive(email, driveEmail);
 
         mockMvc.perform(delete("/unlink-drive")
                         .param("email", email)
                         .param("provider", "OneDrive").with(csrf()))
                 .andExpect(status().isOk());
 
-        verify(oneDriveService).unlinkOneDrive(email);
+        verify(oneDriveService).unlinkOneDrive(email, driveEmail);
     }
 }

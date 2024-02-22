@@ -86,7 +86,12 @@ public class UserService implements IUserService {
         newUser.setAccountType("GOOGLE");
         newUser.setLinkedAccounts(new LinkedAccounts());
         newUser.setLinkedAccounts(new LinkedAccounts());
-        return userEntityRepository.save(newUser);
+        userEntityRepository.save(newUser);
+
+        RecommendationSettings recommendationSettings = new RecommendationSettings();
+        recommendationSettings.setUserEntity(newUser);
+        recommendationSettingsRepository.save(recommendationSettings);
+        return newUser;
     }
 
     public UserDto login(CredentialsDto credentialsDto) {

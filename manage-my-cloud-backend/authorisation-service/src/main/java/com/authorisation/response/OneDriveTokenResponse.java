@@ -29,4 +29,7 @@ public class OneDriveTokenResponse {
 
     @JsonProperty("refresh_token")
     private String refreshToken;
+
+    @JsonProperty("error")
+    private String error;
 }

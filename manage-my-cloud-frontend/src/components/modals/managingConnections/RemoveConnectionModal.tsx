@@ -6,9 +6,10 @@ import CloseIcon from "@mui/icons-material/Close";
 
 interface RemoveConnectionModalProps {
     connectionProvider: string
+    driveEmail: string
 }
 
-const RemoveConnectionModal: React.FC<RemoveConnectionModalProps> = ({connectionProvider}) => {
+const RemoveConnectionModal: React.FC<RemoveConnectionModalProps> = ({connectionProvider, driveEmail}) => {
 
     const {user, refreshUser} = AuthData();
     const [showModal, setShowModal] = useState(false);
@@ -27,7 +28,7 @@ const RemoveConnectionModal: React.FC<RemoveConnectionModalProps> = ({connection
             Authorization: `Bearer ${user?.token}`
         }
 
-        buildAxiosRequestWithHeaders('DELETE', `/unlink-drive?email=${user?.email}&provider=${connectionProvider}`, headers, {}).then(() => {
+        buildAxiosRequestWithHeaders('DELETE', `/unlink-drive?email=${user?.email}&provider=${connectionProvider}&driveEmail=${driveEmail}`, headers, {}).then(() => {
             refreshUser(user?.email);
         })
     }

@@ -28,10 +28,12 @@ public class UserDriveController {
     private final CloudPlatformService cloudPlatformService;
 
     @GetMapping("/drive-information")
-    public ResponseEntity<DriveInformationReponse> getUserDriveInformation(@RequestParam("email") String email, @RequestParam("provider") String connectionProvider) {
+    public ResponseEntity<DriveInformationReponse> getUserDriveInformation(@RequestParam("email") String email,
+                                                                           @RequestParam("provider") String connectionProvider,
+                                                                           @RequestParam("driveEmail") String driveEmail) {
 
         UserEntity userEntity = userService.findUserByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
-        CloudPlatform cloudPlatform = cloudPlatformService.getUserCloudPlatform(userEntity.getEmail(), connectionProvider);
+        CloudPlatform cloudPlatform = cloudPlatformService.getUserCloudPlatform(userEntity.getEmail(), connectionProvider, driveEmail);
 
         if (cloudPlatform == null) {
             throw new RuntimeException(String.format("Cloud platform not found %s", connectionProvider));
@@ -52,7 +54,7 @@ public class UserDriveController {
             try {
                 DriveInformationReponse drive = driveInformationService.getGoogleDriveInformation(email, decryptedRefreshToken, decryptedAccessToken);
                 return ResponseEntity.ok(drive);
-            } catch (Exception e){
+            } catch (Exception e) {
                 return ResponseEntity.badRequest().build();
             }
         }
@@ -61,10 +63,12 @@ public class UserDriveController {
     }
 
     @GetMapping("/drive-items")
-    public ResponseEntity<JsonNode> getUserDriveFiles(@RequestParam("email") String email, @RequestParam("provider") String connectionProvider) {
+    public ResponseEntity<JsonNode> getUserDriveFiles(@RequestParam("email") String email,
+                                                      @RequestParam("provider") String connectionProvider,
+                                                      @RequestParam("driveEmail") String driveEmail) {
 
         UserEntity userEntity = userService.findUserByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
-        CloudPlatform cloudPlatform = cloudPlatformService.getUserCloudPlatform(userEntity.getEmail(), connectionProvider);
+        CloudPlatform cloudPlatform = cloudPlatformService.getUserCloudPlatform(userEntity.getEmail(), connectionProvider, driveEmail);
 
         if (cloudPlatform == null) {
             throw new RuntimeException(String.format("Cloud platform not found %s", connectionProvider));
@@ -80,7 +84,7 @@ public class UserDriveController {
                 return ResponseEntity.badRequest().build();
             }
         } else if (connectionProvider.equals(GOOGLEDRIVE)) {
-            String decryptedRefreshToken= decrypt(cloudPlatform.getRefreshToken());
+            String decryptedRefreshToken = decrypt(cloudPlatform.getRefreshToken());
             String decryptedAccessToken = decrypt(cloudPlatform.getAccessToken());
             try {
                 JsonNode jsonNode = driveInformationService.fetchAllGoogleDriveFiles(decryptedRefreshToken, decryptedAccessToken);
@@ -91,7 +95,7 @@ public class UserDriveController {
         } else {
             return ResponseEntity.badRequest().build();
         }
-        }
+    }
 
     @PostMapping("/recommend-deletions")
     public ResponseEntity<JsonNode> getRecommendedDeletions(@RequestParam("email") String email,
@@ -112,10 +116,11 @@ public class UserDriveController {
     @PostMapping("/delete-recommended")
     public ResponseEntity<FilesDeletedResponse> deleteRecommendedFiles(@RequestParam("email") String email,
                                                                        @RequestParam("provider") String connectionProvider,
+                                                                       @RequestParam("driveEmail") String driveEmail,
                                                                        @RequestBody JsonNode filesToDelete) {
 
         UserEntity userEntity = userService.findUserByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
-        CloudPlatform cloudPlatform = cloudPlatformService.getUserCloudPlatform(userEntity.getEmail(), connectionProvider);
+        CloudPlatform cloudPlatform = cloudPlatformService.getUserCloudPlatform(userEntity.getEmail(), connectionProvider, driveEmail);
 
         if (cloudPlatform == null) {
             throw new RuntimeException(String.format("Cloud platform not found %s", connectionProvider));

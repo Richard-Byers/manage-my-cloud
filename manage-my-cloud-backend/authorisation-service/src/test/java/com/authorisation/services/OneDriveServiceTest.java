@@ -65,15 +65,16 @@ class OneDriveServiceTest {
         OneDriveTokenResponse actualOneDriveTokenResponse = oneDriveService.getAndStoreUserTokens(authCode, email);
 
         assertEquals(expectedOneDriveTokenResponse, actualOneDriveTokenResponse);
-        verify(cloudPlatformService, times(1)).addCloudPlatform(anyString(), anyString(), anyString(), anyString(), any(Date.class));
+        verify(cloudPlatformService, times(1)).addCloudPlatform(anyString(), anyString(), anyString(), anyString(), any(Date.class), anyString());
     }
 
     @Test
     void unlinkOneDriveTest_UnlinksDrive() {
         String email = "email@example.com";
+        String driveEmail = "email2@example.com";
 
-        oneDriveService.unlinkOneDrive(email);
+        oneDriveService.unlinkOneDrive(email, driveEmail);
 
-        verify(cloudPlatformService, times(1)).deleteCloudPlatform(email, "OneDrive");
+        verify(cloudPlatformService, times(1)).deleteCloudPlatform(email, "OneDrive", driveEmail);
     }
 }

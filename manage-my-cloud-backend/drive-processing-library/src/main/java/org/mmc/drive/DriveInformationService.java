@@ -10,6 +10,7 @@ import com.google.api.services.drive.model.About;
 import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.FileList;
 import com.microsoft.graph.models.Drive;
+import com.microsoft.graph.models.User;
 import com.microsoft.graph.requests.DriveItemCollectionPage;
 import com.microsoft.graph.requests.GraphServiceClient;
 import com.microsoft.graph.serializer.AdditionalDataManager;
@@ -69,6 +70,36 @@ public class DriveInformationService implements IDriveInformationService {
                 oneDriveEmail,
                 totalGigabytes,
                 usedGigabytes);
+    }
+
+    public String getOneDriveEmail(String userAccessToken, Date expiryDate) {
+
+        this.graphClient = getOneDriveClient(userAccessToken, expiryDate);
+
+        User user = graphClient.me().buildRequest().get();
+
+        if (user == null) {
+            throw new RuntimeException("Drive not found");
+        }
+
+        return user.mail;
+    }
+
+    public String getGoogleDriveEmail(String refreshToken, String accessToken) throws IOException {
+
+        com.google.api.services.drive.Drive service = getGoogleClient(refreshToken, accessToken);
+
+        if (service == null) {
+            throw new RuntimeException("Failed to create google client");
+        }
+
+        About user = service.about().get().setFields("user").execute();
+
+        if (user == null) {
+            throw new RuntimeException("User not found");
+        }
+
+        return user.getUser().getEmailAddress();
     }
 
     public DriveInformationReponse getGoogleDriveInformation(String email, String refreshToken, String accessToken) {

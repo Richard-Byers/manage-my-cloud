@@ -31,6 +31,7 @@ class CloudPlatformServiceTest {
     @Test
     void addCloudPlatform() {
         String userEmail = "email@example.com";
+        String driveEmail = "email@example.com";
         String platformName = "OneDrive";
         String accessToken = "access_token";
         String refreshToken = "refresh_token";
@@ -44,7 +45,7 @@ class CloudPlatformServiceTest {
         when(userEntityRepository.findByEmail(userEmail)).thenReturn(java.util.Optional.of(userEntity));
         when(cloudPlatformRepository.save(any(CloudPlatform.class))).thenReturn(expectedCloudPlatform);
 
-        CloudPlatform actualCloudPlatform = cloudPlatformService.addCloudPlatform(userEmail, platformName, accessToken, refreshToken, null);
+        CloudPlatform actualCloudPlatform = cloudPlatformService.addCloudPlatform(userEmail, platformName, accessToken, refreshToken, null, driveEmail);
 
         assertEquals(expectedCloudPlatform, actualCloudPlatform);
         verify(userEntityRepository, times(1)).save(userEntity);
@@ -54,6 +55,7 @@ class CloudPlatformServiceTest {
     void deleteCloudPlatform_oneDrive() {
         String userEmail = "email@example.com";
         String platformName = "OneDrive";
+        String driveEmail = "email2@example.com";
 
         UserEntity userEntity = new UserEntity();
         userEntity.setEmail(userEmail);
@@ -61,16 +63,17 @@ class CloudPlatformServiceTest {
 
         when(userEntityRepository.findByEmail(userEmail)).thenReturn(java.util.Optional.of(userEntity));
 
-        cloudPlatformService.deleteCloudPlatform(userEmail, platformName);
+        cloudPlatformService.deleteCloudPlatform(userEmail, platformName, driveEmail);
 
         verify(userEntityRepository, times(1)).save(userEntity);
-        verify(cloudPlatformRepository, times(1)).deleteByUserEntityEmailAndPlatformName(userEmail, platformName);
+        verify(cloudPlatformRepository, times(1)).deleteByUserEntityEmailAndPlatformNameAndDriveEmail(userEmail, platformName, driveEmail);
     }
 
     @Test
     void deleteCloudPlatform_googleDrive() {
         String userEmail = "email@example.com";
         String platformName = "GoogleDrive";
+        String driveEmail = "email2@example.com";
 
         UserEntity userEntity = new UserEntity();
         userEntity.setEmail(userEmail);
@@ -78,37 +81,39 @@ class CloudPlatformServiceTest {
 
         when(userEntityRepository.findByEmail(userEmail)).thenReturn(java.util.Optional.of(userEntity));
 
-        cloudPlatformService.deleteCloudPlatform(userEmail, platformName);
+        cloudPlatformService.deleteCloudPlatform(userEmail, platformName, driveEmail);
 
         verify(userEntityRepository, times(1)).save(userEntity);
-        verify(cloudPlatformRepository, times(1)).deleteByUserEntityEmailAndPlatformName(userEmail, platformName);
+        verify(cloudPlatformRepository, times(1)).deleteByUserEntityEmailAndPlatformNameAndDriveEmail(userEmail, platformName, driveEmail);
     }
 
     @Test
     void deleteCloudPlatform_unsupportedDrive_throwsException() {
         String userEmail = "email@example.com";
         String platformName = "provider";
+        String driveEmail = "email2@example.com";
 
         UserEntity userEntity = new UserEntity();
         userEntity.setEmail(userEmail);
         userEntity.setLinkedAccounts(new LinkedAccounts());
 
         when(userEntityRepository.findByEmail(userEmail)).thenReturn(java.util.Optional.of(userEntity));
-        assertThrows(RuntimeException.class, () -> cloudPlatformService.deleteCloudPlatform(userEmail, platformName));
+        assertThrows(RuntimeException.class, () -> cloudPlatformService.deleteCloudPlatform(userEmail, platformName, driveEmail));
 
         verify(userEntityRepository, times(0)).save(userEntity);
-        verify(cloudPlatformRepository, times(0)).deleteByUserEntityEmailAndPlatformName(userEmail, platformName);
+        verify(cloudPlatformRepository, times(0)).deleteByUserEntityEmailAndPlatformNameAndDriveEmail(userEmail, platformName, driveEmail);
     }
 
     @Test
     void getUserCloudPlatform_returnsCloudPlatform() {
         String userEmail = "email@example.com";
         String platformName = "provider";
+        String driveEmail = "email2@example.com";
 
         CloudPlatform cloudPlatform = new CloudPlatform();
 
         when(cloudPlatformRepository.findByUserEntityEmailAndPlatformName(userEmail, platformName)).thenReturn(cloudPlatform);
-        cloudPlatformService.getUserCloudPlatform(userEmail, platformName);
+        cloudPlatformService.getUserCloudPlatform(userEmail, platformName, driveEmail);
 
         verify(cloudPlatformRepository, times(1)).findByUserEntityEmailAndPlatformName(userEmail, platformName);
     }
