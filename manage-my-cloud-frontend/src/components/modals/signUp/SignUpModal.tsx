@@ -40,8 +40,18 @@ export const SignUpModal: React.FC<SignUpProps> = ({
         password: "",
         role: "USER",
     });
+    const [confirmPassword, setConfirmPassword] = useState<string>("");
     const [showError, setShowError] = useState<ShowErrorProps>({errorMessage: null});
     const [emailConfirmation, setShowEmailConfirmation] = useState<ShowSuccessProps>({successMessage: null});
+
+    const handleSubmit = (event: React.FormEvent) => {
+        event.preventDefault();
+        if (signupInput.password !== confirmPassword) {
+            setShowError({errorMessage: "Passwords don't match"});
+        } else {
+
+        }
+    }
 
     const handleFirstNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const firstName = event.target.value;
@@ -80,6 +90,11 @@ export const SignUpModal: React.FC<SignUpProps> = ({
         setShowEmailConfirmation(() => ({successMessage: null}));
         const {firstName, lastName, email, password} = signupInput;
         e.preventDefault();
+
+        if (password !== confirmPassword) {
+            setShowError({errorMessage: "Passwords don't match"});
+            return;
+        }
 
         if (firstName && lastName && email && password) {
 
@@ -149,6 +164,15 @@ export const SignUpModal: React.FC<SignUpProps> = ({
                                        placeholder={"Enter your password"}
                                        onClick={stopPropagation}
                                        onChange={handlePasswordChange}/>
+                                <LockIcon/>
+                            </label>
+
+                            <label className={"modal-form-label"}>
+                                <input className={"modal-form-input"}
+                                       type="password"
+                                       placeholder={"Confirm your password"}
+                                       onClick={stopPropagation}
+                                       onChange={(e) => setConfirmPassword(e.target.value)}/>
                                 <LockIcon/>
                             </label>
 
