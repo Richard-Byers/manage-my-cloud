@@ -94,7 +94,8 @@
     "navbar": {
       "dashboard": "Dashboard",
       "manageConnections": "Manage Connections",
-      "profile": "Profile"
+      "profile": "Profile",
+      "logout": "Log Out"
     },
     "deleteAccountModal": {
       "deleteAccount": "Delete Account",

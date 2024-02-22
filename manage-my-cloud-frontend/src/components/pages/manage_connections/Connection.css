@@ -5,7 +5,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    width: 100%;
+    width: 25%;
     height: auto;
     background-color: white;
     color: black;
@@ -24,6 +24,22 @@
 
 .connection-container p {
     margin: 0.5em 0 0.5em 0;
-    font-size: 1.8rem;
+    font-size: 1.6rem;
     font-family: MontserratBold, serif;
+}
+
+@media only screen and (max-width: 768px) {
+
+    .connection-container p {
+        font-size: 1.2rem;
+    }
+
+}
+
+/* For mobile screens */
+@media only screen and (max-width: 500px) {
+    .connection-container{
+        width: 85%;
+        grid-column: 1 / span 4;
+    }
 }

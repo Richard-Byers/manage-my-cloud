@@ -69,6 +69,11 @@ const Navbar: React.FC = () => {
                         {t("main.navbar.profile")}
                     </Link>
                 </li>
+                <li>
+                    <button onClick={logout}>
+                        {t("main.navbar.logout")}
+                    </button>
+                </li>
             </ul>
 
             <ul className="navbar-nav">

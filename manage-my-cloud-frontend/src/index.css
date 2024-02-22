@@ -1,5 +1,7 @@
 body {
+  height: 100%;
   margin: 0;
+  background: url("components/images/landing/main-background.jpeg") 100% / cover no-repeat fixed;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
