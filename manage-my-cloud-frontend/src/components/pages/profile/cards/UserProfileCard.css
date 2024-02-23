@@ -2,7 +2,8 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
-    height: inherit;
+    height: 70vh; /* Keep the height as it is */
+    width: 40%; /* Make the content only as wide as 40% of the page */
     border-radius: 20px;
     background: #FFF;
     box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.18);

@@ -45,7 +45,6 @@ function ProfileActionsCard() {
     return (
         <div className="card-content">
             <div className={"card-title"}>
-                {t('main.profileActionsCard.accountActions')}
             </div>
             <DeleteAccountModal />
             <button className="actions-button" onClick={handleUserDataRequest}>{t('main.profileActionsCard.requestData')}</button>

@@ -1,3 +1,9 @@
+body {
+    height: 100%;
+    margin: 0;
+    background: linear-gradient(180deg, #16969E 0%, #04D3E0 50%, #4382AB 100%) no-repeat fixed;
+}
+
 .manage-connections-page-content-grid {
     justify-content: center;
     display: grid;
