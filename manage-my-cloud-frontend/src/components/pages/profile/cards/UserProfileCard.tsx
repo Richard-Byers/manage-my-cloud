@@ -1,11 +1,9 @@
-import React, {useState} from "react";
+import React from "react";
 import './UserProfileCard.css';
-import profileLogo from '../../../images/profile_picture.png';
 import {AuthData} from "../../../routing/AuthWrapper";
 import { useTranslation } from 'react-i18next';
 import ProfileImgButton from "./ProfileImgButton";
 import UpdateDetailsModal  from "../../../modals/profile/UpdateDetailsModal";
-
 
 function UserProfileCard() {
     const {user, logout} = AuthData();
@@ -22,9 +20,7 @@ function UserProfileCard() {
                 <div className='user-profile-card-data-label'>{t('main.userProfileCard.lastName')} : {user?.lastName}</div>
                 <div
                     className='user-profile-card-data-label'>{t('main.userProfileCard.emailAddress')} : {user?.email}</div>
-                <div className='user-profile-card-data-label'>
-                    {t('main.userProfileCard.password')}: ********
-                </div>
+
             </div>
             <div className={'profile-card-buttons'}>
                 <UpdateDetailsModal />
@@ -34,5 +30,4 @@ function UserProfileCard() {
         </div>
     );
 }
-
 export default UserProfileCard;

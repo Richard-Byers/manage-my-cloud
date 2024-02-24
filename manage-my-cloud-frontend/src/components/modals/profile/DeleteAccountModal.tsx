@@ -112,13 +112,13 @@ function DeleteAccountModal() {
                                 {successMessage && <div className="modal-form-message" style={{color: '#4caf50'}}>{successMessage}</div>}
                                 <div className="button-container">
                                     <button
-                                        className="delete-modal-form-submit-button"
+                                        className="modal-form-submit-button"
                                         type="submit"
                                         disabled={isDeleting}
                                     >{t('main.deleteAccountModal.confirm')}
                                     </button>
                                     <button
-                                        className="delete-modal-form-submit-button"
+                                        className="modal-form-submit-button"
                                         onClick={() => setShowModal(false)}
                                         disabled={isDeleting}
                                     >{t('main.deleteAccountModal.cancel')}</button>

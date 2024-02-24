@@ -2,13 +2,14 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
-    height: 70vh; /* Keep the height as it is */
-    width: 40%; /* Make the content only as wide as 40% of the page */
+    height: 70vh;
+    width: 40%;
     border-radius: 20px;
     background: #FFF;
     box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.18);
     -webkit-box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.18);
     -moz-box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.18);
+    padding: 20px;
 }
 
 .user-profile-picture{
@@ -29,7 +30,7 @@
     display: flex;
     flex-direction: column;
     margin: 0 2%;
-    text-align: center; /* Add this line to center the text */
+    text-align: center;
 }
 
 .user-profile-card-data-label{
@@ -38,47 +39,13 @@
     font-size: 22px;
 }
 
-.update-password-btn {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border: none;
-    border-radius: 20px;
-    background: #218b97;
-    color: #FFF;
-    font-family: MontserratRegular, serif;
-    font-size: 18px;
-    margin-right: 10px;
-    height: 40px;
-    padding: 15px;
-}
-
-.save-changes-btn {
-    display: flex;
-    border: none;
-    align-items: center;
-    border-radius: 40px;
-    background: #28AE6E;
-    color: #FFF;
-    font-family: MontserratBold, serif;
-    font-size: 18px;
-    font-style: normal;
-    width: 35%;
-    height: 40px;
-    justify-content: center;
-}
-
-.save-changes-btn:hover {
-    cursor: pointer;
-}
-
 .logout-btn {
     display: flex;
     background: none;
     align-items: center;
     border-radius: 40px;
-    border: 2px solid #28AE6E;
-    color: #28ad6d;
+    border: 2px solid #007BFF;
+    color: #007BFF;
     font-family: MontserratBold, serif;
     font-size: 18px;
     font-style: normal;
@@ -89,7 +56,10 @@
 
 .logout-btn:hover {
     cursor: pointer;
+    background: #007BFF;
+    color: #FFF;
 }
+
 
 .profile-wrapper {
     display: flex;
@@ -106,6 +76,7 @@
     margin: 1%;
     border: none;
 }
+
 
 .separator {
     display: flex;
