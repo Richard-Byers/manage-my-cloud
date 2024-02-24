@@ -27,15 +27,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith(MockitoExtension.class)
 class OneDriveAuthControllerTest {
 
+    ObjectMapper objectMapper = new ObjectMapper();
     private MockMvc mockMvc;
-
     @Autowired
     private WebApplicationContext context;
-
     @MockBean
     private OneDriveService oneDriveService;
-
-    ObjectMapper objectMapper = new ObjectMapper();
 
     @BeforeEach
     public void setup() {

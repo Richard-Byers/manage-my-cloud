@@ -1,5 +1,7 @@
 package com.authorisation.controllers;
 
+import com.authorisation.dto.CredentialsDto;
+import com.authorisation.dto.UserDto;
 import com.authorisation.entities.UserEntity;
 import com.authorisation.services.UserService;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,12 +16,11 @@ import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.io.IOException;
 import java.util.Optional;
 
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willThrow;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = UserController.class)
@@ -27,13 +28,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith(MockitoExtension.class)
 class UserControllerTest {
 
+    private static final String UPDATE_PROFILE_IMG_URL = "/update-profile-Img";
+    private static final String DELETE_USER_URL = "/delete-user";
+    private static final String GET_USER_DATA_URL = "/data-request";
+    private static final String UPDATE_USER_DETAILS_URL = "/update-user-details";
     private UserEntity testUser;
     private MockMultipartFile testImage;
-    private static final String UPDATE_PROFILE_IMG_URL = "/update-profile-Img";
-
     @Autowired
     private MockMvc mockMvc;
-
     @MockBean
     private UserService userService;
 
@@ -74,4 +76,53 @@ class UserControllerTest {
                         .param("email", testUser.getEmail()))
                 .andExpect(status().isNotFound());
     }
+
+    @Test
+    void deleteUser_ValidRequest_ReturnsOk() throws Exception {
+        CredentialsDto credentialsDto = new CredentialsDto();
+        credentialsDto.setEmail(testUser.getEmail());
+        credentialsDto.setPassword("password");
+
+        mockMvc.perform(delete(DELETE_USER_URL)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"email\":\"" + credentialsDto.getEmail() + "\",\"password\":\"" + credentialsDto.getPassword() + "\"}"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void getUserData_UserNotFound_ReturnsNotFound() throws Exception {
+        String nonExistentEmail = "unknown@example.com";
+        given(userService.findUserByEmail(nonExistentEmail)).willReturn(Optional.empty());
+
+        mockMvc.perform(post(GET_USER_DATA_URL)
+                        .param("email", nonExistentEmail))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void updateUserDetails_ValidRequest_ReturnsOk() throws Exception {
+        UserDto userDto = new UserDto();
+        userDto.setEmail(testUser.getEmail());
+        userDto.setFirstName("NewFirstName");
+        userDto.setLastName("NewLastName");
+
+        mockMvc.perform(post(UPDATE_USER_DETAILS_URL)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"email\":\"" + userDto.getEmail() + "\",\"firstName\":\"" + userDto.getFirstName() + "\",\"lastName\":\"" + userDto.getLastName() + "\"}"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void updateUserDetails_UserNotFound_ReturnsNotFound() throws Exception {
+        UserDto userDto = new UserDto();
+        userDto.setEmail("unknown@example.com");
+        userDto.setFirstName("NewFirstName");
+        userDto.setLastName("NewLastName");
+
+        mockMvc.perform(post(UPDATE_USER_DETAILS_URL)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"email\":\"" + userDto.getEmail() + "\",\"firstName\":\"" + userDto.getFirstName() + "\",\"lastName\":\"" + userDto.getLastName() + "\"}"))
+                .andExpect(status().isNotFound());
+    }
 }
+

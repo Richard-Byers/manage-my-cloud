@@ -13,6 +13,7 @@ import com.authorisation.mappers.UserMapper;
 import com.authorisation.mappers.UserPreferencesMapper;
 import com.authorisation.registration.RegistrationRequest;
 import com.authorisation.registration.password.PasswordResetRequest;
+import com.authorisation.repositories.CloudPlatformRepository;
 import com.authorisation.repositories.RecommendationSettingsRepository;
 import com.authorisation.repositories.UserEntityRepository;
 import com.authorisation.repositories.VerificationTokenRepository;
@@ -54,6 +55,8 @@ class UserServiceTest {
     private VerificationTokenRepository verificationTokenRepository;
     @MockBean
     private RecommendationSettingsRepository recommendationSettingsRepository;
+    @MockBean
+    private CloudPlatformRepository cloudPlatformRepository;
     @Autowired
     private PasswordEncoder passwordEncoder;
     @MockBean
@@ -356,5 +359,50 @@ class UserServiceTest {
         assertEquals(expectedUserPreferences.getDeleteItemsCreatedAfterDays(), userPreferences.getDeleteItemsCreatedAfterDays());
     }
 
+    @Test
+    void updateProfileImage_updatesProfileImage() {
+        //given
+        UserEntity userEntity = generateUserEntityEnabled();
+        byte[] newImage = new byte[10];
+
+        //when
+        given(userEntityRepository.save(any(UserEntity.class))).willReturn(userEntity);
+
+        userService.updateProfileImage(userEntity, newImage);
+        //then
+        assertEquals(newImage, userEntity.getProfileImage());
+    }
+
+    @Test
+    void updateDetails_updatesUserDetails() {
+        //given
+        UserEntity userEntity = generateUserEntityEnabled();
+        String newFirstName = "NewFirstName";
+        String newLastName = "NewLastName";
+
+        //when
+        given(userEntityRepository.save(any(UserEntity.class))).willReturn(userEntity);
+
+        userService.updateDetails(userEntity, newFirstName, newLastName);
+        //then
+        assertEquals(newFirstName, userEntity.getFirstName());
+        assertEquals(newLastName, userEntity.getLastName());
+    }
+
+    @Test
+    void getUserData_returnsUserData() {
+        //given
+        UserEntity userEntity = generateUserEntityEnabled();
+        userEntity.getLinkedAccounts().setOneDrive(true);
+        userEntity.getLinkedAccounts().setGoogleDrive(true);
+        String expectedData = String.format("Email: %s\nFirst Name: %s\nLast Name: %s\nLinked Drive Types: %s",
+                userEntity.getEmail(), userEntity.getFirstName(), userEntity.getLastName(), "OneDrive GoogleDrive ");
+
+        //when
+        String actualData = userService.getUserData(userEntity);
+
+        //then
+        assertEquals(expectedData, actualData);
+    }
 
 }

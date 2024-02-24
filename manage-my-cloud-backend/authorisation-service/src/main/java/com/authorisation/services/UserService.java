@@ -3,10 +3,8 @@ package com.authorisation.services;
 import com.authorisation.dto.CredentialsDto;
 import com.authorisation.dto.EmailDto;
 import com.authorisation.dto.UserDto;
-import com.authorisation.entities.LinkedAccounts;
-import com.authorisation.entities.RecommendationSettings;
-import com.authorisation.entities.UserEntity;
-import com.authorisation.entities.VerificationToken;
+import com.authorisation.entities.CloudPlatform;
+import com.authorisation.entities.*;
 import com.authorisation.exception.InvalidPasswordException;
 import com.authorisation.exception.UserAlreadyExistsException;
 import com.authorisation.exception.UserNotFoundException;
@@ -16,6 +14,7 @@ import com.authorisation.mappers.UserPreferencesMapper;
 import com.authorisation.registration.RegistrationRequest;
 import com.authorisation.registration.password.PasswordResetRequest;
 import com.authorisation.repositories.RecommendationSettingsRepository;
+import com.authorisation.repositories.CloudPlatformRepository;
 import com.authorisation.repositories.UserEntityRepository;
 import com.authorisation.repositories.VerificationTokenRepository;
 import jakarta.transaction.Transactional;
@@ -35,7 +34,7 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class UserService implements IUserService {
-
+    private final CloudPlatformRepository cloudPlatformRepository;
     private final UserEntityRepository userEntityRepository;
     private final VerificationTokenRepository verificationTokenRepository;
     private final RecommendationSettingsRepository recommendationSettingsRepository;
@@ -229,4 +228,62 @@ public class UserService implements IUserService {
         RecommendationSettings recommendationSettings = recommendationSettingsRepository.findByUserEntityEmail(userEntity.getEmail());
         return userPreferencesMapper.toUserPreferences(recommendationSettings);
     }
+
+    @Transactional
+    public void deleteUser(CredentialsDto credentialsDto) {
+        UserEntity user = findUserByEmail(credentialsDto.getEmail())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        if (passwordEncoder.matches(credentialsDto.getPassword(), user.getPassword())) {
+            // Delete the RecommendationSettings associated with the user
+            recommendationSettingsRepository.deleteByUserEntityEmail(user.getEmail());
+
+            // Check if the user has a OneDrive account linked and delete it if it exists
+            CloudPlatform oneDriveAccount = cloudPlatformRepository.findByUserEntityEmailAndPlatformName(user.getEmail(), "OneDrive");
+            if (oneDriveAccount != null) {
+                try {
+                    cloudPlatformRepository.deleteByUserEntityEmailAndPlatformName(user.getEmail(), "OneDrive");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            // Check if the user has a GoogleDrive account linked and delete it if it exists
+            CloudPlatform googleDriveAccount = cloudPlatformRepository.findByUserEntityEmailAndPlatformName(user.getEmail(), "GoogleDrive");
+            if (googleDriveAccount != null) {
+                cloudPlatformRepository.deleteByUserEntityEmailAndPlatformName(user.getEmail(), "GoogleDrive");
+            }
+            userEntityRepository.delete(user);
+        } else {
+            throw new RuntimeException("Password doesn't match");
+        }
+    }
+
+    public String getUserData(UserEntity user) {
+        LinkedAccounts linkedAccounts = user.getLinkedAccounts();
+        String linkedDriveTypes = "";
+        if (linkedAccounts.isOneDrive()) {
+            linkedDriveTypes += "OneDrive ";
+        }
+        if (linkedAccounts.isGoogleDrive()) {
+            linkedDriveTypes += "GoogleDrive ";
+        }
+
+        // Add a note if there are no linked accounts
+        if (!linkedAccounts.isOneDrive() && !linkedAccounts.isGoogleDrive()) {
+            linkedDriveTypes = "No linked accounts";
+        }
+
+        return String.format("Email: %s\nFirst Name: %s\nLast Name: %s\nLinked Drive Types: %s",
+                user.getEmail(), user.getFirstName(), user.getLastName(), linkedDriveTypes);
+    }
+
+    public void updateDetails(UserEntity user, String newFirstName, String newLastName) {
+        if (newFirstName != null && !newFirstName.isEmpty()) {
+            user.setFirstName(newFirstName);
+        }
+        if (newLastName != null && !newLastName.isEmpty()) {
+            user.setLastName(newLastName);
+        }
+        userEntityRepository.save(user);
+    }
+
 }
