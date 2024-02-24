@@ -21,11 +21,10 @@ import java.util.Date;
 @Component
 public class UserAuthenticationProvider {
 
+    private final UserService userService;
     //:secret-key is the default value
     @Value("${security.jwt.token.secret-key:secret-key}")
     private String secretKey;
-
-    private final UserService userService;
 
     @PostConstruct
     protected void init() {

@@ -37,10 +37,10 @@ import static org.mmc.enumerations.ItemTypeChecker.VideoType.isVideoType;
 public class DriveInformationService implements IDriveInformationService {
 
     private static final double BYTES_TO_GIGABYTES_DOUBLE = 1073741824.0;
-    private GraphServiceClient<Request> graphClient;
     private static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("#.##");
     private static final DecimalFormat ZERO_DECIMAL_FORMAT = new DecimalFormat("#");
     ObjectMapper mapper = JsonMapper.builder().addModule(new JavaTimeModule()).build();
+    private GraphServiceClient<Request> graphClient;
 
     public DriveInformationReponse getOneDriveInformation(String userAccessToken, Date expiryDate) {
 

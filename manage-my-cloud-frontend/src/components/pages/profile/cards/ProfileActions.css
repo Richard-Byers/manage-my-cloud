@@ -1,15 +1,15 @@
-
-.small-card {
+.card-content {
     display: flex;
+    flex-direction: column;
     justify-content: center;
-    height: inherit;
-    width: 30%;
+    height: 70vh;
+    width: 40%;
     border-radius: 20px;
-    margin-left: 2pc;
     background: #FFF;
-    box-shadow: 3px 3px 50px 0px rgba(0, 0, 0, 0.10);
+    box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.18);
+    -webkit-box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.18);
+    -moz-box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.18);
 }
-
 h1 {
     margin-top: -17vh;
     line-height: 40vh;
@@ -32,13 +32,19 @@ h1 {
     justify-content: center;
     align-items: center;
     font-family: MontserratRegular, serif;
-    font-size: 18px;
+    font-size: 30px;
     border-radius: 20px;
     border: none;
-    height: 7%;
-    width: 90%;
+    height: 15%;
+    width: 60%;
+    margin-top: 40px;
     margin-right: 2pc;
     margin-left: 2pc;
-    margin-bottom: 20%;
+
     box-shadow: 0 4px 25px 0 #05919f;
+    transition: background-color 0.3s ease;
+}
+
+.actions-button:hover {
+    background-color: #027b8b;
 }
