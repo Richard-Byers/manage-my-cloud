@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import './ProfilePreferencesCard.css';
 import { useTranslation } from 'react-i18next';
 import ToggleSwitch from "../../../ui_components/ToggleSwitch";
-import Select from 'react-select'; // Import the Select component
+import Select from 'react-select';
 import { buildAxiosRequestWithHeaders } from "../../../helpers/AxiosHelper";
 import { AuthData } from "../../../routing/AuthWrapper";
 
@@ -18,21 +18,21 @@ function ProfilePreferencesCard() {
     const [deleteDocuments, setDeleteDocuments] = useState(true);
     const [deleteEmails, setDeleteEmails] = useState(true);
 
-    // Define the headers
+
     const headers = {
         'Authorization': `Bearer ${user?.token}`
     };
 
-    // Define a common options list
+
     const weekOptions = [
-        { value: 'anytime', label: 'Anytime' },
-        { value: '1', label: '1 Week' },
-        { value: '2', label: '2 Weeks' },
+        { value: 'anytime', label: '\u00A0Anytime\u00A0' },
+        { value: '1', label: '\u00A01 Week\u00A0\u00A0' },
+        { value: '2', label: '\u00A02 Weeks\u00A0' },
         { value: '3', label: '1 Months' },
         { value: '4', label: '2 Months' },
         { value: '5', label: '6 Months' },
-        { value: '6', label: '1 Year' },
-        // Add more options as needed
+        { value: '6', label: '\u00A0\u00A01 Year\u00A0\u00A0\u00A0' },
+
     ];
     useEffect(() => {
         buildAxiosRequestWithHeaders('GET', `/get-preferences/${user?.email}`, headers, {})

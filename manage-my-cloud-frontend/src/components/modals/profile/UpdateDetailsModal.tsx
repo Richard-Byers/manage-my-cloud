@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { AuthData } from "../../routing/AuthWrapper";
 import './UpdateDetailsModal.css';
 import "../Modal.css";
-import { useTranslation } from 'react-i18next';
+import {Trans, useTranslation} from 'react-i18next';
 import {buildAxiosRequestWithHeaders} from "../../helpers/AxiosHelper";
 import {ResetPasswordModal} from "../resetPassword/ResetPasswordModal";
 
@@ -73,17 +73,16 @@ function UpdateDetailsModal() {
                     <div className="modal" onClick={e => e.stopPropagation()}>
                         <div className={"modal-form-container"}>
                             <div className={"modal-description"}>
-                                Enter new First name, Last name
-                                <br/>
-                                or Both
+                                <Trans i18nKey='main.updateDetailsModal.enterNewName'/><br/>
+                                <Trans i18nKey='main.updateDetailsModal.orBoth'/>
                             </div>
 
                             <form className={"modal-form"} onSubmit={(e) => handleUpdateDetails(e)}>
                                 <div className={"modal-form-group"}>
-                                    <label className={"modal-form-label"}>
+                                <label className={"modal-form-label"}>
                                         <input className={"modal-form-input"}
                                                type="text"
-                                               placeholder={t('main.updateDetailsModal.enterNewFirstName')}
+                                               placeholder={t('main.updateDetailsModal.enterFirstName')}
                                                value={firstName}
                                                onChange={(e) => setFirstName(e.target.value)}
                                         />
@@ -93,7 +92,7 @@ function UpdateDetailsModal() {
                                     <label className={"modal-form-label"}>
                                         <input className={"modal-form-input"}
                                                type="text"
-                                               placeholder={t('main.updateDetailsModal.enterNewLastName')}
+                                               placeholder={t('main.updateDetailsModal.enterLastName')}
                                                value={lastName}
                                                onChange={(e) => setLastName(e.target.value)}
                                         />
@@ -115,7 +114,7 @@ function UpdateDetailsModal() {
                             <div className={"separator"}></div>
                             <div className={"sign-up-login-container"}>
                                 <button className={"modal-login-reset-signup"} onClick={toggleForgotPasswordModal}>
-                                    Reset Password
+                                    {t('main.updateDetailsModal.Reset')}
                                 </button>
                             </div>
                         </div>

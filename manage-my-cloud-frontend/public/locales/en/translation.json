@@ -100,6 +100,7 @@
       "confirmPassword": "Confirm password",
       "confirm": "Confirm",
       "cancel": "Cancel",
+      "modalDescription": "Please confirm your Password to delete your account.<br/>This action is irreversible.",
       "errorMessage": {
         "enterBothPasswords": "Please enter password in both fields",
         "fillBothPasswords": "Please fill out both password fields",
@@ -112,13 +113,16 @@
     },
     "updateDetailsModal": {
       "updateDetails": "Update Details",
-      "enterNewFirstName": "Enter New First Name",
-      "enterNewLastName": "Enter New Last Name",
+      "enterFirstName": "Enter New First Name",
+      "enterLastName": "Enter New Last Name",
+      "enterNewName": "Enter New First Name, Last Name",
+      "orBoth": "or Both",
       "enterNewEmail": "Enter New Email",
       "confirm": "Confirm",
       "cancel": "Cancel",
       "FirstName": "First Name:",
       "LastName": "Last Name:",
+      "Reset": "Reset Password",
       "errorMessage": {
         "userNotLoggedIn": "User is not logged in",
         "successMessage": "Details updated successfully",
@@ -135,7 +139,11 @@
         "deleteEmails": "Delete Emails",
         "createdAfter": "Since Creation",
         "weeksSinceLastEdited": "Since Last Edit"
-      }
+      },
+    "termsOfServiceModal": {
+      "viewTermsOfService": "View Terms of Service",
+      "termsOfServiceTitle": "Terms of Service"
+    }
     }
   }
 

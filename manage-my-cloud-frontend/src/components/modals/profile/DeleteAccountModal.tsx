@@ -4,6 +4,7 @@ import './DeleteAccountModal.css';
 import "../Modal.css";
 import { useTranslation } from 'react-i18next';
 import {buildAxiosRequestWithHeaders} from "../../helpers/AxiosHelper";
+import { Trans } from 'react-i18next';
 
 function DeleteAccountModal() {
     const {user, logout} = AuthData();
@@ -79,9 +80,7 @@ function DeleteAccountModal() {
                     <div className="modal" onClick={e => e.stopPropagation()}>
                         <div className={"modal-form-container"}>
                             <div className={"modal-description"}>
-                                Please confirm your Password to delete your account.
-                                <br/>
-                                This action is irreversible.
+                                <Trans i18nKey='main.deleteAccountModal.modalDescription' />
                                 <br/>
                             </div>
 

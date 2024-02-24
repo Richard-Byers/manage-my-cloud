@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './termsOfServiceModal.css';
 import CloseIcon from '@mui/icons-material/Close';
 import ReactMarkdown from 'react-markdown';
+import {useTranslation} from "react-i18next";
 
 interface TermsOfServiceModalProps {
     show: boolean;
@@ -11,6 +12,7 @@ interface TermsOfServiceModalProps {
 function TermsOfServiceModal({ show: showModal, handleClose: closeHandle }: TermsOfServiceModalProps) {
     const [show, setShow] = useState(showModal);
     const [termsOfServiceText, setTermsOfServiceText] = useState('');
+    const { t } = useTranslation();
 
     useEffect(() => {
         if (show) {
@@ -34,13 +36,14 @@ function TermsOfServiceModal({ show: showModal, handleClose: closeHandle }: Term
 
     return (
         <>
-            <button className="actions-button" onClick={handleShow}>View Terms of Service</button>
+            <button className="actions-button"
+                    onClick={handleShow}>{t('main.termsOfServiceModal.viewTermsOfService')}</button>
 
             {show && (
                 <div className="modal-overlay terms-of-service-modal" onClick={handleClose}>
                     <div className="modal modal-dialog" onClick={stopPropagation}>
                         <div className="modal-header">
-                            <h5 className="modal-title">Terms of Service</h5>
+                            <h5 className="modal-title">{t('main.termsOfServiceModal.termsOfServiceTitle')}</h5>
 
                         </div>
                         <div className="modal-body">
