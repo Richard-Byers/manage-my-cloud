@@ -350,9 +350,9 @@ public class DriveInformationServiceTest {
             when(driveItemRequest.delete()).thenReturn(null);
 
             RuntimeException runtimeException = assertThrows(RuntimeException.class, () -> driveInformationService.deleteRecommendedOneDriveFiles(itemsToDelete, accessToken, expiryDate));
-
+            String actualExceptionMessage = runtimeException.getMessage();
             //then
-            assertEquals("Error deleting file", runtimeException.getMessage());
+            assertEquals("Error deleting OneDrive files", actualExceptionMessage);
         }
     }
 

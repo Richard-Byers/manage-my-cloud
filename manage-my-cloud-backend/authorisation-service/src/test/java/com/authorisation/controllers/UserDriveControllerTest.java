@@ -125,7 +125,7 @@ class UserDriveControllerTest {
         //when
         ServletException exception = assertThrows(ServletException.class, () -> mockMvc.perform(get("/drive-information")
                 .param("email", email)
-                .param("provider", "OneDrive").with(csrf())).andReturn());
+                .param("provider", "OneDrive").param("driveEmail", email).with(csrf())).andReturn());
 
         assertEquals("User not found", exception.getRootCause().getMessage());
     }
@@ -229,7 +229,7 @@ class UserDriveControllerTest {
         //when
         ServletException exception = assertThrows(ServletException.class, () -> mockMvc.perform(get("/drive-items")
                 .param("email", email)
-                .param("provider", "OneDrive").with(csrf())).andReturn());
+                .param("provider", "OneDrive").param("driveEmail", email).with(csrf())).andReturn());
 
         assertEquals("User not found", exception.getRootCause().getMessage());
     }
@@ -363,7 +363,7 @@ class UserDriveControllerTest {
 
         //when
         ServletException exception = assertThrows(ServletException.class, () -> mockMvc.perform(post("/delete-recommended")
-                        .param("email", email).param("provider", "OneDrive").contentType("application/json")
+                        .param("email", email).param("provider", "OneDrive").param("driveEmail", email).contentType("application/json")
                         .content(objectMapper.writeValueAsString(expectedJsonNode)).with(csrf()))
                 //then
                 .andExpect(status().isOk()));

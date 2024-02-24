@@ -19,31 +19,27 @@ const ProfilePage = () => {
     }
 
     return (
-        <div className={"profile-page-main"}>
+        <>
             <Navbar/>
-            <div className={"main-card-container"}>
-                <div className={"profile-page-navigation-bar"}>
-                    <button onClick={() => handleCardChange('userProfile')}>User Profile</button>
-                    <button onClick={() => handleCardChange('profilePreferences')}>Preferences</button>
-                    <button onClick={() => handleCardChange('profileActions')}>Advanced</button>
-                </div>
-                {activeCard === 'userProfile' &&
-                    <div className={"user-profile-card-container"}>
+            <div className={"profile-page-content-grid"}>
+                <div className={"main-card-container"}>
+                    <div className={"profile-page-navigation-bar"}>
+                        <button onClick={() => handleCardChange('userProfile')}>User Profile</button>
+                        <button onClick={() => handleCardChange('profilePreferences')}>Preferences</button>
+                        <button onClick={() => handleCardChange('profileActions')}>Advanced</button>
+                    </div>
+                    {activeCard === 'userProfile' &&
                         <UserProfileCard/>
-                    </div>
-                }
-                {activeCard === 'profilePreferences' &&
-                    <div className={"profile-preferences-card-container"}>
+                    }
+                    {activeCard === 'profilePreferences' &&
                         <ProfilePreferencesCard/>
-                    </div>
-                }
-                {activeCard === 'profileActions' &&
-                    <div className={"profile-actions-card-container"}>
+                    }
+                    {activeCard === 'profileActions' &&
                         <ProfileActionsCard/>
-                    </div>
-                }
+                    }
+                </div>
             </div>
-        </div>
+        </>
     )
 };
 

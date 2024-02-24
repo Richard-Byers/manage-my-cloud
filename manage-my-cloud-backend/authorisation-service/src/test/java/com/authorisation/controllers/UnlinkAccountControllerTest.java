@@ -55,7 +55,7 @@ class UnlinkAccountControllerTest {
 
         mockMvc.perform(delete("/unlink-drive")
                         .param("email", email)
-                        .param("provider", "OneDrive").with(csrf()))
+                        .param("provider", "OneDrive").param("driveEmail", driveEmail).with(csrf()))
                 .andExpect(status().isOk());
 
         verify(oneDriveService).unlinkOneDrive(email, driveEmail);

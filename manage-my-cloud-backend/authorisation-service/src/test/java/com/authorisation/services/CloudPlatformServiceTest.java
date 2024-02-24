@@ -3,6 +3,7 @@ package com.authorisation.services;
 import com.authorisation.entities.CloudPlatform;
 import com.authorisation.entities.LinkedAccounts;
 import com.authorisation.entities.UserEntity;
+import com.authorisation.pojo.Account;
 import com.authorisation.repositories.CloudPlatformRepository;
 import com.authorisation.repositories.UserEntityRepository;
 import org.junit.jupiter.api.Test;
@@ -10,6 +11,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.authorisation.givens.CloudPlatformGivens.generateCloudPlatform;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -39,6 +43,7 @@ class CloudPlatformServiceTest {
         UserEntity userEntity = new UserEntity();
         userEntity.setEmail(userEmail);
         userEntity.setLinkedAccounts(new LinkedAccounts());
+        userEntity.getLinkedAccounts().setLinkedDriveAccounts(new ArrayList<>(List.of(new Account(driveEmail, "OneDrive"))));
 
         CloudPlatform expectedCloudPlatform = generateCloudPlatform();
 
@@ -60,6 +65,7 @@ class CloudPlatformServiceTest {
         UserEntity userEntity = new UserEntity();
         userEntity.setEmail(userEmail);
         userEntity.setLinkedAccounts(new LinkedAccounts());
+        userEntity.getLinkedAccounts().setLinkedDriveAccounts(new ArrayList<>(List.of(new Account(driveEmail, "OneDrive"))));
 
         when(userEntityRepository.findByEmail(userEmail)).thenReturn(java.util.Optional.of(userEntity));
 
@@ -78,6 +84,7 @@ class CloudPlatformServiceTest {
         UserEntity userEntity = new UserEntity();
         userEntity.setEmail(userEmail);
         userEntity.setLinkedAccounts(new LinkedAccounts());
+        userEntity.getLinkedAccounts().setLinkedDriveAccounts(List.of(new Account(driveEmail, "OneDrive")));
 
         when(userEntityRepository.findByEmail(userEmail)).thenReturn(java.util.Optional.of(userEntity));
 
@@ -112,9 +119,9 @@ class CloudPlatformServiceTest {
 
         CloudPlatform cloudPlatform = new CloudPlatform();
 
-        when(cloudPlatformRepository.findByUserEntityEmailAndPlatformName(userEmail, platformName)).thenReturn(cloudPlatform);
+        when(cloudPlatformRepository.findByUserEntityEmailAndPlatformNameAndDriveEmail(userEmail, platformName, driveEmail)).thenReturn(cloudPlatform);
         cloudPlatformService.getUserCloudPlatform(userEmail, platformName, driveEmail);
 
-        verify(cloudPlatformRepository, times(1)).findByUserEntityEmailAndPlatformName(userEmail, platformName);
+        verify(cloudPlatformRepository, times(1)).findByUserEntityEmailAndPlatformNameAndDriveEmail(userEmail, platformName, driveEmail);
     }
 }

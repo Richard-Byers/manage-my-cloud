@@ -153,6 +153,7 @@ const DashboardCardModal: React.FC<DashboardCardModalProps> = ({
                                     <DashboardPageButtons data={driveData}
                                                           connectionProvider={CONNECTION_TITLE[connectionProvider]}
                                                           setSowModal={setShowModal}
+                                                          driveEmail={driveEmail}
                                     />
                                 </div>
                             }

@@ -4,12 +4,10 @@
     justify-content: space-between;
     align-items: center;
     width: 50%;
-    margin-bottom: 30px;
 }
 
 .toggle-container label {
-    margin-right: 10px;
-    font-size: 30px;
+    font-size: 1.5rem;
 }
 
 
@@ -19,13 +17,18 @@
 }
 
 .button-container button {
-    padding: 20px 40px;
-    font-size: 20px;
-    border: 2px solid #007BFF;
+    display: flex;
+    background: none;
+    align-items: center;
     border-radius: 40px;
-    background-color: transparent;
+    border: 2px solid #007BFF;
     color: #007BFF;
-    cursor: pointer;
+    font-family: MontserratBold, serif;
+    font-size: 18px;
+    font-style: normal;
+    width: 50%;
+    height: 40px;
+    justify-content: center;
 }
 
 .button-container button:hover {

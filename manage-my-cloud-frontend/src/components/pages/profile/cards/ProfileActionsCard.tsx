@@ -51,13 +51,10 @@ function ProfileActionsCard() {
 
     return (
         <div className="card-content">
-            <div className={"card-title"}>
-            </div>
             <button className="actions-button" onClick={handleUserDataRequest}>{t('main.profileActionsCard.requestData')}</button>
             <TermsOfServiceModal show={showTermsOfServiceModal} handleClose={handleTermsOfServiceModal} />
             <button className="actions-button">{t('main.profileActionsCard.ContactUs')}</button>
             <DeleteAccountModal />
-
         </div>
     );
 }
