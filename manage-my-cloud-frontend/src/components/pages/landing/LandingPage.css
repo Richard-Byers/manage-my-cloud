@@ -1,8 +1,9 @@
 /* Default styling for all screen sizes. */
 .landing-page-main {
-    background: url("../../images/landing/LandingPageBackground.jpg") lightgray 50% / cover no-repeat;
+    /*background: url("../../images/landing/LandingPageBackground.jpg") lightgray 50% / cover no-repeat;*/
     display: flex;
     flex-direction: column;
+    align-items: center;
     height: 100vh;
 }
 
@@ -45,6 +46,7 @@
     line-height: normal;
     text-align: center;
     padding: 30px 30px;
+    width: 50%;
 }
 
 .landing-page-login-button-div {
@@ -81,11 +83,4 @@
         width: 400px;
         height: 150px;
     }
-}
-
-.landing-page-main-text,
-.landing-page-sub-text,
-.landing-page-sub-text-description {
-    text-shadow: -1px -1px 0 #09929d, 1px -1px 0 #09929d, -1px 1px 0 #09929d,
-        1px 1px 0 #09929d;
 }

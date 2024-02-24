@@ -112,7 +112,7 @@ export const SignUpModal: React.FC<SignUpProps> = ({
             <div className="modal-overlay" onClick={closeSignUpModal}>
                 <div className="modal" onClick={stopPropagation}>
 
-                    <button className={"modal-close-button"} onClick={closeSignUpModal}><CloseIcon/></button>
+                    <button className={"modal-close-button"} onClick={closeSignUpModal}><CloseIcon className={"svg_icons"}/></button>
 
                     <div className={"modal-logo-signup"}>
                         <img src={logo} alt={"Manage My Cloud Logo"}/>

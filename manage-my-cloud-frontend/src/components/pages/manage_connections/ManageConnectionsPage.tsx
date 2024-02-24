@@ -54,6 +54,7 @@ const ManageConnectionsPage = () => {
                     : null
                 }
 
+                {user?.linkedAccounts.linkedAccountsCount === 0 ? null :
                 <div className="overflow-container">
                     {user?.linkedAccounts.linkedAccountsCount === 0 ? null
                         :
@@ -61,6 +62,7 @@ const ManageConnectionsPage = () => {
                             <Connection key={accountEmail} accountEmail={accountEmail} accountType={accountType}/>
                         ))}
                 </div>
+                }
 
                 {user?.linkedAccounts.linkedAccountsCount !== undefined && user?.linkedAccounts.linkedAccountsCount >= 1 ? (
                     <div className={"manage-connections-page-link-button-container"}>
