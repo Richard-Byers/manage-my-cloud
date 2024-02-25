@@ -346,16 +346,14 @@ public class DriveInformationServiceTest {
             when(mockGraphClient.me()).thenReturn(userRequestBuilder);
             when(userRequestBuilder.drive()).thenReturn(driveRequestBuilder);
             when(driveRequestBuilder.items(anyString())).thenReturn(driveItemRequestBuilder);
-            when(driveItemRequestBuilder.buildRequest()).thenThrow(new RuntimeException("Error deleting file"));
+            when(driveItemRequestBuilder.buildRequest()).thenThrow(new RuntimeException("Error deleting OneDrive files"));
             when(driveItemRequest.delete()).thenReturn(null);
 
             RuntimeException runtimeException = assertThrows(RuntimeException.class, () -> driveInformationService.deleteRecommendedOneDriveFiles(itemsToDelete, accessToken, expiryDate));
-
             //then
-            assertEquals("Error deleting file", runtimeException.getMessage());
+            assertEquals("Error deleting OneDrive files", runtimeException.getMessage());
         }
     }
-
     @Test
     public void mapToDriveInformationResponse_ReturnsDriveInformationResponse() {
         String displayName = "Test User";

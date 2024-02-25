@@ -10,7 +10,7 @@ function UserProfileCard() {
     const { t } = useTranslation();
 
     return (
-        <div className={"user-profile-card-content"}>
+        <div className={"card-content"}>
             <div className={'profile-card-buttons'}>
                 <ProfileImgButton />
             </div>

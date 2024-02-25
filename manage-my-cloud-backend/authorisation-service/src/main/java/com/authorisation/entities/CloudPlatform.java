@@ -28,5 +28,6 @@ public class CloudPlatform {
     private Date accessTokenExpiryDate;
     @Column(length = 2000)
     private String refreshToken;
+    private String driveEmail;
 
 }

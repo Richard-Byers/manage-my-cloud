@@ -77,15 +77,16 @@ class UserDriveControllerTest {
         String email = userEntity.getEmail();
         CloudPlatform cloudPlatform = generateCloudPlatformEncryptedTokens();
         DriveInformationReponse expectedDriveInformationReponse = generateDriveInformationResponse();
+        String driveEmail = "email2@example.com";
 
         when(userService.findUserByEmail(email)).thenReturn(Optional.of(userEntity));
-        when(cloudPlatformService.getUserCloudPlatform(email, "OneDrive")).thenReturn(cloudPlatform);
+        when(cloudPlatformService.getUserCloudPlatform(email, "OneDrive", driveEmail)).thenReturn(cloudPlatform);
         when(driveInformationService.getOneDriveInformation(decrypt(cloudPlatform.getAccessToken()), cloudPlatform.getAccessTokenExpiryDate())).thenReturn(expectedDriveInformationReponse);
 
         //when
         MvcResult mvcResult = mockMvc.perform(get("/drive-information")
                         .param("email", email)
-                        .param("provider", "OneDrive").with(csrf()))
+                        .param("provider", "OneDrive").param("driveEmail", driveEmail).with(csrf()))
                 //then
                 .andExpect(status().isOk()).andReturn();
 
@@ -99,14 +100,15 @@ class UserDriveControllerTest {
         //given
         UserEntity userEntity = generateUserEntityEnabled();
         String email = userEntity.getEmail();
+        String driveEmail = "email2@example.com";
 
         when(userService.findUserByEmail(email)).thenReturn(Optional.of(userEntity));
-        when(cloudPlatformService.getUserCloudPlatform(email, "OneDrive")).thenReturn(null);
+        when(cloudPlatformService.getUserCloudPlatform(email, "OneDrive", driveEmail)).thenReturn(null);
 
         //when
         ServletException exception = assertThrows(ServletException.class, () -> mockMvc.perform(get("/drive-information")
                 .param("email", email)
-                .param("provider", "OneDrive").with(csrf())).andReturn());
+                .param("provider", "OneDrive").param("driveEmail", driveEmail).with(csrf())).andReturn());
         //then
         assertEquals("Cloud platform not found OneDrive", exception.getRootCause().getMessage());
     }
@@ -123,7 +125,7 @@ class UserDriveControllerTest {
         //when
         ServletException exception = assertThrows(ServletException.class, () -> mockMvc.perform(get("/drive-information")
                 .param("email", email)
-                .param("provider", "OneDrive").with(csrf())).andReturn());
+                .param("provider", "OneDrive").param("driveEmail", email).with(csrf())).andReturn());
 
         assertEquals("User not found", exception.getRootCause().getMessage());
     }
@@ -135,15 +137,16 @@ class UserDriveControllerTest {
         UserEntity userEntity = generateUserEntityEnabled();
         String email = userEntity.getEmail();
         CloudPlatform cloudPlatform = generateCloudPlatformEncryptedTokens();
+        String driveEmail = "email2@example.com";
 
         when(userService.findUserByEmail(email)).thenReturn(Optional.of(userEntity));
-        when(cloudPlatformService.getUserCloudPlatform(email, "OneDrive")).thenReturn(cloudPlatform);
+        when(cloudPlatformService.getUserCloudPlatform(email, "OneDrive", driveEmail)).thenReturn(cloudPlatform);
         when(driveInformationService.getOneDriveInformation(any(), any())).thenThrow(new RuntimeException("Drive not found"));
 
         //when
         mockMvc.perform(get("/drive-information")
                         .param("email", email)
-                        .param("provider", "OneDrive").with(csrf()))
+                        .param("provider", "OneDrive").param("driveEmail", driveEmail).with(csrf()))
                 //then
                 .andExpect(status().isBadRequest());
     }
@@ -156,15 +159,16 @@ class UserDriveControllerTest {
         String email = userEntity.getEmail();
         CloudPlatform cloudPlatform = generateCloudPlatformEncryptedTokens();
         DriveInformationReponse expectedDriveInformationReponse = generateDriveInformationResponse();
+        String driveEmail = "email2@example.com";
 
         when(userService.findUserByEmail(email)).thenReturn(Optional.of(userEntity));
-        when(cloudPlatformService.getUserCloudPlatform(email, "random")).thenReturn(cloudPlatform);
+        when(cloudPlatformService.getUserCloudPlatform(email, "random", driveEmail)).thenReturn(cloudPlatform);
         when(driveInformationService.getOneDriveInformation(decrypt(cloudPlatform.getAccessToken()), cloudPlatform.getAccessTokenExpiryDate())).thenReturn(expectedDriveInformationReponse);
 
         //when
         mockMvc.perform(get("/drive-information")
                         .param("email", email)
-                        .param("provider", "random").with(csrf()))
+                        .param("provider", "random").param("driveEmail", driveEmail).with(csrf()))
                 //then
                 .andExpect(status().isBadRequest());
     }
@@ -177,15 +181,16 @@ class UserDriveControllerTest {
         String email = userEntity.getEmail();
         CloudPlatform cloudPlatform = generateCloudPlatformEncryptedTokens();
         JsonNode expectedJsonNode = generateJsonNode();
+        String driveEmail = "email2@example.com";
 
         when(userService.findUserByEmail(email)).thenReturn(Optional.of(userEntity));
-        when(cloudPlatformService.getUserCloudPlatform(email, "OneDrive")).thenReturn(cloudPlatform);
+        when(cloudPlatformService.getUserCloudPlatform(email, "OneDrive", driveEmail)).thenReturn(cloudPlatform);
         when(driveInformationService.listAllItemsInOneDrive(decrypt(cloudPlatform.getAccessToken()), cloudPlatform.getAccessTokenExpiryDate())).thenReturn(expectedJsonNode);
 
         //when
         MvcResult mvcResult = mockMvc.perform(get("/drive-items")
                         .param("email", email)
-                        .param("provider", "OneDrive").with(csrf()))
+                        .param("provider", "OneDrive").param("driveEmail", driveEmail).with(csrf()))
                 //then
                 .andExpect(status().isOk()).andReturn();
 
@@ -199,14 +204,15 @@ class UserDriveControllerTest {
         //given
         UserEntity userEntity = generateUserEntityEnabled();
         String email = userEntity.getEmail();
+        String driveEmail = "email2@example.com";
 
         when(userService.findUserByEmail(email)).thenReturn(Optional.of(userEntity));
-        when(cloudPlatformService.getUserCloudPlatform(email, "OneDrive")).thenReturn(null);
+        when(cloudPlatformService.getUserCloudPlatform(email, "OneDrive", driveEmail)).thenReturn(null);
 
         //when
         ServletException exception = assertThrows(ServletException.class, () -> mockMvc.perform(get("/drive-items")
                 .param("email", email)
-                .param("provider", "OneDrive").with(csrf())).andReturn());
+                .param("provider", "OneDrive").param("driveEmail", driveEmail).with(csrf())).andReturn());
         //then
         assertEquals("Cloud platform not found OneDrive", exception.getRootCause().getMessage());
     }
@@ -223,7 +229,7 @@ class UserDriveControllerTest {
         //when
         ServletException exception = assertThrows(ServletException.class, () -> mockMvc.perform(get("/drive-items")
                 .param("email", email)
-                .param("provider", "OneDrive").with(csrf())).andReturn());
+                .param("provider", "OneDrive").param("driveEmail", email).with(csrf())).andReturn());
 
         assertEquals("User not found", exception.getRootCause().getMessage());
     }
@@ -235,15 +241,16 @@ class UserDriveControllerTest {
         UserEntity userEntity = generateUserEntityEnabled();
         String email = userEntity.getEmail();
         CloudPlatform cloudPlatform = generateCloudPlatformEncryptedTokens();
+        String driveEmail = "email2@example.com";
 
         when(userService.findUserByEmail(email)).thenReturn(Optional.of(userEntity));
-        when(cloudPlatformService.getUserCloudPlatform(email, "OneDrive")).thenReturn(cloudPlatform);
+        when(cloudPlatformService.getUserCloudPlatform(email, "OneDrive", driveEmail)).thenReturn(cloudPlatform);
         when(driveInformationService.listAllItemsInOneDrive(any(), any())).thenThrow(new RuntimeException("Drive not found"));
 
         //when
         mockMvc.perform(get("/drive-items")
                         .param("email", email)
-                        .param("provider", "OneDrive").with(csrf()))
+                        .param("provider", "OneDrive").param("driveEmail", driveEmail).with(csrf()))
                 //then
                 .andExpect(status().isBadRequest());
     }
@@ -256,15 +263,16 @@ class UserDriveControllerTest {
         String email = userEntity.getEmail();
         CloudPlatform cloudPlatform = generateCloudPlatformEncryptedTokens();
         DriveInformationReponse expectedDriveInformationReponse = generateDriveInformationResponse();
+        String driveEmail = "email2@example.com";
 
         when(userService.findUserByEmail(email)).thenReturn(Optional.of(userEntity));
-        when(cloudPlatformService.getUserCloudPlatform(email, "random")).thenReturn(cloudPlatform);
+        when(cloudPlatformService.getUserCloudPlatform(email, "random", driveEmail)).thenReturn(cloudPlatform);
         when(driveInformationService.getOneDriveInformation(decrypt(cloudPlatform.getAccessToken()), cloudPlatform.getAccessTokenExpiryDate())).thenReturn(expectedDriveInformationReponse);
 
         //when
         mockMvc.perform(get("/drive-items")
                         .param("email", email)
-                        .param("provider", "random").with(csrf()))
+                        .param("provider", "random").param("driveEmail", driveEmail).with(csrf()))
                 //then
                 .andExpect(status().isBadRequest());
     }
@@ -325,15 +333,16 @@ class UserDriveControllerTest {
         CloudPlatform cloudPlatform = generateCloudPlatformEncryptedTokens();
         String accessToken = decrypt(cloudPlatform.getAccessToken());
         FilesDeletedResponse expectedFilesDeletedResponse = generateFilesDeletedResponse();
+        String driveEmail = "email2@example.com";
 
         when(userService.findUserByEmail(email)).thenReturn(Optional.of(userEntity));
         when(userService.getUserRecommendationSettings(email)).thenReturn(preferences);
-        when(cloudPlatformService.getUserCloudPlatform(email, "OneDrive")).thenReturn(cloudPlatform);
+        when(cloudPlatformService.getUserCloudPlatform(email, "OneDrive", driveEmail)).thenReturn(cloudPlatform);
         when(driveInformationService.deleteRecommendedOneDriveFiles(expectedJsonNode, accessToken, cloudPlatform.getAccessTokenExpiryDate())).thenReturn(expectedFilesDeletedResponse);
 
         //when
         MvcResult mvcResult = mockMvc.perform(post("/delete-recommended")
-                        .param("email", email).param("provider", "OneDrive").contentType("application/json")
+                        .param("email", email).param("provider", "OneDrive").param("driveEmail", driveEmail).contentType("application/json")
                         .content(objectMapper.writeValueAsString(expectedJsonNode)).with(csrf()))
                 //then
                 .andExpect(status().isOk()).andReturn();
@@ -354,7 +363,7 @@ class UserDriveControllerTest {
 
         //when
         ServletException exception = assertThrows(ServletException.class, () -> mockMvc.perform(post("/delete-recommended")
-                        .param("email", email).param("provider", "OneDrive").contentType("application/json")
+                        .param("email", email).param("provider", "OneDrive").param("driveEmail", email).contentType("application/json")
                         .content(objectMapper.writeValueAsString(expectedJsonNode)).with(csrf()))
                 //then
                 .andExpect(status().isOk()));
@@ -369,13 +378,14 @@ class UserDriveControllerTest {
         JsonNode expectedJsonNode = generateJsonNode();
         UserEntity userEntity = generateUserEntityEnabled();
         String email = userEntity.getEmail();
+        String driveEmail = "email2@example.com";
 
         when(userService.findUserByEmail(email)).thenReturn(Optional.of(userEntity));
-        when(cloudPlatformService.getUserCloudPlatform(email, "OneDrive")).thenThrow(new RuntimeException("Cloud platform not found"));
+        when(cloudPlatformService.getUserCloudPlatform(email, "OneDrive", driveEmail)).thenThrow(new RuntimeException("Cloud platform not found"));
 
         //when
         ServletException exception = assertThrows(ServletException.class, () -> mockMvc.perform(post("/delete-recommended")
-                        .param("email", email).param("provider", "OneDrive").contentType("application/json")
+                        .param("email", email).param("provider", "OneDrive").param("driveEmail", driveEmail).contentType("application/json")
                         .content(objectMapper.writeValueAsString(expectedJsonNode)).with(csrf()))
                 //then
                 .andExpect(status().isOk()));
@@ -393,15 +403,16 @@ class UserDriveControllerTest {
         UserPreferences preferences = generateUserPreferences();
         CloudPlatform cloudPlatform = generateCloudPlatformEncryptedTokens();
         String accessToken = decrypt(cloudPlatform.getAccessToken());
+        String driveEmail = "email2@example.com";
 
         when(userService.findUserByEmail(email)).thenReturn(Optional.of(userEntity));
         when(userService.getUserRecommendationSettings(email)).thenReturn(preferences);
-        when(cloudPlatformService.getUserCloudPlatform(email, "OneDrive")).thenReturn(cloudPlatform);
+        when(cloudPlatformService.getUserCloudPlatform(email, "OneDrive", driveEmail)).thenReturn(cloudPlatform);
         when(driveInformationService.deleteRecommendedOneDriveFiles(expectedJsonNode, accessToken, cloudPlatform.getAccessTokenExpiryDate())).thenThrow(new RuntimeException("Error"));
 
         //when
         mockMvc.perform(post("/delete-recommended")
-                        .param("email", email).param("provider", "OneDrive").contentType("application/json")
+                        .param("email", email).param("provider", "OneDrive").param("driveEmail", driveEmail).contentType("application/json")
                         .content(objectMapper.writeValueAsString(expectedJsonNode)).with(csrf()))
                 //then
                 .andExpect(status().isBadRequest());
@@ -416,14 +427,15 @@ class UserDriveControllerTest {
         String email = userEntity.getEmail();
         UserPreferences preferences = generateUserPreferences();
         CloudPlatform cloudPlatform = generateCloudPlatformEncryptedTokens();
+        String driveEmail = "email2@example.com";
 
         when(userService.findUserByEmail(email)).thenReturn(Optional.of(userEntity));
         when(userService.getUserRecommendationSettings(email)).thenReturn(preferences);
-        when(cloudPlatformService.getUserCloudPlatform(email, "random")).thenReturn(cloudPlatform);
+        when(cloudPlatformService.getUserCloudPlatform(email, "random", driveEmail)).thenReturn(cloudPlatform);
 
         //when
         mockMvc.perform(post("/delete-recommended")
-                        .param("email", email).param("provider", "random").contentType("application/json")
+                        .param("email", email).param("provider", "random").param("driveEmail", driveEmail).contentType("application/json")
                         .content(objectMapper.writeValueAsString(expectedJsonNode)).with(csrf()))
                 //then
                 .andExpect(status().isBadRequest());

@@ -18,6 +18,7 @@ interface DashboardCardModalProps {
     totalStorage: number;
     usedStorage: number;
     email: string;
+    driveEmail: string;
 }
 
 interface FileNode {
@@ -42,7 +43,8 @@ const DashboardCardModal: React.FC<DashboardCardModalProps> = ({
                                                                    connectionProvider,
                                                                    totalStorage,
                                                                    usedStorage,
-                                                                   email
+                                                                   email,
+                                                                   driveEmail
                                                                }) => {
     const {user} = AuthData();
     const {t} = useTranslation();
@@ -106,7 +108,7 @@ const DashboardCardModal: React.FC<DashboardCardModalProps> = ({
 
         const connectionProviderTitle = CONNECTION_TITLE[connectionProvider];
         setLoading(true);
-        const response = await buildAxiosRequestWithHeaders('GET', `/drive-items?email=${user.email}&provider=${connectionProviderTitle}`, headers, {})
+        const response = await buildAxiosRequestWithHeaders('GET', `/drive-items?email=${user.email}&provider=${connectionProviderTitle}&driveEmail=${driveEmail}`, headers, {})
 
         if (!response.data) {
             setLoading(false);
@@ -136,7 +138,7 @@ const DashboardCardModal: React.FC<DashboardCardModalProps> = ({
                                 <img src={CONNECTION_LOGOS[connectionProvider]}
                                      alt={`Logo for ${connectionProvider}`}/>
                                 <p>{t('main.dashboard.dashboardCardModal.driveInformation.accountDetails')}</p>
-                                <span>{email}</span>
+                                <span>{driveEmail}</span>
                                 <span>{t('main.dashboard.dashboardCardModal.driveInformation.usedStorage')} {usedStorage > 0.0 ? usedStorage : "< 0"}/GB</span>
                                 <span>{t('main.dashboard.dashboardCardModal.driveInformation.totalStorage')} {totalStorage}/GB</span>
                             </div>
@@ -151,6 +153,7 @@ const DashboardCardModal: React.FC<DashboardCardModalProps> = ({
                                     <DashboardPageButtons data={driveData}
                                                           connectionProvider={CONNECTION_TITLE[connectionProvider]}
                                                           setSowModal={setShowModal}
+                                                          driveEmail={driveEmail}
                                     />
                                 </div>
                             }

@@ -2,15 +2,9 @@ import React, {useState} from "react";
 import "./AddConnectionsModal.css";
 import LinkOneDrive from "../../pages/manage_connections/LinkOneDrive";
 import LinkGoogleDrive from "../../pages/manage_connections/LinkGoogleDrive";
-import {Success} from "../../helpers/Success";
 import CloseIcon from "@mui/icons-material/Close";
 
-interface AddConnectionsModalProps {
-    oneDrive: boolean | undefined;
-    googleDrive: boolean | undefined;
-}
-
-const AddConnectionsModal: React.FC<AddConnectionsModalProps> = ({oneDrive, googleDrive}) => {
+const AddConnectionsModal = () => {
     const [showModal, setShowModal] = useState(false);
 
     const toggleModal = () => {
@@ -35,19 +29,10 @@ const AddConnectionsModal: React.FC<AddConnectionsModalProps> = ({oneDrive, goog
                             <CloseIcon className="svg_icons"/>
                         </button>
 
-                        {oneDrive && googleDrive ?
-                            <div className={"all-drives-linked-container"}>
-                                <button className={"modal-close-button"} onClick={closeModal}>
-                                    <CloseIcon className="svg_icons" sx={{stroke:"none", fill:"none"}}/>
-                                </button>
-                                <p>All supported drives have been linked</p>
-                                <Success/>
-                            </div>
-                            :
-                            <p>Link with one of our available providers below</p>}
+                        <p>Link with one of our available providers below</p>
 
-                        {oneDrive ? null : <LinkOneDrive/>}
-                        {googleDrive ? null : <LinkGoogleDrive/>}
+                        <LinkOneDrive/>
+                        <LinkGoogleDrive/>
                     </div>
                 </div>
             )}

@@ -13,11 +13,6 @@ const DashboardPage = () => {
     const {t} = useTranslation();
     const {user} = AuthData();
 
-    const linkedAccountsArray = Object.entries(user?.linkedAccounts || {})
-        .filter(([key]) => key !== 'linkedAccountsCount')
-        .filter(([key, value]) => value)
-        .map(([key, value]) => ({key, value}));
-
     function navigateToManageConnections() {
         navigate(ROUTES.MANAGE_CONNECTIONS);
     }
@@ -30,15 +25,18 @@ const DashboardPage = () => {
                     {t('main.dashboard.title')}
                 </div>
 
-                <div className={"connected-drives-overflow-container"}>
-                    {
-                        linkedAccountsArray.map(({
-                                                     key,
-                                                     value
-                                                 }) => (
-                                <ConnectedDrivesCard key={key} connectionProvider={key}/>
-                        ))}
-                </div>
+                {user?.linkedAccounts.linkedAccountsCount === 0 ? null :
+                    <div className={"connected-drives-overflow-container"}>
+                        {
+                            user?.linkedAccounts.linkedDriveAccounts.map(({
+                                                                              accountEmail,
+                                                                              accountType
+                                                                          }) => (
+                                <ConnectedDrivesCard key={accountEmail} connectionProvider={accountType}
+                                                     driveEmail={accountEmail}/>
+                            ))}
+                    </div>
+                }
 
                 <div className="text-under-line">
                     <p>

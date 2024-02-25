@@ -11,6 +11,7 @@ import com.authorisation.exception.UserNotFoundException;
 import com.authorisation.exception.UserNotVerifiedException;
 import com.authorisation.mappers.UserMapper;
 import com.authorisation.mappers.UserPreferencesMapper;
+import com.authorisation.pojo.Account;
 import com.authorisation.registration.RegistrationRequest;
 import com.authorisation.registration.password.PasswordResetRequest;
 import com.authorisation.repositories.CloudPlatformRepository;
@@ -30,6 +31,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 import static com.authorisation.givens.CredentialsGivens.generateCredentialsDto;
@@ -393,10 +395,11 @@ class UserServiceTest {
     void getUserData_returnsUserData() {
         //given
         UserEntity userEntity = generateUserEntityEnabled();
-        userEntity.getLinkedAccounts().setOneDrive(true);
-        userEntity.getLinkedAccounts().setGoogleDrive(true);
-        String expectedData = String.format("Email: %s\nFirst Name: %s\nLast Name: %s\nLinked Drive Types: %s",
-                userEntity.getEmail(), userEntity.getFirstName(), userEntity.getLastName(), "OneDrive GoogleDrive ");
+        userEntity.getLinkedAccounts().setLinkedAccountsCount(1);
+        userEntity.getLinkedAccounts().setLinkedDriveAccounts(List.of(new Account("johndoe@gmail.com", "OneDrive"),
+                new Account("johndoe2@gmail.com", "GoogleDrive")));
+        String expectedData = String.format("Email: %s%nFirst Name: %s%nLast Name: %s%nLinked Drives: %s",
+                userEntity.getEmail(), userEntity.getFirstName(), userEntity.getLastName(), "[Drive Email: johndoe@gmail.com, Drive Type: OneDrive] [Drive Email: johndoe2@gmail.com, Drive Type: GoogleDrive] ");
 
         //when
         String actualData = userService.getUserData(userEntity);

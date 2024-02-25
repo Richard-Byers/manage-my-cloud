@@ -60,7 +60,8 @@
       }
     },
     "manageConnectionsPage": {
-      "title": "Manage Connections"
+      "title": "Manage Connections",
+      "linkButton": "To link an account press the button below"
     },
     "profile": {
       "title": "Profile"

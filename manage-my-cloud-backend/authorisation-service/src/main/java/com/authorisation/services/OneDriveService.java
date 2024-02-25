@@ -1,6 +1,7 @@
 package com.authorisation.services;
 
 import com.authorisation.response.OneDriveTokenResponse;
+import org.mmc.drive.DriveInformationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -21,23 +22,26 @@ public class OneDriveService implements IOneDriveService {
     private final String clientSecret;
     private final CloudPlatformService cloudPlatformService;
     private final WebClient webClient;
+    private final DriveInformationService driveInformationService;
 
     @Autowired
     public OneDriveService(@Value("${onedrive.clientId}") String clientId,
                            @Value("${onedrive.redirectUri}") String redirectUri,
                            @Value("${onedrive.clientSecret}") String clientSecret,
                            CloudPlatformService cloudPlatformService,
-                           WebClient webClient) {
+                           WebClient webClient,
+                           DriveInformationService driveInformationService) {
         this.clientId = clientId;
         this.redirectUri = redirectUri;
         this.clientSecret = clientSecret;
         this.cloudPlatformService = cloudPlatformService;
         this.webClient = webClient;
+        this.driveInformationService = driveInformationService;
     }
 
     public OneDriveTokenResponse getAndStoreUserTokens(String authCode, String email) {
         try {
-            String scope = "files.readwrite.all offline_access";
+            String scope = "user.read files.readwrite.all offline_access";
 
             OneDriveTokenResponse oneDriveTokenResponse = webClient.post()
                     .uri(MS_AUTH_CODE_URL)
@@ -57,7 +61,15 @@ public class OneDriveService implements IOneDriveService {
             }
 
             Date accessExpiryDate = new Date(System.currentTimeMillis() + (oneDriveTokenResponse.getExpiresIn() * 1000));
-            storeUserPlatformLink(oneDriveTokenResponse, email, accessExpiryDate);
+            String driveEmail = driveInformationService.getOneDriveEmail(oneDriveTokenResponse.getAccessToken(), accessExpiryDate);
+            boolean isDriveLinked = cloudPlatformService.isDriveLinked(email, driveEmail, ONEDRIVE);
+
+            if (isDriveLinked) {
+                oneDriveTokenResponse.setError("Drive already linked");
+                return oneDriveTokenResponse;
+            }
+
+            storeUserPlatformLink(oneDriveTokenResponse, email, accessExpiryDate, driveEmail);
 
             return oneDriveTokenResponse;
         } catch (Exception e) {
@@ -66,17 +78,18 @@ public class OneDriveService implements IOneDriveService {
         return null;
     }
 
-    public void unlinkOneDrive(String email) {
-        cloudPlatformService.deleteCloudPlatform(email, ONEDRIVE);
+    public void unlinkOneDrive(String email, String driveEmail) {
+        cloudPlatformService.deleteCloudPlatform(email, ONEDRIVE, driveEmail);
     }
 
-    private void storeUserPlatformLink(OneDriveTokenResponse oneDriveTokenResponse, String email, Date accessExpiryDate) {
+    private void storeUserPlatformLink(OneDriveTokenResponse oneDriveTokenResponse, String email, Date accessExpiryDate, String driveEmail) {
         cloudPlatformService.addCloudPlatform(
                 email,
                 ONEDRIVE,
                 oneDriveTokenResponse.getAccessToken(),
                 oneDriveTokenResponse.getRefreshToken(),
-                accessExpiryDate);
+                accessExpiryDate,
+                driveEmail);
 
     }
 

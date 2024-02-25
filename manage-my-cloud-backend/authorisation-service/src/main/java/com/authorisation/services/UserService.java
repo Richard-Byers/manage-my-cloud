@@ -3,7 +3,6 @@ package com.authorisation.services;
 import com.authorisation.dto.CredentialsDto;
 import com.authorisation.dto.EmailDto;
 import com.authorisation.dto.UserDto;
-import com.authorisation.entities.CloudPlatform;
 import com.authorisation.entities.*;
 import com.authorisation.exception.InvalidPasswordException;
 import com.authorisation.exception.UserAlreadyExistsException;
@@ -11,10 +10,11 @@ import com.authorisation.exception.UserNotFoundException;
 import com.authorisation.exception.UserNotVerifiedException;
 import com.authorisation.mappers.UserMapper;
 import com.authorisation.mappers.UserPreferencesMapper;
+import com.authorisation.pojo.Account;
 import com.authorisation.registration.RegistrationRequest;
 import com.authorisation.registration.password.PasswordResetRequest;
-import com.authorisation.repositories.RecommendationSettingsRepository;
 import com.authorisation.repositories.CloudPlatformRepository;
+import com.authorisation.repositories.RecommendationSettingsRepository;
 import com.authorisation.repositories.UserEntityRepository;
 import com.authorisation.repositories.VerificationTokenRepository;
 import jakarta.transaction.Transactional;
@@ -85,7 +85,12 @@ public class UserService implements IUserService {
         newUser.setAccountType("GOOGLE");
         newUser.setLinkedAccounts(new LinkedAccounts());
         newUser.setLinkedAccounts(new LinkedAccounts());
-        return userEntityRepository.save(newUser);
+        userEntityRepository.save(newUser);
+
+        RecommendationSettings recommendationSettings = new RecommendationSettings();
+        recommendationSettings.setUserEntity(newUser);
+        recommendationSettingsRepository.save(recommendationSettings);
+        return newUser;
     }
 
     public UserDto login(CredentialsDto credentialsDto) {
@@ -254,21 +259,24 @@ public class UserService implements IUserService {
 
     public String getUserData(UserEntity user) {
         LinkedAccounts linkedAccounts = user.getLinkedAccounts();
-        String linkedDriveTypes = "";
-        if (linkedAccounts.isOneDrive()) {
-            linkedDriveTypes += "OneDrive ";
-        }
-        if (linkedAccounts.isGoogleDrive()) {
-            linkedDriveTypes += "GoogleDrive ";
+        StringBuilder linkedDriveTypes = new StringBuilder();
+
+        for (Account linkedAccount : linkedAccounts.getLinkedDriveAccounts()) {
+            linkedDriveTypes.append("[")
+                    .append("Drive Email: ")
+                    .append(linkedAccount.getAccountEmail())
+                    .append(", Drive Type: ")
+                    .append(linkedAccount.getAccountType())
+                    .append("] ");
         }
 
         // Add a note if there are no linked accounts
-        if (!linkedAccounts.isOneDrive() && !linkedAccounts.isGoogleDrive()) {
-            linkedDriveTypes = "No linked accounts";
+        if (linkedAccounts.getLinkedAccountsCount() == 0) {
+            linkedDriveTypes = new StringBuilder("No linked accounts");
         }
 
-        return String.format("Email: %s\nFirst Name: %s\nLast Name: %s\nLinked Drive Types: %s",
-                user.getEmail(), user.getFirstName(), user.getLastName(), linkedDriveTypes);
+        return String.format("Email: %s%nFirst Name: %s%nLast Name: %s%nLinked Drives: %s",
+                user.getEmail(), user.getFirstName(), user.getLastName(), linkedDriveTypes.toString());
     }
 
     public void updateDetails(UserEntity user, String newFirstName, String newLastName) {

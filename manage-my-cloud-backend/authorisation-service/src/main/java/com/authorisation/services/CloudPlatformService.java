@@ -3,6 +3,7 @@ package com.authorisation.services;
 import com.authorisation.entities.CloudPlatform;
 import com.authorisation.entities.LinkedAccounts;
 import com.authorisation.entities.UserEntity;
+import com.authorisation.pojo.Account;
 import com.authorisation.repositories.CloudPlatformRepository;
 import com.authorisation.repositories.UserEntityRepository;
 import jakarta.transaction.Transactional;
@@ -22,7 +23,7 @@ public class CloudPlatformService implements ICloudPlatformService {
     private final CloudPlatformRepository cloudPlatformRepository;
     private final UserEntityRepository userEntityRepository;
 
-    public CloudPlatform addCloudPlatform(String userEmail, String platformName, String accessToken, String refreshToken, Date accessTokenExpiryDate) {
+    public CloudPlatform addCloudPlatform(String userEmail, String platformName, String accessToken, String refreshToken, Date accessTokenExpiryDate, String driveEmail) {
         UserEntity userEntity = userEntityRepository.findByEmail(userEmail).orElseThrow(() -> new RuntimeException("User not found"));
         LinkedAccounts linkedAccounts = userEntity.getLinkedAccounts();
 
@@ -31,13 +32,10 @@ public class CloudPlatformService implements ICloudPlatformService {
                 linkedAccounts = new LinkedAccounts();
                 userEntity.setLinkedAccounts(linkedAccounts);
             }
-            if (ONEDRIVE.equals(platformName)) {
-                linkedAccounts.setOneDrive(true);
-                linkedAccounts.setLinkedAccountsCount(linkedAccounts.getLinkedAccountsCount() + 1);
-            } else {
-                linkedAccounts.setGoogleDrive(true);
-                linkedAccounts.setLinkedAccountsCount(linkedAccounts.getLinkedAccountsCount() + 1);
-            }
+            linkedAccounts.getLinkedDriveAccounts().add(new Account(driveEmail, platformName));
+            linkedAccounts.setLinkedAccountsCount(linkedAccounts.getLinkedAccountsCount() + 1);
+        } else {
+            throw new RuntimeException("Platform not supported");
         }
         userEntityRepository.save(userEntity);
 
@@ -50,12 +48,13 @@ public class CloudPlatformService implements ICloudPlatformService {
         cloudPlatform.setAccessToken(encryptedAccessToken);
         cloudPlatform.setRefreshToken(encryptedRefreshToken);
         cloudPlatform.setAccessTokenExpiryDate(accessTokenExpiryDate);
+        cloudPlatform.setDriveEmail(driveEmail);
 
         return cloudPlatformRepository.save(cloudPlatform);
     }
 
     @Transactional
-    public void deleteCloudPlatform(String userEmail, String platformName) {
+    public void deleteCloudPlatform(String userEmail, String platformName, String driveEmail) {
         UserEntity userEntity = userEntityRepository.findByEmail(userEmail).orElseThrow(() -> new RuntimeException("User not found"));
         LinkedAccounts linkedAccounts = userEntity.getLinkedAccounts();
 
@@ -64,11 +63,14 @@ public class CloudPlatformService implements ICloudPlatformService {
             userEntity.setLinkedAccounts(linkedAccounts);
         }
 
-        if (ONEDRIVE.equals(platformName)) {
-            linkedAccounts.setOneDrive(false);
-            linkedAccounts.setLinkedAccountsCount(linkedAccounts.getLinkedAccountsCount() - 1);
-        } else if (GOOGLEDRIVE.equals(platformName)) {
-            linkedAccounts.setGoogleDrive(false);
+        if (ONEDRIVE.equals(platformName) || GOOGLEDRIVE.equals(platformName)) {
+            for (Account account : linkedAccounts.getLinkedDriveAccounts()) {
+                if (account.getAccountType().equals(platformName) && account.getAccountEmail().equals(driveEmail)) {
+                    linkedAccounts.getLinkedDriveAccounts().remove(account);
+                    break;
+                }
+            }
+
             linkedAccounts.setLinkedAccountsCount(linkedAccounts.getLinkedAccountsCount() - 1);
         } else {
             throw new RuntimeException("Platform not supported");
@@ -76,11 +78,16 @@ public class CloudPlatformService implements ICloudPlatformService {
 
         userEntityRepository.save(userEntity);
 
-        cloudPlatformRepository.deleteByUserEntityEmailAndPlatformName(userEntity.getEmail(), platformName);
+        cloudPlatformRepository.deleteByUserEntityEmailAndPlatformNameAndDriveEmail(userEntity.getEmail(), platformName, driveEmail);
     }
 
-    public CloudPlatform getUserCloudPlatform(String userEmail, String platformName) {
-        return cloudPlatformRepository.findByUserEntityEmailAndPlatformName(userEmail, platformName);
+    boolean isDriveLinked(String userEmail, String driveEmail, String platformName) {
+        CloudPlatform cloudPlatform = cloudPlatformRepository.findByUserEntityEmailAndDriveEmailAndPlatformName(userEmail, driveEmail, platformName);
+        return cloudPlatform != null;
+    }
+
+    public CloudPlatform getUserCloudPlatform(String userEmail, String platformName, String driveEmail) {
+        return cloudPlatformRepository.findByUserEntityEmailAndPlatformNameAndDriveEmail(userEmail, platformName, driveEmail);
     }
 
 }

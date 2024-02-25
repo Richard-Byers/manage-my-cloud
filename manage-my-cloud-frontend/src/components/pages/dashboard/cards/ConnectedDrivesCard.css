@@ -109,7 +109,7 @@ hr {
 @media only screen and (max-width: 940px) {
     .dashboard-connection-item {
         height: auto;
-        width: 70%;
+        width: 75%;
     }
 }
 

@@ -1,8 +1,8 @@
 .dashboard-page-content-grid {
     justify-content: center;
     display: grid;
-    grid-template-columns: 24% 24% 24% 24%;
-    grid-template-rows: auto auto auto auto;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 60vh auto;
     grid-gap: 1em;
     margin: 0 2%;
 }
@@ -11,25 +11,11 @@
     font-family: MontserratBold, serif;
     font-size: 2.5rem;
     color: white;
-    grid-row: 1 / 1;
-    grid-column: 1 / 1;
-}
-
-.connect-drives-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    align-content: center;
-    border-top: 3px solid white;
-    text-align: center;
-    width: 50%;
-    margin: 1% auto;
-    grid-row: 4 / 4;
-    grid-column: span 4;
+    grid-row: 1;
+    grid-column: 1;
 }
 
 .text-under-line {
-    margin-top: 5vh;
     display: flex;
     font-family: MontserratLight, serif;
     color: #FFFFFF;
@@ -37,7 +23,7 @@
     width: 100%;
     text-align: center;
     flex-direction: column;
-    grid-column: span 4;
+    grid-column: 1;
     height: fit-content;
 }
 
@@ -65,9 +51,17 @@
 
 .connected-drives-overflow-container{
     display: flex;
-    grid-row: span 1;
-    grid-column: span 4;
+    justify-content: space-evenly;
     gap: 1em;
+    grid-column: 1;
+    width: auto;
+    height: 98%;
+    overflow-y: scroll;
+    flex-wrap: wrap;
+}
+
+.connected-drives-overflow-container > * {
+    flex: 0 0 20%; /* 100% / 5 = 20% */
 }
 
 @media only screen and (max-width: 1420px) {
@@ -82,21 +76,23 @@
         justify-content: center;
         display: grid;
         grid-template-rows: 4vh 60vh 18vh;
-        grid-template-columns: 90%;
+        grid-template-columns: auto;
         margin: 0;
     }
 
     .connected-drives-overflow-container{
         display: flex;
+        justify-content: normal;
         align-items: center;
         align-content: center;
         flex-direction: column;
         grid-row: span 1;
-        grid-column: span 4;
+        grid-column: 1;
         height: 100%;
         overflow-y: auto;
         width: fit-content;
         gap: 10px;
+        flex-wrap: nowrap;
     }
 
     .dashboard-page-title-container{
@@ -105,13 +101,8 @@
         align-items: center;
         text-align: center;
         justify-content: center;
-        grid-column: span 4;
+        grid-column: 1;
         width: 100%;
-    }
-
-    .connect-drives-container {
-        grid-row: span 1;
-        grid-column: span 4;
     }
 
     .text-under-line {
@@ -122,8 +113,6 @@
         width: 80%;
         text-align: center;
         flex-direction: column;
-        grid-row: span 1;
-        grid-column: span 4;
     }
 
     .text-under-line p {
