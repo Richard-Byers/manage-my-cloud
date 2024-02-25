@@ -47,7 +47,7 @@ const ManageConnectionsPage = () => {
 
                     <div className={linkAccountsClassname}>
                         <div className={"manage-connections-page-link-text"}>
-                            To link an account press the button below
+                            {t('main.manageConnectionsPage.linkButton')}
                         </div>
                         <AddConnectionsModal/>
                     </div>
