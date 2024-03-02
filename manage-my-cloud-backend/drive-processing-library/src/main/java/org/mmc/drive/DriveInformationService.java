@@ -5,10 +5,14 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.google.api.client.util.DateTime;
 import com.google.api.services.drive.model.About;
 import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.FileList;
+import com.google.cloud.vertexai.VertexAI;
+import com.google.cloud.vertexai.api.GenerateContentResponse;
+import com.google.cloud.vertexai.generativeai.ChatSession;
+import com.google.cloud.vertexai.generativeai.GenerativeModel;
+import com.google.cloud.vertexai.generativeai.ResponseHandler;
 import com.microsoft.graph.models.Drive;
 import com.microsoft.graph.models.User;
 import com.microsoft.graph.requests.DriveItemCollectionPage;
@@ -322,6 +326,42 @@ public class DriveInformationService implements IDriveInformationService {
         FilesDeletedResponse filesDeletedResponse = new FilesDeletedResponse();
         filesDeletedResponse.setFilesDeleted(filesDeleted.get());
         return filesDeletedResponse;
+    }
+
+    public JsonNode callEndpointAndGetResponse(String refreshToken, String accessToken) throws IOException, InterruptedException {
+        // TODO(developer): Replace these variables before running the sample.
+        String projectId = "finalyearproject-406016";
+        String location = "us-central1";
+        String modelName = "gemini-1.0-pro";
+
+        JsonNode files = fetchAllGoogleDriveFiles(refreshToken, accessToken);
+
+        ObjectMapper mapper = new ObjectMapper();
+        String prettyJson = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(files);
+
+        chatDiscussion(projectId, location, modelName, prettyJson);
+
+        return null;
+    }
+
+    private static String chatDiscussion(String projectId, String location, String modelName, String files)
+            throws IOException {
+
+        // Initialize client that will be used to send requests. This client only needs
+        // to be created once, and can be reused for multiple requests.
+        GenerateContentResponse response;
+        try (VertexAI vertexAI = new VertexAI(projectId, location)) {
+
+            GenerativeModel model = new GenerativeModel(modelName, vertexAI);
+            // Create a chat session to be used for interactive conversation.
+            ChatSession chatSession = new ChatSession(model);
+
+            String prompt = "Can you only return duplicates from this JSON? Here is the JSON: " + files;
+            response = chatSession.sendMessage(prompt);
+            System.out.println(ResponseHandler.getText(response));
+
+        }
+        return response.toString();
     }
 
     public DriveInformationReponse mapToDriveInformationResponse(String displayName, String email, Double total, Double used) {
