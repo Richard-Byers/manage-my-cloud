@@ -40,6 +40,7 @@ export const SignUpModal: React.FC<SignUpProps> = ({
         password: "",
         role: "USER",
     });
+    const [confirmPassword, setConfirmPassword] = useState<string>("");
     const [showError, setShowError] = useState<ShowErrorProps>({errorMessage: null});
     const [emailConfirmation, setShowEmailConfirmation] = useState<ShowSuccessProps>({successMessage: null});
 
@@ -67,6 +68,11 @@ export const SignUpModal: React.FC<SignUpProps> = ({
         setShowError({errorMessage: null});
     };
 
+    const handleConfirmPasswordChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setConfirmPassword(event.target.value);
+        setShowError({errorMessage: null});
+    };
+
     const closeSignUpModal = () => {
         setShowSignUpModal(false);
     };
@@ -76,8 +82,15 @@ export const SignUpModal: React.FC<SignUpProps> = ({
     };
 
     const handleSignupSubmission = (e: React.FormEvent) => {
+        setShowError(() => ({errorMessage: null}));
+        setShowEmailConfirmation(() => ({successMessage: null}));
         const {firstName, lastName, email, password} = signupInput;
         e.preventDefault();
+
+        if (password !== confirmPassword) {
+            setShowError({errorMessage: "Passwords don't match"});
+            return;
+        }
 
         if (firstName && lastName && email && password) {
 
@@ -99,7 +112,7 @@ export const SignUpModal: React.FC<SignUpProps> = ({
             <div className="modal-overlay" onClick={closeSignUpModal}>
                 <div className="modal" onClick={stopPropagation}>
 
-                    <button className={"modal-close-button"} onClick={closeSignUpModal}><CloseIcon/></button>
+                    <button className={"modal-close-button"} onClick={closeSignUpModal}><CloseIcon className={"svg_icons"}/></button>
 
                     <div className={"modal-logo-signup"}>
                         <img src={logo} alt={"Manage My Cloud Logo"}/>
@@ -147,6 +160,15 @@ export const SignUpModal: React.FC<SignUpProps> = ({
                                        placeholder={"Enter your password"}
                                        onClick={stopPropagation}
                                        onChange={handlePasswordChange}/>
+                                <LockIcon/>
+                            </label>
+
+                            <label className={"modal-form-label"}>
+                                <input className={"modal-form-input"}
+                                       type="password"
+                                       placeholder={"Confirm your password"}
+                                       onClick={stopPropagation}
+                                       onChange={handleConfirmPasswordChange}/>
                                 <LockIcon/>
                             </label>
 

@@ -14,6 +14,7 @@ interface DashboardPageButtonsProps {
     data: FileNode;
     connectionProvider: string;
     setSowModal: (arg0: boolean) => void;
+    driveEmail: string;
 }
 
 interface FilesToBeDeleted {
@@ -87,7 +88,8 @@ const FileTree: React.FC<FileTreeProps> = ({data, setFilesToBeDeleted, filesToBe
 const DashboardPageButtons: React.FC<DashboardPageButtonsProps> = ({
                                                                        data,
                                                                        connectionProvider,
-                                                                       setSowModal
+                                                                       setSowModal,
+                                                                       driveEmail
                                                                    }) => {
     const {user} = AuthData();
     const {t} = useTranslation();
@@ -164,14 +166,14 @@ const DashboardPageButtons: React.FC<DashboardPageButtonsProps> = ({
         return response.data;
     }
 
-    async function deleteRecommendedFiles(user: any, connectionProvider: string, filesToDelete: FilesToBeDeleted): Promise<void> {
+    async function deleteRecommendedFiles(user: any, connectionProvider: string, filesToDelete: FilesToBeDeleted, driveEmail: string): Promise<void> {
 
         const headers = {
             'Authorization': `Bearer ${user.token}`
         }
 
         setLoading(true);
-        await buildAxiosRequestWithHeaders('POST', `/delete-recommended?email=${user.email}&provider=${connectionProvider}`, headers, filesToDelete)
+        await buildAxiosRequestWithHeaders('POST', `/delete-recommended?email=${user.email}&provider=${connectionProvider}&driveEmail=${driveEmail}`, headers, filesToDelete)
             .then((response) => {
                 setLoading(false);
                 setSuccessfulDeletionMessage(`Successfully deleted ${response.data.filesDeleted} file(s) from your drive.`);
@@ -262,7 +264,7 @@ const DashboardPageButtons: React.FC<DashboardPageButtonsProps> = ({
                                         :
                                         <div className={"recommended-file-button-container"}>
                                             <button className={"dashboard-button"} onClick={() => {
-                                                deleteRecommendedFiles(user, connectionProvider, filesToBeDeleted)
+                                                deleteRecommendedFiles(user, connectionProvider, filesToBeDeleted, driveEmail)
                                             }}>
                                                 {t('main.dashboard.deletionModals.deleteRecommended.deleteButton')}
                                             </button>

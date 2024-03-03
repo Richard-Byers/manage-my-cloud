@@ -13,12 +13,13 @@ import CloseIcon from "@mui/icons-material/Close";
 import {DashboardCardModalEmptyFiles} from "./DashboardCardModalEmptyFiles";
 
 interface DashboardCardModalProps {
-  showModal: boolean;
-  setShowModal: (arg0: boolean) => void;
-  connectionProvider: string;
-  totalStorage: number;
-  usedStorage: number;
-  email: string;
+    showModal: boolean;
+    setShowModal: (arg0: boolean) => void;
+    connectionProvider: string;
+    totalStorage: number;
+    usedStorage: number;
+    email: string;
+    driveEmail: string;
 }
 
 interface FileNode {
@@ -43,7 +44,8 @@ const DashboardCardModal: React.FC<DashboardCardModalProps> = ({
                                                                    connectionProvider,
                                                                    totalStorage,
                                                                    usedStorage,
-                                                                   email
+                                                                   email,
+                                                                   driveEmail
                                                                }) => {
     const {user} = AuthData();
     const {t} = useTranslation();
@@ -84,10 +86,9 @@ const DashboardCardModal: React.FC<DashboardCardModalProps> = ({
     React.useEffect(() => {
         const fetchDriveData = async () => {
             const info = await getDriveItems(user, connectionProvider);
-            console.log(info);
             setDriveData(info);
 
-            if (connectionProvider === "googleDrive") {
+            if (connectionProvider === "GoogleDrive") {
                 info.children.forEach((item: FileNode) => {
                     if (item.type.startsWith('image')) {
                         categories.Images += 1;
@@ -101,7 +102,7 @@ const DashboardCardModal: React.FC<DashboardCardModalProps> = ({
                         categories.Others += 1;
                     }
                 });
-            } else if (connectionProvider === "oneDrive") {
+            } else if (connectionProvider === "OneDrive") {
                 const processNode = (node: FileNode) => {
                     if (node.type.startsWith('image')) {
                         categories.Images += 1;
@@ -128,8 +129,6 @@ const DashboardCardModal: React.FC<DashboardCardModalProps> = ({
                 value: parseFloat(((value / totalCount) * 100).toFixed(2)),
             }));
 
-            // Now you can use the data array in your PieChart
-            // You might want to save it in the component's state so you can use it in your render method
             setPieChartData(pieChartData);
         };
 
@@ -184,7 +183,7 @@ const DashboardCardModal: React.FC<DashboardCardModalProps> = ({
 
         const connectionProviderTitle = CONNECTION_TITLE[connectionProvider];
         setLoading(true);
-        const response = await buildAxiosRequestWithHeaders('GET', `/drive-items?email=${user.email}&provider=${connectionProviderTitle}`, headers, {})
+        const response = await buildAxiosRequestWithHeaders('GET', `/drive-items?email=${user.email}&provider=${connectionProviderTitle}&driveEmail=${driveEmail}`, headers, {})
 
         if (!response.data) {
             setLoading(false);
@@ -214,7 +213,7 @@ const DashboardCardModal: React.FC<DashboardCardModalProps> = ({
                                 <img src={CONNECTION_LOGOS[connectionProvider]}
                                      alt={`Logo for ${connectionProvider}`}/>
                                 <p>{t('main.dashboard.dashboardCardModal.driveInformation.accountDetails')}</p>
-                                <span>{email}</span>
+                                <span>{driveEmail}</span>
                                 <span>{t('main.dashboard.dashboardCardModal.driveInformation.usedStorage')} {usedStorage > 0.0 ? usedStorage : "< 0"}/GB</span>
                                 <span>{t('main.dashboard.dashboardCardModal.driveInformation.totalStorage')} {totalStorage}/GB</span>
                                 <PieChart className="dashboard-card-modal-pie-chart" width={200} height={200}>
@@ -246,6 +245,7 @@ const DashboardCardModal: React.FC<DashboardCardModalProps> = ({
                                     <DashboardPageButtons data={driveData}
                                                           connectionProvider={CONNECTION_TITLE[connectionProvider]}
                                                           setSowModal={setShowModal}
+                                                          driveEmail={driveEmail}
                                     />
                                 </div>
                             }

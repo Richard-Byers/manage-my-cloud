@@ -7,6 +7,10 @@ import {Popover} from "@mui/material";
 import {AuthData} from "../routing/AuthWrapper";
 import MenuIcon from '@mui/icons-material/Menu';
 import CloseIcon from '@mui/icons-material/Close';
+import DashboardIcon from '@mui/icons-material/Dashboard';
+import SettingsInputComponentIcon from '@mui/icons-material/SettingsInputComponent';
+import PersonIcon from '@mui/icons-material/Person';
+import LogoutIcon from '@mui/icons-material/Logout';
 import {useTranslation} from "react-i18next";
 
 const Navbar: React.FC = () => {
@@ -47,7 +51,7 @@ const Navbar: React.FC = () => {
 
             <ul className={sideBarClass}>
                 <li className="nav-item" onClick={hideSideBar}>
-                    <button className={"sidebar-button-close"}><CloseIcon/></button>
+                    <button className={"sidebar-button-close"}><CloseIcon className={"svg_icons"}/></button>
                 </li>
 
                 <li>
@@ -56,18 +60,27 @@ const Navbar: React.FC = () => {
 
                 <li>
                     <Link to={ROUTES.DASHBOARD}>
+                        <DashboardIcon/>
                         {t("main.navbar.dashboard")}
                     </Link>
                 </li>
                 <li>
                     <Link to={ROUTES.MANAGE_CONNECTIONS}>
+                        <SettingsInputComponentIcon/>
                         {t("main.navbar.manageConnections")}
                     </Link>
                 </li>
                 <li>
                     <Link to={ROUTES.PROFILE}>
+                        <PersonIcon/>
                         {t("main.navbar.profile")}
                     </Link>
+                </li>
+                <li>
+                    <button onClick={logout}>
+                        <LogoutIcon/>
+                        {t("main.navbar.logout")}
+                    </button>
                 </li>
             </ul>
 

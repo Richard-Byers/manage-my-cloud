@@ -15,11 +15,10 @@ import com.google.auth.oauth2.GoogleCredentials;
 import com.microsoft.graph.authentication.TokenCredentialAuthProvider;
 import com.microsoft.graph.requests.GraphServiceClient;
 import okhttp3.Request;
-import org.mmc.Constants;
 import org.mmc.implementations.UserAccessTokenCredential;
 
 import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.StringReader;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.util.Date;
@@ -61,9 +60,9 @@ public class DriveAuthManager {
         TokenResponse response = new GoogleTokenResponse();
 
         try {
-            GoogleClientSecrets clientSecrets =
-                    GoogleClientSecrets.load(
-                            GsonFactory.getDefaultInstance(), new InputStreamReader(DriveAuthManager.class.getResourceAsStream(Constants.GOOGLE_CREDENTIALS_FILE_PATH)));
+            String googleCredentialsJson = System.getenv("GOOGLE_CREDENTIALS_JSON");
+            GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(
+                    JacksonFactory.getDefaultInstance(), new StringReader(googleCredentialsJson));
             response = new GoogleRefreshTokenRequest(
                     new NetHttpTransport(),
                     new GsonFactory(),

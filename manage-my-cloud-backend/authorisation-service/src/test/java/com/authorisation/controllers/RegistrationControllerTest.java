@@ -44,6 +44,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith(MockitoExtension.class)
 class RegistrationControllerTest {
 
+    private static final String REGISTER_URL = "/register";
+    private static final String VERIFY_EMAIL = REGISTER_URL + "/verifyEmail";
+    private static final String RESEND_VERIFICATION_EMAIL = REGISTER_URL + "/resendVerificationEmail";
+    private static final String RESET_USER_PASSWORD = REGISTER_URL + "/resetUserPassword";
+    private static final String RESET_PASSWORD = REGISTER_URL + "/resetPassword";
+    ObjectMapper objectMapper = new ObjectMapper();
     @Autowired
     private MockMvc mockMvc;
     @MockBean
@@ -56,13 +62,6 @@ class RegistrationControllerTest {
     private RegistrationCompleteEventListener eventListener;
     @MockBean
     private PasswordResetTokenRepository passwordResetTokenRepository;
-
-    private static final String REGISTER_URL = "/register";
-    private static final String VERIFY_EMAIL = REGISTER_URL + "/verifyEmail";
-    private static final String RESEND_VERIFICATION_EMAIL = REGISTER_URL + "/resendVerificationEmail";
-    private static final String RESET_USER_PASSWORD = REGISTER_URL + "/resetUserPassword";
-    private static final String RESET_PASSWORD = REGISTER_URL + "/resetPassword";
-    ObjectMapper objectMapper = new ObjectMapper();
 
     @Test
     void registrationController_register_returnsOkWithVerificationEmail() throws Exception {

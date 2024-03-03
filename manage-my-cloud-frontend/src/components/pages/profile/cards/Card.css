@@ -12,12 +12,9 @@
 .card-content {
     display: flex;
     flex-direction: column;
-    justify-content: flex-start;
+    justify-content: center;
     align-items: center;
-    background: #FFF;
-    box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.18);
-    -webkit-box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.18);
-    -moz-box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.18);
-    border-radius: 20px;
+    gap: 1.5em;
     height: 100%;
+    width: 100%;
 }

@@ -97,7 +97,7 @@ export const ResetPasswordModal: React.FC<ForgotPasswordModalProps> = ({
             <div className="modal-overlay" onClick={closeForgotPassword}>
                 <div className="modal" onClick={stopPropagation}>
 
-                    <button className={"modal-close-button"} onClick={closeForgotPassword}><CloseIcon/></button>
+                    <button className={"modal-close-button"} onClick={closeForgotPassword}><CloseIcon className={"svg_icons"}/></button>
 
                     <div className={"forgot-password-modal-logo"}>
                         <img src={logo} alt={"Manage My Cloud Logo"}/>

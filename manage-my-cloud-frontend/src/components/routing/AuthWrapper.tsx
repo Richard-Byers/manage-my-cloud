@@ -6,6 +6,10 @@ import {ROUTES} from "../../constants/RouteConstants";
 import {useGoogleLogin} from '@react-oauth/google';
 import Cookies from 'universal-cookie'
 
+interface Account {
+    accountEmail: string;
+    accountType: string;
+}
 
 interface User {
     id: number;
@@ -17,8 +21,7 @@ interface User {
     profileImage: Uint8Array | null;
     linkedAccounts: {
         linkedAccountsCount: number;
-        oneDrive: boolean;
-        googleDrive: boolean;
+        linkedDriveAccounts: Account[];
     }
 }
 

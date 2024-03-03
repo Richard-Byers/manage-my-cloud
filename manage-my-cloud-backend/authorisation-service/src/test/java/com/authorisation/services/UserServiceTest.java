@@ -11,8 +11,10 @@ import com.authorisation.exception.UserNotFoundException;
 import com.authorisation.exception.UserNotVerifiedException;
 import com.authorisation.mappers.UserMapper;
 import com.authorisation.mappers.UserPreferencesMapper;
+import com.authorisation.pojo.Account;
 import com.authorisation.registration.RegistrationRequest;
 import com.authorisation.registration.password.PasswordResetRequest;
+import com.authorisation.repositories.CloudPlatformRepository;
 import com.authorisation.repositories.RecommendationSettingsRepository;
 import com.authorisation.repositories.UserEntityRepository;
 import com.authorisation.repositories.VerificationTokenRepository;
@@ -29,6 +31,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 import static com.authorisation.givens.CredentialsGivens.generateCredentialsDto;
@@ -54,6 +57,8 @@ class UserServiceTest {
     private VerificationTokenRepository verificationTokenRepository;
     @MockBean
     private RecommendationSettingsRepository recommendationSettingsRepository;
+    @MockBean
+    private CloudPlatformRepository cloudPlatformRepository;
     @Autowired
     private PasswordEncoder passwordEncoder;
     @MockBean
@@ -356,5 +361,51 @@ class UserServiceTest {
         assertEquals(expectedUserPreferences.getDeleteItemsCreatedAfterDays(), userPreferences.getDeleteItemsCreatedAfterDays());
     }
 
+    @Test
+    void updateProfileImage_updatesProfileImage() {
+        //given
+        UserEntity userEntity = generateUserEntityEnabled();
+        byte[] newImage = new byte[10];
+
+        //when
+        given(userEntityRepository.save(any(UserEntity.class))).willReturn(userEntity);
+
+        userService.updateProfileImage(userEntity, newImage);
+        //then
+        assertEquals(newImage, userEntity.getProfileImage());
+    }
+
+    @Test
+    void updateDetails_updatesUserDetails() {
+        //given
+        UserEntity userEntity = generateUserEntityEnabled();
+        String newFirstName = "NewFirstName";
+        String newLastName = "NewLastName";
+
+        //when
+        given(userEntityRepository.save(any(UserEntity.class))).willReturn(userEntity);
+
+        userService.updateDetails(userEntity, newFirstName, newLastName);
+        //then
+        assertEquals(newFirstName, userEntity.getFirstName());
+        assertEquals(newLastName, userEntity.getLastName());
+    }
+
+    @Test
+    void getUserData_returnsUserData() {
+        //given
+        UserEntity userEntity = generateUserEntityEnabled();
+        userEntity.getLinkedAccounts().setLinkedAccountsCount(1);
+        userEntity.getLinkedAccounts().setLinkedDriveAccounts(List.of(new Account("johndoe@gmail.com", "OneDrive"),
+                new Account("johndoe2@gmail.com", "GoogleDrive")));
+        String expectedData = String.format("Email: %s%nFirst Name: %s%nLast Name: %s%nLinked Drives: %s",
+                userEntity.getEmail(), userEntity.getFirstName(), userEntity.getLastName(), "[Drive Email: johndoe@gmail.com, Drive Type: OneDrive] [Drive Email: johndoe2@gmail.com, Drive Type: GoogleDrive] ");
+
+        //when
+        String actualData = userService.getUserData(userEntity);
+
+        //then
+        assertEquals(expectedData, actualData);
+    }
 
 }

@@ -10,10 +10,10 @@ import org.springframework.context.annotation.Profile;
 import javax.sql.DataSource;
 
 @Configuration
+@Profile("!dev & !docker")
 public class DataSourceConfig {
 
     @Bean
-    @Profile("!dev")
     public static DataSource createConnectionPool() {
         // The configuration object specifies behaviors for the connection pool.
         HikariConfig config = new HikariConfig();

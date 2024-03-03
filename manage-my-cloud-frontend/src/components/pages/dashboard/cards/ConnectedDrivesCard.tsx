@@ -17,9 +17,10 @@ interface DriveInformation {
 
 interface ConnectedDrivesCardProps {
     connectionProvider: string,
+    driveEmail: string
 }
 
-const CardContainer: React.FC<ConnectedDrivesCardProps> = ({connectionProvider}) => {
+const CardContainer: React.FC<ConnectedDrivesCardProps> = ({connectionProvider, driveEmail}) => {
 
     const {user} = AuthData();
     const {t} = useTranslation();
@@ -32,7 +33,7 @@ const CardContainer: React.FC<ConnectedDrivesCardProps> = ({connectionProvider})
 
     React.useEffect(() => {
         const fetchDriveInformation = async () => {
-            const info = await getUserDrives(user, connectionProvider);
+            const info = await getUserDrives(user, connectionProvider, driveEmail);
             setDriveInformation(info);
         };
 
@@ -50,7 +51,8 @@ const CardContainer: React.FC<ConnectedDrivesCardProps> = ({connectionProvider})
                                     connectionProvider={connectionProvider}
                                     totalStorage={driveInformation.total}
                                     usedStorage={driveInformation.used}
-                                    email={driveInformation.email}/>}
+                                    email={driveInformation.email}
+                                    driveEmail={driveEmail}/>}
             <div className="dashboard-connection-item" onClick={toggleModal}>
                 <img src={CONNECTION_LOGOS[connectionProvider]}
                      alt={`Logo for ${connectionProvider}`}/>
@@ -67,14 +69,14 @@ const CardContainer: React.FC<ConnectedDrivesCardProps> = ({connectionProvider})
     );
 }
 
-async function getUserDrives(user: any, connectionProvider: string): Promise<DriveInformation> {
+async function getUserDrives(user: any, connectionProvider: string, driveEmail: string): Promise<DriveInformation> {
 
     const headers = {
         'Authorization': `Bearer ${user.token}`
     }
 
     const connectionProviderTitle = CONNECTION_TITLE[connectionProvider];
-    const response = await buildAxiosRequestWithHeaders('GET', `/drive-information?email=${user.email}&provider=${connectionProviderTitle}`, headers, {});
+    const response = await buildAxiosRequestWithHeaders('GET', `/drive-information?email=${user.email}&provider=${connectionProviderTitle}&driveEmail=${driveEmail}`, headers, {});
 
     if (!response.data) {
         throw new Error('Invalid response data');

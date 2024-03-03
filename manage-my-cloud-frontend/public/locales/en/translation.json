@@ -60,7 +60,8 @@
       }
     },
     "manageConnectionsPage": {
-      "title": "Manage Connections"
+      "title": "Manage Connections",
+      "linkButton": "To link an account press the button below"
     },
     "profile": {
       "title": "Profile"
@@ -78,10 +79,7 @@
       "deleteAccount": "Delete Account",
       "requestData": "Request Data",
       "viewTermsOfService": "View Terms of Service",
-      "downloadTermsOfService": "Download Terms of Service"
-    },
-    "profilePreferencesCard": {
-      "preferences": "Preferences"
+      "ContactUs": "Contact Us"
     },
     "changeProfileImage": {
       "changeProfileImage": "Change Profile Image",
@@ -94,7 +92,59 @@
     "navbar": {
       "dashboard": "Dashboard",
       "manageConnections": "Manage Connections",
-      "profile": "Profile"
+      "profile": "Profile",
+      "logout": "Log Out"
+    },
+    "deleteAccountModal": {
+      "deleteAccount": "Delete Account",
+      "enterPassword": "Enter password",
+      "confirmPassword": "Confirm password",
+      "confirm": "Confirm",
+      "cancel": "Cancel",
+      "modalDescription": "Please confirm your Password to delete your account.<br/>This action is irreversible.",
+      "errorMessage": {
+        "enterBothPasswords": "Please enter password in both fields",
+        "fillBothPasswords": "Please fill out both password fields",
+        "passwordsDoNotMatch": "Passwords do not match",
+        "accountDeletedSuccessfully": "Account deleted successfully",
+        "errorDeletingAccount": "Error deleting account",
+        "userNotLoggedIn": "User is not logged in",
+        "invalidPassword": "Invalid password"
+      }
+    },
+    "updateDetailsModal": {
+      "updateDetails": "Update Details",
+      "enterFirstName": "Enter New First Name",
+      "enterLastName": "Enter New Last Name",
+      "enterNewName": "Enter New First Name, Last Name",
+      "orBoth": "or Both",
+      "enterNewEmail": "Enter New Email",
+      "confirm": "Confirm",
+      "cancel": "Cancel",
+      "FirstName": "First Name:",
+      "LastName": "Last Name:",
+      "Reset": "Reset Password",
+      "errorMessage": {
+        "userNotLoggedIn": "User is not logged in",
+        "successMessage": "Details updated successfully",
+        "emailExists": "Email already exists",
+        "errorUpdatingDetails": "Error updating details",
+        "enterSomething": "Please enter something in at least one field"
+      }
+      },
+      "profilePreferencesCard": {
+        "preferences": "Preferences",
+        "deleteVideos": "Delete Videos",
+        "deleteImages": "Delete Images",
+        "deleteDocuments": "Delete Documents",
+        "deleteEmails": "Delete Emails",
+        "createdAfter": "Since Creation",
+        "weeksSinceLastEdited": "Since Last Edit"
+      },
+    "termsOfServiceModal": {
+      "viewTermsOfService": "View Terms of Service",
+      "termsOfServiceTitle": "Terms of Service"
+    }
     }
   }
-}
+

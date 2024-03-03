@@ -15,12 +15,12 @@ public class UnlinkAccountController {
     private final GoogleAuthService googleAuthService;
 
     @DeleteMapping("/unlink-drive")
-    public void unlinkOneDrive(@RequestParam("email") String email, @RequestParam("provider") String provider) {
+    public void unlinkOneDrive(@RequestParam("email") String email, @RequestParam("provider") String provider, @RequestParam("driveEmail") String driveEmail) {
 
         if (provider.equals("OneDrive")) {
-            oneDriveService.unlinkOneDrive(email);
+            oneDriveService.unlinkOneDrive(email, driveEmail);
         } else if (provider.equals("GoogleDrive")) {
-            googleAuthService.unlinkGoogleDrive(email);
+            googleAuthService.unlinkGoogleDrive(email, driveEmail);
         }
     }
 

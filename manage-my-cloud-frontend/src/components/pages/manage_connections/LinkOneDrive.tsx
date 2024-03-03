@@ -11,7 +11,7 @@ const LinkOneDrive = () => {
         params.append('response_type', 'code');
         params.append('redirect_uri', 'http://localhost:3000/manage-connections');
         params.append('response_mode', 'query');
-        params.append('scope', 'files.readwrite.all offline_access');
+        params.append('scope', 'user.read files.readwrite.all offline_access');
 
         const loginUrl = "https://login.microsoftonline.com/common/oauth2/v2.0/authorize?" + params.toString();
 
