@@ -56,7 +56,7 @@
     grid-column: 1;
     width: auto;
     height: 98%;
-    overflow-y: scroll;
+    overflow-y: auto;
     flex-wrap: wrap;
 }
 

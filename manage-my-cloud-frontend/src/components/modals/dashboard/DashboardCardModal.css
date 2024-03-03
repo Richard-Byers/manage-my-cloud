@@ -56,7 +56,8 @@
 
 .dashboard-card-modal-drive-files-container {
     display: flex;
-    width: 100%;
+    flex-direction: column;
+    width: 30em;
     height: 60vh;
     overflow: auto;
 }
@@ -66,10 +67,49 @@
     justify-items: center;
     align-items: flex-start;
     grid-template-columns: repeat(1, 1fr);
-    width: fit-content;
+    width: auto;
     height: fit-content;
     padding: 1em;
     gap: 1em;
+}
+
+.google-drive-item-type-navigation-container {
+    display: flex;
+    justify-content: center;
+    gap: 1em;
+    padding: 1em;
+    position: sticky;
+    top: 0;
+    background: white;
+    width: auto;
+}
+
+.google-drive-item-type-navigation-container button {
+    display: flex;
+    align-items: center;
+    background: none;
+    border: none;
+    font-family: MontserratRegular, serif;
+    font-size: 1rem;
+    padding: 0.3em;
+    gap: 0.2em;
+    cursor: pointer;
+    background: rgb(100, 189, 120);
+    width: 8em;
+    border-radius: 0.1em;
+    transition: 0.1s ease-in-out;
+    color: white;
+    box-shadow: 6px 9px 5px 0px rgba(0, 0, 0, 0.18);
+    -webkit-box-shadow: 6px 9px 5px 0px rgba(0, 0, 0, 0.18);
+    -moz-box-shadow: 6px 9px 5px 0px rgba(0, 0, 0, 0.18);
+}
+
+.google-drive-item-type-navigation-container button:hover {
+    transform: scale(1.1);
+}
+
+.google-drive-item-type-navigation-container button:active {
+    transform: scale(1);
 }
 
 .svg-icon {
@@ -84,7 +124,7 @@
     grid-column: 1 / span 2;
 }
 
-.dashboard-page-buttons-checkbox{
+.dashboard-page-buttons-checkbox {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -93,7 +133,7 @@
     height: 1.5rem;
 }
 
-.dashboard-page-buttons-select-all-checkbox{
+.dashboard-page-buttons-select-all-checkbox {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -102,13 +142,30 @@
 }
 
 @media only screen and (max-width: 768px) {
-    .dashboard-card-modal-drive-files-grid {
+
+    .google-drive-item-type-navigation-container {
         width: 100%;
+        padding: 0.6em
+    }
+
+    .google-drive-item-type-navigation-container button {
+        width: 44%;
+        box-shadow: none;
+        height: 5vh;
+    }
+
+    .google-drive-item-type-navigation-container button:hover {
+        transform: scale(1);
+    }
+
+    .dashboard-card-modal-drive-files-grid {
+        width: auto;
+        padding: 0;
     }
 
     .dashboard-card-modal-drive-files-container {
         display: flex;
-        justify-content: center;
+        justify-content: flex-start;
         width: 100px;
         height: 100%;
         grid-row: 2 / 2;
@@ -157,7 +214,7 @@
 
     .dashboard-card-modal-file-container span {
         display: flex;
-        width: 60%;
+        width: 80%;
     }
 
     .dashboard-page-buttons-container {

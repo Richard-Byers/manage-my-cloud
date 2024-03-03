@@ -9,7 +9,10 @@ import {AuthData} from "../../routing/AuthWrapper";
 import LoadingSpinner from "../../helpers/LoadingSpinner";
 import {useTranslation} from "react-i18next";
 import CloseIcon from "@mui/icons-material/Close";
+import ArticleIcon from '@mui/icons-material/Article';
+import EmailIcon from '@mui/icons-material/Email';
 import {DashboardCardModalEmptyFiles} from "./DashboardCardModalEmptyFiles";
+import EmailContainer from "./EmailContainer";
 
 interface DashboardCardModalProps {
     showModal: boolean;
@@ -21,12 +24,21 @@ interface DashboardCardModalProps {
     driveEmail: string;
 }
 
+interface Email {
+    emailSubject: string;
+    receivedDate: number;
+    webUrl: string;
+}
+
 interface FileNode {
     name: string;
     type: string;
     id: string;
     webUrl: string;
+    thumbnailUrl: string;
     children: FileNode[];
+    emails: Email[];
+    googlePhotos: FileNode[];
 }
 
 interface FileNodeProps {
@@ -50,14 +62,21 @@ const DashboardCardModal: React.FC<DashboardCardModalProps> = ({
     const {t} = useTranslation();
     const [driveData, setDriveData] = React.useState<FileNode>();
     const [loading, setLoading] = React.useState(false);
+    const [showEmails, setShowEmails] = React.useState(false);
+    const [showDriveData, setShowDriveData] = React.useState(true);
+    const [haveFilesBeenDeleted, setHaveFilesBeenDeleted] = React.useState(false);
 
     React.useEffect(() => {
+
         const fetchDriveData = async () => {
             const info = await getDriveItems(user, connectionProvider);
             setDriveData(info);
         };
 
-        fetchDriveData();
+        if (haveFilesBeenDeleted || !driveData) {
+            fetchDriveData();
+            setHaveFilesBeenDeleted(false);
+        }
     }, []);
 
     const FileNode: React.FC<FileNodeProps> = ({node}) => {
@@ -100,6 +119,16 @@ const DashboardCardModal: React.FC<DashboardCardModalProps> = ({
         e.stopPropagation();
     };
 
+    const handleShowDriveData = () => {
+        setShowDriveData(true);
+        setShowEmails(false);
+    }
+
+    const handleShowEmails = () => {
+        setShowDriveData(false);
+        setShowEmails(true);
+    }
+
     async function getDriveItems(user: any, connectionProvider: string): Promise<FileNode> {
 
         const headers = {
@@ -131,34 +160,57 @@ const DashboardCardModal: React.FC<DashboardCardModalProps> = ({
                         <CloseIcon className="svg_icons"/>
                     </button>
 
-                    {driveData && areAllChildrenFolders(driveData) ? <DashboardCardModalEmptyFiles/> :
+                    <div className={"dashboard-card-modal-grid"}>
+                        <div className={"dashboard-card-modal-drive-information"}>
+                            <img src={CONNECTION_LOGOS[connectionProvider]}
+                                 alt={`Logo for ${connectionProvider}`}/>
+                            <p>{t('main.dashboard.dashboardCardModal.driveInformation.accountDetails')}</p>
+                            <span>{driveEmail}</span>
+                            <span>{t('main.dashboard.dashboardCardModal.driveInformation.usedStorage')} {usedStorage > 0.0 ? usedStorage : "< 0"}/GB</span>
+                            <span>{t('main.dashboard.dashboardCardModal.driveInformation.totalStorage')} {totalStorage}/GB</span>
+                        </div>
+                        <div className={"dashboard-card-modal-drive-files-container"}>
 
-                        <div className={"dashboard-card-modal-grid"}>
-                            <div className={"dashboard-card-modal-drive-information"}>
-                                <img src={CONNECTION_LOGOS[connectionProvider]}
-                                     alt={`Logo for ${connectionProvider}`}/>
-                                <p>{t('main.dashboard.dashboardCardModal.driveInformation.accountDetails')}</p>
-                                <span>{driveEmail}</span>
-                                <span>{t('main.dashboard.dashboardCardModal.driveInformation.usedStorage')} {usedStorage > 0.0 ? usedStorage : "< 0"}/GB</span>
-                                <span>{t('main.dashboard.dashboardCardModal.driveInformation.totalStorage')} {totalStorage}/GB</span>
-                            </div>
-                            <div className={"dashboard-card-modal-drive-files-container"}>
-                                <div className={"dashboard-card-modal-drive-files-grid"}>
-                                    {driveData && driveData.children.length > 0 ?
-                                        <FileTree data={driveData}/> : "No files found"}
+                            {connectionProvider === "GoogleDrive" ?
+                                <div className={"google-drive-item-type-navigation-container"}>
+                                    <button onClick={handleShowDriveData}><ArticleIcon/>{t('main.dashboard.dashboardCardModal.driveInformation.driveFiles')}</button>
+                                    <button onClick={handleShowEmails}><EmailIcon/> Gmail</button>
                                 </div>
-                            </div>
-                            {driveData &&
-                                <div className={"dashboard-page-buttons-container"}>
-                                    <DashboardPageButtons data={driveData}
-                                                          connectionProvider={CONNECTION_TITLE[connectionProvider]}
-                                                          setSowModal={setShowModal}
-                                                          driveEmail={driveEmail}
-                                    />
+                                : null
+                            }
+
+                            {showDriveData &&
+                                <div className={"dashboard-card-modal-drive-files-grid"}>
+                                    {driveData && !areAllChildrenFolders(driveData) ?
+                                        <FileTree data={driveData}/>
+                                        : <DashboardCardModalEmptyFiles message={
+                                            t('main.dashboard.dashboardCardModal.driveInformation.noFilesFoundMessage')
+                                        }/>}
                                 </div>
                             }
+
+                            {showEmails &&
+                                <div className={"dashboard-card-modal-drive-files-grid"}>
+                                    {driveData && driveData.emails.length > 0 ?
+                                        <EmailContainer emails={driveData.emails}/> :
+                                        <DashboardCardModalEmptyFiles message={
+                                            t('main.dashboard.dashboardCardModal.driveInformation.noEmailsFoundMessage')
+                                        }/>}
+                                </div>
+                            }
+
                         </div>
-                    }
+                        {driveData &&
+                            <div className={"dashboard-page-buttons-container"}>
+                                <DashboardPageButtons data={driveData}
+                                                      connectionProvider={CONNECTION_TITLE[connectionProvider]}
+                                                      setShowModal={setShowModal}
+                                                      driveEmail={driveEmail}
+                                                      setHaveFilesBeenDeleted={setHaveFilesBeenDeleted}
+                                />
+                            </div>
+                        }
+                    </div>
                 </div>
             }
         </div>

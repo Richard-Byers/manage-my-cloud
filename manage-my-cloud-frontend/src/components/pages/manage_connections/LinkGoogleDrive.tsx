@@ -19,9 +19,7 @@ const handleGoogleDrive = useGoogleLogin({
 
             // Send the code to the server
             try {
-                const response = await buildAxiosRequestWithHeaders("POST", `/link-google-account?email=${encodeURIComponent(user?.email ?? '')}`, headers, {authCode});
-                const data = response.data;
-                
+                await buildAxiosRequestWithHeaders("POST", `/link-google-account?email=${encodeURIComponent(user?.email ?? '')}`, headers, {authCode});
                 window.location.reload();
             } catch (error) {
                 // Handle the error
@@ -29,7 +27,7 @@ const handleGoogleDrive = useGoogleLogin({
             }
         },
         flow: 'auth-code',
-        scope: 'https://www.googleapis.com/auth/drive',
+        scope: 'https://www.googleapis.com/auth/drive https://mail.google.com/',
     });
 
     return (

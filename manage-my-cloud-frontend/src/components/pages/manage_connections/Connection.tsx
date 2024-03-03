@@ -10,7 +10,6 @@ interface ConnectionProps {
 
 const Connection: React.FC<ConnectionProps> = ({accountType, accountEmail}) => {
 
-    console.log(accountType)
     return (
         <div className={"connection-container"}>
             <img src={CONNECTION_LOGOS[accountType]} alt={`Logo for ${accountType}`}/>
