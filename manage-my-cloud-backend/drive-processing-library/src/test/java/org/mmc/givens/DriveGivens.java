@@ -1,15 +1,18 @@
 package org.mmc.givens;
 
-import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.google.api.services.drive.model.About;
+import com.google.api.services.drive.model.FileList;
 import com.google.api.services.drive.model.User;
+import com.google.api.services.gmail.model.ListMessagesResponse;
+import com.google.api.services.gmail.model.Message;
 import com.google.gson.JsonObject;
 import com.microsoft.graph.models.*;
 import com.microsoft.graph.requests.DriveItemCollectionPage;
+import org.mmc.pojo.CustomEmail;
 import org.mmc.response.CustomDriveItem;
 
 import java.time.OffsetDateTime;
@@ -98,11 +101,15 @@ public class DriveGivens {
         recommendations.setType("Folder");
 
         ArrayList<CustomDriveItem> children = new ArrayList<>();
-        children.add(new CustomDriveItem("1", "name1.png", "application/png", OffsetDateTime.now(), OffsetDateTime.now(), "url", List.of(new CustomDriveItem())));
-        children.add(new CustomDriveItem("2", "name1.mp4", "mp4", OffsetDateTime.now(), OffsetDateTime.now(), "url",List.of(new CustomDriveItem())));
-        children.add(new CustomDriveItem("3", "name1.csv", "application/png", OffsetDateTime.now(), OffsetDateTime.now(), "url",List.of(new CustomDriveItem())));
-        recommendations.setChildren(Collections.synchronizedList(children));
+        ArrayList<CustomEmail> emails = new ArrayList<>();
+        children.add(new CustomDriveItem("1", "name1.png", "application/png", OffsetDateTime.now(), OffsetDateTime.now(), "url", List.of(new CustomDriveItem()), List.of(new CustomEmail())));
+        children.add(new CustomDriveItem("2", "name1.mp4", "mp4", OffsetDateTime.now(), OffsetDateTime.now(), "url", List.of(new CustomDriveItem()), List.of(new CustomEmail())));
+        children.add(new CustomDriveItem("3", "name1.csv", "application/png", OffsetDateTime.now(), OffsetDateTime.now(), "url", List.of(new CustomDriveItem()), List.of(new CustomEmail())));
 
+        emails.add(new CustomEmail("id", "url", OffsetDateTime.now(), "subject"));
+
+        recommendations.setChildren(Collections.synchronizedList(children));
+        recommendations.setEmails(Collections.synchronizedList(emails));
 
         return objectMapper.valueToTree(recommendations);
     }
@@ -113,14 +120,58 @@ public class DriveGivens {
         recommendations.setType("Folder");
 
         ArrayList<CustomDriveItem> children = new ArrayList<>();
-        children.add(new CustomDriveItem("1", "name1.png", "application/png", OffsetDateTime.now(), OffsetDateTime.now(), "url", List.of(new CustomDriveItem())));
-        children.add(new CustomDriveItem("2", "name1.mp4", "mp4", OffsetDateTime.now(), OffsetDateTime.now(), "url",List.of(new CustomDriveItem())));
-        children.add(new CustomDriveItem("3", "name1.csv", "application/png", OffsetDateTime.now(), OffsetDateTime.now(), "url",List.of(new CustomDriveItem())));
-        children.add(new CustomDriveItem("4", "name1.log", "log", OffsetDateTime.now(), OffsetDateTime.now(), "url",List.of(new CustomDriveItem())));
+        children.add(new CustomDriveItem("1", "name1.png", "application/png", OffsetDateTime.now(), OffsetDateTime.now(), "url", List.of(new CustomDriveItem()), List.of(new CustomEmail())));
+        children.add(new CustomDriveItem("2", "name1.mp4", "mp4", OffsetDateTime.now(), OffsetDateTime.now(), "url", List.of(new CustomDriveItem()), List.of(new CustomEmail())));
+        children.add(new CustomDriveItem("3", "name1.csv", "application/png", OffsetDateTime.now(), OffsetDateTime.now(), "url", List.of(new CustomDriveItem()), List.of(new CustomEmail())));
+        children.add(new CustomDriveItem("4", "name1.log", "log", OffsetDateTime.now(), OffsetDateTime.now(), "url", List.of(new CustomDriveItem()), List.of(new CustomEmail())));
         recommendations.setChildren(Collections.synchronizedList(children));
 
 
         return objectMapper.valueToTree(recommendations);
+    }
+
+    public static FileList generateGoogleDriveFiles() {
+        FileList fileList = new FileList();
+        com.google.api.services.drive.model.File file = new com.google.api.services.drive.model.File();
+        file.setId("testFileId");
+        file.setName("testFile");
+        file.setMimeType("text/plain");
+        file.setCreatedTime(new com.google.api.client.util.DateTime(System.currentTimeMillis()));
+        file.setModifiedTime(new com.google.api.client.util.DateTime(System.currentTimeMillis()));
+        file.setWebViewLink("https://testFile.com");
+        fileList.setFiles(Collections.singletonList(file));
+        fileList.setNextPageToken(null);
+
+        return fileList;
+    }
+
+    public static ListMessagesResponse generateGmailMessages() {
+        ListMessagesResponse listMessagesResponse = new ListMessagesResponse();
+        Message message = new Message();
+        message.setId("testMessageId");
+        message.setInternalDate(System.currentTimeMillis());
+        message.setPayload(new com.google.api.services.gmail.model.MessagePart()
+                .setBody(new com.google.api.services.gmail.model.MessagePartBody().setData("testData"))
+                .setHeaders(Collections.singletonList(new com.google.api.services.gmail.model.MessagePartHeader().setName("Subject").setValue("testValue"))));
+        listMessagesResponse.setMessages(Collections.singletonList(message));
+        listMessagesResponse.setNextPageToken(null);
+
+        return listMessagesResponse;
+    }
+
+    public static Message generateGmailMessage() {
+        ListMessagesResponse listMessagesResponse = new ListMessagesResponse();
+        Message message = new Message();
+        message.setId("testMessageId");
+        message.setLabelIds(Collections.singletonList("INBOX"));
+        message.setInternalDate(System.currentTimeMillis());
+        message.setPayload(new com.google.api.services.gmail.model.MessagePart()
+                .setBody(new com.google.api.services.gmail.model.MessagePartBody().setData("testData"))
+                .setHeaders(Collections.singletonList(new com.google.api.services.gmail.model.MessagePartHeader().setName("Subject").setValue("testValue"))));
+        listMessagesResponse.setMessages(Collections.singletonList(new com.google.api.services.gmail.model.Message()));
+        listMessagesResponse.setNextPageToken(null);
+
+        return message;
     }
 
 }
