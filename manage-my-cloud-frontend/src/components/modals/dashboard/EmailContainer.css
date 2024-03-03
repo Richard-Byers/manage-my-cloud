@@ -10,3 +10,10 @@
 .email-container:hover{
     background-color: #d3d3d3;
 }
+
+@media only screen and (max-width: 768px) {
+    .email-container{
+        width: 100%;
+        padding: 0.6em;
+    }
+}
