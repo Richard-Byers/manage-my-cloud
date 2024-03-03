@@ -2,6 +2,8 @@ package org.mmc;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.api.services.drive.model.About;
+import com.google.api.services.gmail.Gmail;
+import com.google.api.services.gmail.model.Message;
 import com.microsoft.graph.models.Drive;
 import com.microsoft.graph.requests.*;
 import okhttp3.Request;
@@ -18,15 +20,13 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mmc.givens.DriveGivens.*;
 import static org.mmc.givens.DriveInformationResponseGivens.*;
 import static org.mmc.givens.UserPreferencesGivens.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class DriveInformationServiceTest {
 
@@ -335,6 +335,7 @@ public class DriveInformationServiceTest {
         DriveRequestBuilder driveRequestBuilder = mock(DriveRequestBuilder.class);
         DriveItemRequestBuilder driveItemRequestBuilder = mock(DriveItemRequestBuilder.class);
         DriveItemRequest driveItemRequest = mock(DriveItemRequest.class);
+        String expectedExceptionMessage = "Error deleting OneDrive files";
 
         Date expiryDate = new Date();
         String accessToken = "testAccessToken";
@@ -346,14 +347,16 @@ public class DriveInformationServiceTest {
             when(mockGraphClient.me()).thenReturn(userRequestBuilder);
             when(userRequestBuilder.drive()).thenReturn(driveRequestBuilder);
             when(driveRequestBuilder.items(anyString())).thenReturn(driveItemRequestBuilder);
-            when(driveItemRequestBuilder.buildRequest()).thenThrow(new RuntimeException("Error deleting OneDrive files"));
+            when(driveItemRequestBuilder.buildRequest()).thenThrow(new RuntimeException(expectedExceptionMessage));
             when(driveItemRequest.delete()).thenReturn(null);
 
-            RuntimeException runtimeException = assertThrows(RuntimeException.class, () -> driveInformationService.deleteRecommendedOneDriveFiles(itemsToDelete, accessToken, expiryDate));
+            Exception exception = assertThrows(RuntimeException.class, () -> driveInformationService.deleteRecommendedOneDriveFiles(itemsToDelete, accessToken, expiryDate));
+            String actualExceptionMessage = exception.getMessage();
             //then
-            assertEquals("Error deleting OneDrive files", runtimeException.getMessage());
+            assertTrue(actualExceptionMessage.contains(expectedExceptionMessage));
         }
     }
+
     @Test
     public void mapToDriveInformationResponse_ReturnsDriveInformationResponse() {
         String displayName = "Test User";
@@ -366,6 +369,86 @@ public class DriveInformationServiceTest {
         assertEquals(email, driveInformationReponse.getEmail());
         assertEquals(total, driveInformationReponse.getTotal());
         assertEquals(used, driveInformationReponse.getUsed());
+    }
+
+    @Test
+    public void fetchAllGoogleDriveFiles_returnsDriveFiles() throws IOException {
+        //given
+        com.google.api.services.drive.Drive mockDrive = mock(com.google.api.services.drive.Drive.class);
+        Gmail mockGmail = mock(Gmail.class);
+        String accessToken = "testAccessToken";
+        String refreshToken = "testRefreshToken";
+        com.google.api.services.drive.Drive.Files files = mock(com.google.api.services.drive.Drive.Files.class);
+        com.google.api.services.drive.Drive.Files.List list = mock(com.google.api.services.drive.Drive.Files.List.class);
+        Gmail.Users users = mock(Gmail.Users.class);
+        Gmail.Users.Messages messages = mock(Gmail.Users.Messages.class);
+        Gmail.Users.Messages.List listMessages = mock(Gmail.Users.Messages.List.class);
+        Gmail.Users.Messages.Get getMessages = mock(Gmail.Users.Messages.Get.class);
+        Message message = generateGmailMessage();
+
+        try (MockedStatic<DriveAuthManager> driveAuthManagerMockedStatic = Mockito.mockStatic(DriveAuthManager.class)) {
+            //when
+            driveAuthManagerMockedStatic.when(() -> DriveAuthManager.getGoogleClient(anyString(), anyString())).thenReturn(mockDrive);
+            driveAuthManagerMockedStatic.when(() -> DriveAuthManager.getGmailClient(anyString(), anyString())).thenReturn(mockGmail);
+            when(mockDrive.files()).thenReturn(files);
+            when(files.list()).thenReturn(list);
+            when(list.setFields(anyString())).thenReturn(list);
+            when(list.setQ(anyString())).thenReturn(list);
+            when(list.execute()).thenReturn(generateGoogleDriveFiles());
+
+            when(mockGmail.users()).thenReturn(users);
+            when(users.messages()).thenReturn(messages);
+            when(messages.list(anyString())).thenReturn(listMessages);
+            when(listMessages.setQ(anyString())).thenReturn(listMessages);
+            when(listMessages.execute()).thenReturn(generateGmailMessages());
+
+            when(mockGmail.users()).thenReturn(users);
+            when(users.messages()).thenReturn(messages);
+            when(messages.get(anyString(), anyString())).thenReturn(getMessages);
+            when(getMessages.execute()).thenReturn(message);
+
+            JsonNode driveFiles = driveInformationService.fetchAllGoogleDriveFiles(refreshToken, accessToken);
+
+            //then
+            assertEquals(1, driveFiles.get("children").size());
+            assertEquals("testFileId", driveFiles.get("children").get(0).get("id").asText());
+            assertEquals(1, driveFiles.get("emails").size());
+            assertEquals("testMessageId", driveFiles.get("emails").get(0).get("id").asText());
+        }
+    }
+
+    @Test
+    public void deleteRecommendedGoogleDriveFiles_returnsFilesDeletedResponse() throws IOException {
+        //given
+        com.google.api.services.drive.Drive mockDrive = mock(com.google.api.services.drive.Drive.class);
+        Gmail mockGmail = mock(Gmail.class);
+        String accessToken = "testAccessToken";
+        String refreshToken = "testRefreshToken";
+        JsonNode itemsToDelete = generateItemsToDelete();
+        com.google.api.services.drive.Drive.Files files = mock(com.google.api.services.drive.Drive.Files.class);
+        Gmail.Users users = mock(Gmail.Users.class);
+        Gmail.Users.Messages messages = mock(Gmail.Users.Messages.class);
+        com.google.api.services.drive.Drive.Files.Delete delete = mock(com.google.api.services.drive.Drive.Files.Delete.class);
+        Gmail.Users.Messages.Delete deleteMessage = mock(Gmail.Users.Messages.Delete.class);
+
+        try (MockedStatic<DriveAuthManager> driveAuthManagerMockedStatic = Mockito.mockStatic(DriveAuthManager.class)) {
+            //when
+            driveAuthManagerMockedStatic.when(() -> DriveAuthManager.getGoogleClient(anyString(), anyString())).thenReturn(mockDrive);
+            driveAuthManagerMockedStatic.when(() -> DriveAuthManager.getGmailClient(anyString(), anyString())).thenReturn(mockGmail);
+
+            when(mockDrive.files()).thenReturn(files);
+            when(files.delete(anyString())).thenReturn(delete);
+
+            when(mockGmail.users()).thenReturn(users);
+            when(users.messages()).thenReturn(messages);
+            when(messages.delete(anyString(), anyString())).thenReturn(deleteMessage);
+
+            FilesDeletedResponse filesDeletedResponse = driveInformationService.deleteRecommendedGoogleDriveFiles(itemsToDelete, refreshToken, accessToken);
+
+            //then
+            assertEquals(3, filesDeletedResponse.getFilesDeleted());
+            assertEquals(1, filesDeletedResponse.getEmailsDeleted());
+        }
     }
 
 }

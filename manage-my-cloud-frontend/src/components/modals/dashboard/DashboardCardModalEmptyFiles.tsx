@@ -1,8 +1,13 @@
+import React from "react";
 
-export const DashboardCardModalEmptyFiles = () => {
+interface DashboardCardModalEmptyFilesProps {
+    message: string;
+}
+
+export const DashboardCardModalEmptyFiles: React.FC<DashboardCardModalEmptyFilesProps> = ({message}) => {
     return(
         <div>
-            <p>No files found in your drive</p>
+            <p>{message}</p>
         </div>
     );
 }

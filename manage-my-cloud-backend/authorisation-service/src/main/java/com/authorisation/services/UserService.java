@@ -28,6 +28,7 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -83,7 +84,6 @@ public class UserService implements IUserService {
         newUser.setRole("USER");
         newUser.setEnabled(true);
         newUser.setAccountType("GOOGLE");
-        newUser.setLinkedAccounts(new LinkedAccounts());
         newUser.setLinkedAccounts(new LinkedAccounts());
         userEntityRepository.save(newUser);
 
@@ -237,20 +237,15 @@ public class UserService implements IUserService {
             // Delete the RecommendationSettings associated with the user
             recommendationSettingsRepository.deleteByUserEntityEmail(user.getEmail());
 
-            // Check if the user has a OneDrive account linked and delete it if it exists
-            CloudPlatform oneDriveAccount = cloudPlatformRepository.findByUserEntityEmailAndPlatformName(user.getEmail(), "OneDrive");
-            if (oneDriveAccount != null) {
+            List<CloudPlatform> cloudAccounts = cloudPlatformRepository.findAllByUserEntityEmail(user.getEmail());
+            if (cloudAccounts != null) {
                 try {
-                    cloudPlatformRepository.deleteByUserEntityEmailAndPlatformName(user.getEmail(), "OneDrive");
+                    cloudPlatformRepository.deleteAll(cloudAccounts);
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    throw new RuntimeException("Error deleting cloud accounts");
                 }
             }
-            // Check if the user has a GoogleDrive account linked and delete it if it exists
-            CloudPlatform googleDriveAccount = cloudPlatformRepository.findByUserEntityEmailAndPlatformName(user.getEmail(), "GoogleDrive");
-            if (googleDriveAccount != null) {
-                cloudPlatformRepository.deleteByUserEntityEmailAndPlatformName(user.getEmail(), "GoogleDrive");
-            }
+
             userEntityRepository.delete(user);
         } else {
             throw new RuntimeException("Password doesn't match");

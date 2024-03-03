@@ -32,4 +32,6 @@ public class RecommendationSettings {
     private int deleteItemsCreatedAfterDays = 7;
 
     private int deleteItemsNotChangedSinceDays = 7;
+
+    private int deleteEmailsAfterDays = 7;
 }
