@@ -10,7 +10,10 @@ import LoadingSpinner from "../../helpers/LoadingSpinner";
 import { useTranslation } from "react-i18next";
 import { PieChart, Pie, Cell, Tooltip, TooltipProps } from "recharts";
 import CloseIcon from "@mui/icons-material/Close";
+import ArticleIcon from '@mui/icons-material/Article';
+import EmailIcon from '@mui/icons-material/Email';
 import {DashboardCardModalEmptyFiles} from "./DashboardCardModalEmptyFiles";
+import EmailContainer from "./EmailContainer";
 
 interface DashboardCardModalProps {
     showModal: boolean;
@@ -22,12 +25,21 @@ interface DashboardCardModalProps {
     driveEmail: string;
 }
 
+interface Email {
+    emailSubject: string;
+    receivedDate: number;
+    webUrl: string;
+}
+
 interface FileNode {
     name: string;
     type: string;
     id: string;
     webUrl: string;
+    thumbnailUrl: string;
     children: FileNode[];
+    emails: Email[];
+    googlePhotos: FileNode[];
 }
 
 interface FileNodeProps {
@@ -52,6 +64,9 @@ const DashboardCardModal: React.FC<DashboardCardModalProps> = ({
     const [driveData, setDriveData] = React.useState<FileNode>();
     const [pieChartData, setPieChartData] = React.useState<{ name: string; value: number; }[]>([]);
     const [loading, setLoading] = React.useState(false);
+    const [showEmails, setShowEmails] = React.useState(false);
+    const [showDriveData, setShowDriveData] = React.useState(true);
+    const [haveFilesBeenDeleted, setHaveFilesBeenDeleted] = React.useState(false);
     const COLOURS = ["blue", "brown", "red", "orange", "purple", "green"];
 
     let categories = {
@@ -84,6 +99,7 @@ const DashboardCardModal: React.FC<DashboardCardModalProps> = ({
     };
 
     React.useEffect(() => {
+
         const fetchDriveData = async () => {
             const info = await getDriveItems(user, connectionProvider);
             setDriveData(info);
@@ -132,7 +148,10 @@ const DashboardCardModal: React.FC<DashboardCardModalProps> = ({
             setPieChartData(pieChartData);
         };
 
-        fetchDriveData();
+        if (haveFilesBeenDeleted || !driveData) {
+            fetchDriveData();
+            setHaveFilesBeenDeleted(false);
+        }
     }, []);
 
     const FileNode: React.FC<FileNodeProps> = ({node}) => {
@@ -175,6 +194,16 @@ const DashboardCardModal: React.FC<DashboardCardModalProps> = ({
         e.stopPropagation();
     };
 
+    const handleShowDriveData = () => {
+        setShowDriveData(true);
+        setShowEmails(false);
+    }
+
+    const handleShowEmails = () => {
+        setShowDriveData(false);
+        setShowEmails(true);
+    }
+
     async function getDriveItems(user: any, connectionProvider: string): Promise<FileNode> {
 
         const headers = {
@@ -206,51 +235,74 @@ const DashboardCardModal: React.FC<DashboardCardModalProps> = ({
                         <CloseIcon className="svg_icons"/>
                     </button>
 
-                    {driveData && areAllChildrenFolders(driveData) ? <DashboardCardModalEmptyFiles/> :
+                    <div className={"dashboard-card-modal-grid"}>
+                        <div className={"dashboard-card-modal-drive-information"}>
+                            <img src={CONNECTION_LOGOS[connectionProvider]}
+                                 alt={`Logo for ${connectionProvider}`}/>
+                            <p>{t('main.dashboard.dashboardCardModal.driveInformation.accountDetails')}</p>
+                            <span>{driveEmail}</span>
+                            <span>{t('main.dashboard.dashboardCardModal.driveInformation.usedStorage')} {usedStorage > 0.0 ? usedStorage : "< 0"}/GB</span>
+                            <span>{t('main.dashboard.dashboardCardModal.driveInformation.totalStorage')} {totalStorage}/GB</span>
+                            <PieChart className="dashboard-card-modal-pie-chart" width={200} height={200}>
+                                <Pie
+                                    data={pieChartData}
+                                    cx="50%"
+                                    cy="50%"
+                                    labelLine={false}
+                                    outerRadius={80}
+                                    fill="#8884d8"
+                                    dataKey="value"
+                                    isAnimationActive={false}
+                                >
+                                    {pieChartData.map((entry, index) => (
+                                        <Cell key={`cell-${index}`} fill={COLOURS[index % COLOURS.length]} />
+                                    ))}
+                                </Pie>
+                                <Tooltip content={<CustomTooltip />} />
+                            </PieChart>
+                        </div>
+                        <div className={"dashboard-card-modal-drive-files-container"}>
 
-                        <div className={"dashboard-card-modal-grid"}>
-                            <div className={"dashboard-card-modal-drive-information"}>
-                                <img src={CONNECTION_LOGOS[connectionProvider]}
-                                     alt={`Logo for ${connectionProvider}`}/>
-                                <p>{t('main.dashboard.dashboardCardModal.driveInformation.accountDetails')}</p>
-                                <span>{driveEmail}</span>
-                                <span>{t('main.dashboard.dashboardCardModal.driveInformation.usedStorage')} {usedStorage > 0.0 ? usedStorage : "< 0"}/GB</span>
-                                <span>{t('main.dashboard.dashboardCardModal.driveInformation.totalStorage')} {totalStorage}/GB</span>
-                                <PieChart className="dashboard-card-modal-pie-chart" width={200} height={200}>
-                                    <Pie
-                                        data={pieChartData}
-                                        cx="50%"
-                                        cy="50%"
-                                        labelLine={false}
-                                        outerRadius={80}
-                                        fill="#8884d8"
-                                        dataKey="value"
-                                        isAnimationActive={false}
-                                    >
-                                        {pieChartData.map((entry, index) => (
-                                            <Cell key={`cell-${index}`} fill={COLOURS[index % COLOURS.length]} />
-                                        ))}
-                                    </Pie>
-                                    <Tooltip content={<CustomTooltip />} />
-                                </PieChart>
-                            </div>
-                            <div className={"dashboard-card-modal-drive-files-container"}>
-                                <div className={"dashboard-card-modal-drive-files-grid"}>
-                                    {driveData && driveData.children.length > 0 ?
-                                        <FileTree data={driveData}/> : "No files found"}
+                            {connectionProvider === "GoogleDrive" ?
+                                <div className={"google-drive-item-type-navigation-container"}>
+                                    <button onClick={handleShowDriveData}><ArticleIcon/>{t('main.dashboard.dashboardCardModal.driveInformation.driveFiles')}</button>
+                                    <button onClick={handleShowEmails}><EmailIcon/> Gmail</button>
                                 </div>
-                            </div>
-                            {driveData &&
-                                <div className={"dashboard-page-buttons-container"}>
-                                    <DashboardPageButtons data={driveData}
-                                                          connectionProvider={CONNECTION_TITLE[connectionProvider]}
-                                                          setSowModal={setShowModal}
-                                                          driveEmail={driveEmail}
-                                    />
+                                : null
+                            }
+
+                            {showDriveData &&
+                                <div className={"dashboard-card-modal-drive-files-grid"}>
+                                    {driveData && !areAllChildrenFolders(driveData) ?
+                                        <FileTree data={driveData}/>
+                                        : <DashboardCardModalEmptyFiles message={
+                                            t('main.dashboard.dashboardCardModal.driveInformation.noFilesFoundMessage')
+                                        }/>}
                                 </div>
                             }
+
+                            {showEmails &&
+                                <div className={"dashboard-card-modal-drive-files-grid"}>
+                                    {driveData && driveData.emails.length > 0 ?
+                                        <EmailContainer emails={driveData.emails}/> :
+                                        <DashboardCardModalEmptyFiles message={
+                                            t('main.dashboard.dashboardCardModal.driveInformation.noEmailsFoundMessage')
+                                        }/>}
+                                </div>
+                            }
+
                         </div>
-                    }
+                        {driveData &&
+                            <div className={"dashboard-page-buttons-container"}>
+                                <DashboardPageButtons data={driveData}
+                                                      connectionProvider={CONNECTION_TITLE[connectionProvider]}
+                                                      setShowModal={setShowModal}
+                                                      driveEmail={driveEmail}
+                                                      setHaveFilesBeenDeleted={setHaveFilesBeenDeleted}
+                                />
+                            </div>
+                        }
+                    </div>
                 </div>
             }
         </div>

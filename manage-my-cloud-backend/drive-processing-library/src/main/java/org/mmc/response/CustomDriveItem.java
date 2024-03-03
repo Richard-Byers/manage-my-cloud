@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.mmc.pojo.CustomEmail;
 
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -20,4 +21,5 @@ public class CustomDriveItem {
     private OffsetDateTime lastModifiedDateTime;
     private String webUrl;
     private List<CustomDriveItem> children;
+    private List<CustomEmail> emails;
 }

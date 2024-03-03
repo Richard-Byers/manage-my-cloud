@@ -9,7 +9,10 @@
         "driveInformation": {
           "accountDetails": "Account Details",
           "usedStorage": "Used Storage",
-          "totalStorage": "Total Storage"
+          "totalStorage": "Total Storage",
+          "driveFiles": "Drive Files",
+          "noEmailsFoundMessage": "No emails found",
+          "noFilesFoundMessage": "No files found"
         }
       },
       "connectedDrivesCard": {
@@ -22,11 +25,14 @@
       "deletionModals": {
         "deleteRecommended": {
           "title": "File(s) have been recommended for deletion",
+          "titleEmail": "Email(s) have been recommended for deletion",
           "mainText": "Select the file(s) you would like to delete and click delete.",
+          "mainTextEmail": "Select the emails(s) you would like to delete and click delete.",
           "noFiles": "You do not have any files that have been recommended for deletion.",
           "deleteButton": "Delete",
           "closeRecommendation": "Done",
-          "closeRecommendationTryAgain": "Try Again"
+          "closeRecommendationTryAgain": "Try Again",
+          "selectAll": "Select All"
         }
       }
     },
@@ -131,20 +137,30 @@
         "errorUpdatingDetails": "Error updating details",
         "enterSomething": "Please enter something in at least one field"
       }
-      },
-      "profilePreferencesCard": {
-        "preferences": "Preferences",
-        "deleteVideos": "Delete Videos",
-        "deleteImages": "Delete Images",
-        "deleteDocuments": "Delete Documents",
-        "deleteEmails": "Delete Emails",
-        "createdAfter": "Since Creation",
-        "weeksSinceLastEdited": "Since Last Edit"
-      },
+    },
+    "profilePreferencesCard": {
+      "preferences": "Preferences",
+      "deleteVideos": "Delete Videos",
+      "deleteImages": "Delete Images",
+      "deleteDocuments": "Delete Documents",
+      "deleteEmails": "Delete Emails",
+      "deleteEmailsAfter": "Delete Emails Older Than",
+      "createdAfter": "Recommend Items Created After",
+      "weeksSinceLastEdited": "Recommend Items Not Edited Since"
+    },
     "termsOfServiceModal": {
       "viewTermsOfService": "View Terms of Service",
       "termsOfServiceTitle": "Terms of Service"
     }
+  },
+  "helpers": {
+    "nothingFound": {
+      "caughtUpOne": "All caught up with",
+      "caughtUpTwo": "Nothing to recommend"
+    },
+    "emailContainer": {
+      "noSubject": "No Subject"
     }
   }
+}
 

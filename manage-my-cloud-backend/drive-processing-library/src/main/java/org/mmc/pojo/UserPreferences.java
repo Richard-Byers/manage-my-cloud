@@ -15,5 +15,5 @@ public class UserPreferences {
     boolean deleteEmails;
     private int deleteItemsCreatedAfterDays;
     private int deleteItemsNotChangedSinceDays;
-
+    private int deleteEmailsAfterDays;
 }

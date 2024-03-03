@@ -11,4 +11,5 @@ import lombok.Setter;
 @NoArgsConstructor
 public class FilesDeletedResponse {
     private int filesDeleted;
+    private int emailsDeleted;
 }
