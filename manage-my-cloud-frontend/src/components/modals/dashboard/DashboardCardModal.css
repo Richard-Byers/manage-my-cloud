@@ -226,6 +226,10 @@
         height: 3em;
         padding-bottom: 0.2em;
     }
+
+    .dashboard-card-modal-pie-chart {
+        display: none;
+    }
 }
 
 @media only screen and (max-width: 400px) {
@@ -234,5 +238,9 @@
         grid-template-columns: 100%;
         grid-template-rows: 25vh 40vh auto;
         overflow-y: auto;
+    }
+
+    .dashboard-card-modal-pie-chart {
+        display: none;
     }
 }
