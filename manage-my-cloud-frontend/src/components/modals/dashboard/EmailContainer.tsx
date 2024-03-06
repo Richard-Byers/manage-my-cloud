@@ -44,8 +44,8 @@ const EmailContainer: React.FC<EmailContainerProps> = (emails) => {
                             <span>{t("helpers.emailContainer.noSubject")}</span>
                             :
                             <span>
-                                {email.emailSubject.length < 45 ? email.emailSubject :
-                                    `${email.emailSubject.substring(0, 45)}...`
+                                {email.emailSubject.length <= 30 ? email.emailSubject :
+                                    `${email.emailSubject.substring(0, 35)}...`
                                 }
                             </span>
                         }

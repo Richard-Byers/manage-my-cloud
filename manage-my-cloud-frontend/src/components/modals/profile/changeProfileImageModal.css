@@ -8,6 +8,15 @@
     margin-bottom: 20px;
 }
 
+.profile-modal-form {
+    display: flex;
+    flex-direction: column;
+}
+
+.profile-modal-form span {
+    border: none;
+}
+
 .profile-modal-form-submit-button {
     padding: 10px 20px;
     border: none;
@@ -27,7 +36,22 @@
     color: green;
     font-weight: bold;
 }
+
 .error-message {
     color: red;
     font-weight: bold;
+}
+
+@media only screen and (max-width: 768px) {
+
+    .profile-modal-form {
+        width: 100%;
+    }
+
+    .profile-modal-form-input {
+        display: flex;
+        padding: 0.6em 0 0.6em 0;
+        width: 100%;
+        margin-bottom: 1em;
+    }
 }

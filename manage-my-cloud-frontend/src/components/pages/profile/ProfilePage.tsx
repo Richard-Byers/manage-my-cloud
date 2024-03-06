@@ -24,7 +24,7 @@ const ProfilePage = () => {
             <div className={"profile-page-content-grid"}>
                 <div className={"main-card-container"}>
                     <div className={"profile-page-navigation-bar"}>
-                        <button onClick={() => handleCardChange('userProfile')}>User Profile</button>
+                        <button onClick={() => handleCardChange('userProfile')}>Profile</button>
                         <button onClick={() => handleCardChange('profilePreferences')}>Preferences</button>
                         <button onClick={() => handleCardChange('profileActions')}>Advanced</button>
                     </div>

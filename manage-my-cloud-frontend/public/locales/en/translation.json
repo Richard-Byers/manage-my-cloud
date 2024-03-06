@@ -140,13 +140,16 @@
     },
     "profilePreferencesCard": {
       "preferences": "Preferences",
-      "deleteVideos": "Delete Videos",
-      "deleteImages": "Delete Images",
-      "deleteDocuments": "Delete Documents",
-      "deleteEmails": "Delete Emails",
-      "deleteEmailsAfter": "Delete Emails Older Than",
+      "deleteVideos": "Recommend and Delete Videos",
+      "deleteImages": "Recommend and Delete Images",
+      "deleteDocuments": "Recommend and Delete Documents",
+      "deleteEmails": "Recommend and Delete Emails",
+      "deleteEmailsAfter": "Recommend Emails Older Than",
       "createdAfter": "Recommend Items Created After",
-      "weeksSinceLastEdited": "Recommend Items Not Edited Since"
+      "weeksSinceLastEdited": "Recommend Items Not Edited Since",
+      "updatePreferences": "Update Preferences",
+      "drivePreferences": "Drive Preferences",
+      "emailPreferences": "Email Preferences"
     },
     "termsOfServiceModal": {
       "viewTermsOfService": "View Terms of Service",

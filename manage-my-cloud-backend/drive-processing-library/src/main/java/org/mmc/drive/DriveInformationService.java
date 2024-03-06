@@ -326,6 +326,8 @@ public class DriveInformationService implements IDriveInformationService {
 
     private List<CustomEmail> performFetchAllGoogleEmails(Gmail service) throws IOException {
         ListMessagesResponse response = service.users().messages().list("me").setQ("in:inbox AND is:read OR in:spam").execute();
+        // Limit amount of emails returned for performance reasons, could make this coonfigurable
+        int emailPagesRetrieved = 0;
 
         List<CustomEmail> emails = new ArrayList<>();
         while (response.getMessages() != null) {
@@ -347,7 +349,9 @@ public class DriveInformationService implements IDriveInformationService {
                     throw new RuntimeException(e);
                 }
             });
-            if (response.getNextPageToken() != null) {
+            //Limit the amount of emails retrieved to 500 for performance reasons
+            if (response.getNextPageToken() != null && emailPagesRetrieved < 4) {
+                emailPagesRetrieved++;
                 String pageToken = response.getNextPageToken();
                 response = service.users().messages().list("me").setQ("in:inbox OR in:spam is:read").setPageToken(pageToken).execute();
             } else {
