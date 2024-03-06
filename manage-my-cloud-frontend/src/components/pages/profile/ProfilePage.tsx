@@ -24,9 +24,9 @@ const ProfilePage = () => {
             <div className={"profile-page-content-grid"}>
                 <div className={"main-card-container"}>
                     <div className={"profile-page-navigation-bar"}>
-                        <button onClick={() => handleCardChange('userProfile')}>Profile</button>
-                        <button onClick={() => handleCardChange('profilePreferences')}>Preferences</button>
-                        <button onClick={() => handleCardChange('profileActions')}>Advanced</button>
+                        <button onClick={() => handleCardChange('userProfile')}>{t("main.profile.profileButton")}</button>
+                        <button onClick={() => handleCardChange('profilePreferences')}>{t("main.profile.preferencesButton")}</button>
+                        <button onClick={() => handleCardChange('profileActions')}>{t("main.profile.profileActionsButton")}</button>
                     </div>
                     {activeCard === 'userProfile' &&
                         <UserProfileCard/>

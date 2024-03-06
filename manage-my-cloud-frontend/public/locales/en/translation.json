@@ -70,7 +70,10 @@
       "linkButton": "To link an account press the button below"
     },
     "profile": {
-      "title": "Profile"
+      "title": "Profile",
+      "profileButton": "Profile",
+      "preferencesButton": "Preferences",
+      "profileActionsButton": "Advanced"
     },
     "userProfileCard": {
       "firstName": "First Name",
