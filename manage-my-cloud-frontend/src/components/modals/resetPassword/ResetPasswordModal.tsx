@@ -95,9 +95,10 @@ export const ResetPasswordModal: React.FC<ForgotPasswordModalProps> = ({
     return (
         <>
             <div className="modal-overlay" onClick={closeForgotPassword}>
-                <div className="modal" onClick={stopPropagation}>
+                <div className="modal" id={"reset-password-modal"} onClick={stopPropagation}>
 
-                    <button className={"modal-close-button"} onClick={closeForgotPassword}><CloseIcon className={"svg_icons"}/></button>
+                    <button className={"modal-close-button"} onClick={closeForgotPassword}><CloseIcon
+                        className={"svg_icons"}/></button>
 
                     <div className={"forgot-password-modal-logo"}>
                         <img src={logo} alt={"Manage My Cloud Logo"}/>
@@ -114,13 +115,14 @@ export const ResetPasswordModal: React.FC<ForgotPasswordModalProps> = ({
                             {t("main.landingPage.resetPasswordModal.mainTextTwo")}
                         </div>
 
-                        <form className={"modal-form"}>
+                        <form className={"modal-form"} id={"reset-password-modal-form"}>
                             <label className={"modal-form-label"}>
                                 <input className={"modal-form-input"}
                                        type="email"
                                        placeholder={"Enter your email Address"}
                                        onClick={stopPropagation}
-                                       onChange={handleEmailChange}/>
+                                       onChange={handleEmailChange}
+                                       id={"reset-password-email-input"}/>
                                 <EmailIcon/>
                             </label>
                             <label className={"modal-form-label"}>
@@ -128,7 +130,8 @@ export const ResetPasswordModal: React.FC<ForgotPasswordModalProps> = ({
                                        type="password"
                                        placeholder={"Enter your new password"}
                                        onClick={stopPropagation}
-                                       onChange={handlePasswordChange}/>
+                                       onChange={handlePasswordChange}
+                                       id={"reset-password-password-input"}/>
                                 <LockIcon/>
                             </label>
                             <label className={"modal-form-label"}>
@@ -136,7 +139,8 @@ export const ResetPasswordModal: React.FC<ForgotPasswordModalProps> = ({
                                        type="password"
                                        placeholder={"Confirm your new password"}
                                        onClick={stopPropagation}
-                                       onChange={handleConfirmationPasswordChange}/>
+                                       onChange={handleConfirmationPasswordChange}
+                                       id={"reset-password-confirm-password-input"}/>
                                 <LockIcon/>
                             </label>
                             {showError.errorMessage !== null && (
@@ -153,7 +157,8 @@ export const ResetPasswordModal: React.FC<ForgotPasswordModalProps> = ({
                                 </div>
                             )}
 
-                            <button className={"modal-form-submit-button"} type="submit"
+                            <button className={"modal-form-submit-button"} id={"reset-password-modal-submit-button"}
+                                    type="submit"
                                     onClick={handleResetPasswordSubmission}>
                                 {t("main.landingPage.resetPasswordModal.resetPasswordButton")}
                             </button>
