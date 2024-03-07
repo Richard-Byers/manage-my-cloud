@@ -1,15 +1,15 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import './ProfileActions.css';
 import './Card.css';
-import { useTranslation } from 'react-i18next';
+import {useTranslation} from 'react-i18next';
 import DeleteAccountModal from "../../../modals/profile/DeleteAccountModal";
-import {buildAxiosRequest, buildAxiosRequestWithHeaders} from "../../../helpers/AxiosHelper";
-import { AuthData } from '../../../routing/AuthWrapper';
+import {buildAxiosRequestWithHeaders} from "../../../helpers/AxiosHelper";
+import {AuthData} from '../../../routing/AuthWrapper';
 import TermsOfServiceModal from "../../../modals/profile/termsOfServiceModal";
 
 function ProfileActionsCard() {
-    const { t } = useTranslation();
-    const {user, logout} = AuthData();
+    const {t} = useTranslation();
+    const {user} = AuthData();
     const [showTermsOfServiceModal, setShowTermsOfServiceModal] = useState(false);
 
     const handleUserDataRequest = () => {
@@ -51,10 +51,11 @@ function ProfileActionsCard() {
 
     return (
         <div className="card-content">
-            <button className="actions-button" onClick={handleUserDataRequest}>{t('main.profileActionsCard.requestData')}</button>
-            <TermsOfServiceModal show={showTermsOfServiceModal} handleClose={handleTermsOfServiceModal} />
+            <button className="actions-button"
+                    onClick={handleUserDataRequest}>{t('main.profileActionsCard.requestData')}</button>
+            <TermsOfServiceModal show={showTermsOfServiceModal} handleClose={handleTermsOfServiceModal}/>
             <button className="actions-button">{t('main.profileActionsCard.ContactUs')}</button>
-            <DeleteAccountModal />
+            <DeleteAccountModal/>
         </div>
     );
 }
