@@ -44,6 +44,7 @@ function ProfilePreferencesCard() {
                 setDeleteDocuments(settings.deleteDocuments);
                 setDeleteEmails(settings.deleteEmails);
                 setCreatedAfter(mapDaysToWeeks(settings.deleteItemsCreatedAfterDays));
+                setDeleteEmailsOlderThan(mapDaysToWeeks(settings.deleteEmailsAfterDays));
                 setLastEdited(mapDaysToWeeks(settings.deleteItemsNotChangedSinceDays));
             })
             .catch((error: any) => {
@@ -128,6 +129,11 @@ function ProfilePreferencesCard() {
 
     return (
         <div className="card-content">
+
+            <span className={"preference-section-span"}>
+                {t('main.profilePreferencesCard.drivePreferences')}
+            </span>
+
             <div className="toggle-container">
                 <label>{t('main.profilePreferencesCard.deleteVideos')}:</label>
                 <ToggleSwitch value={deleteVideos}
@@ -144,24 +150,6 @@ function ProfilePreferencesCard() {
                               onChange={(newValue: boolean) => handleToggleChange('deleteDocuments', newValue)}></ToggleSwitch>
             </div>
             <div className="toggle-container">
-                <label>{t('main.profilePreferencesCard.deleteEmails')}:</label>
-                <ToggleSwitch value={deleteEmails}
-                              onChange={(newValue: boolean) => handleToggleChange('deleteEmails', newValue)}/>
-            </div>
-            <div className="toggle-container">
-                <label>{t('main.profilePreferencesCard.deleteEmailsAfter')}:</label>
-                <Select
-                    options={weekOptions}
-                    value={weekOptions.find(option => option.value === deleteEmailsOlderThan)}
-                    onChange={(selectedOption) => selectedOption && setDeleteEmailsOlderThan(selectedOption.value)}
-                    menuPortalTarget={document.body}
-                    styles={{
-                        menuPortal: base => ({...base, zIndex: 9999}),
-                        menu: provided => ({...provided, maxHeight: 200, overflow: 'auto'})
-                    }}
-                />
-            </div>
-            <div className="toggle-container">
                 <label>{t('main.profilePreferencesCard.createdAfter')}:</label>
                 <Select
                     options={weekOptions}
@@ -170,8 +158,10 @@ function ProfilePreferencesCard() {
                     menuPortalTarget={document.body}
                     styles={{
                         menuPortal: base => ({...base, zIndex: 9999}),
-                        menu: provided => ({...provided, maxHeight: 200, overflow: 'auto'})
+                        menu: provided => ({...provided, maxHeight: 200, overflow: 'auto'}),
+                        control: (baseStyles) => ({...baseStyles, width: '150px'}),
                     }}
+                    isDisabled={!deleteVideos && !deleteImages && !deleteDocuments}
                 />
             </div>
             <div className="toggle-container">
@@ -183,12 +173,41 @@ function ProfilePreferencesCard() {
                     menuPortalTarget={document.body}
                     styles={{
                         menuPortal: base => ({...base, zIndex: 9999}),
-                        menu: provided => ({...provided, maxHeight: 200, overflow: 'auto'})
+                        menu: provided => ({...provided, maxHeight: 200, overflow: 'auto'}),
+                        control: (baseStyles) => ({...baseStyles, width: '150px'}),
                     }}
+                    isDisabled={!deleteVideos && !deleteImages && !deleteDocuments}
                 />
             </div>
+
+            <span className={"preference-section-span"}>
+                {t('main.profilePreferencesCard.emailPreferences')}
+            </span>
+
+            <div className="toggle-container">
+                <label>{t('main.profilePreferencesCard.deleteEmails')}:</label>
+                <ToggleSwitch value={deleteEmails}
+                              onChange={(newValue: boolean) => handleToggleChange('deleteEmails', newValue)}/>
+            </div>
+
+            <div className="toggle-container">
+                <label>{t('main.profilePreferencesCard.deleteEmailsAfter')}:</label>
+                <Select
+                    options={weekOptions}
+                    value={weekOptions.find(option => option.value === deleteEmailsOlderThan)}
+                    onChange={(selectedOption) => selectedOption && setDeleteEmailsOlderThan(selectedOption.value)}
+                    menuPortalTarget={document.body}
+                    styles={{
+                        menuPortal: base => ({...base, zIndex: 9999}),
+                        menu: provided => ({...provided, maxHeight: 200, overflow: 'auto'}),
+                        control: (baseStyles) => ({...baseStyles, width: 150}),
+                    }}
+                    isDisabled={!deleteEmails}
+                />
+            </div>
+
             <div className="button-container">
-                <button onClick={updatePreferences}>Update Preferences</button>
+                <button onClick={updatePreferences}>{t('main.profilePreferencesCard.updatePreferences')}</button>
             </div>
         </div>
     );

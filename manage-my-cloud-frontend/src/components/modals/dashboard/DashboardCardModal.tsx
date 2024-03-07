@@ -243,7 +243,7 @@ const DashboardCardModal: React.FC<DashboardCardModalProps> = ({
                             <span>{driveEmail}</span>
                             <span>{t('main.dashboard.dashboardCardModal.driveInformation.usedStorage')} {usedStorage > 0.0 ? usedStorage : "< 0"}/GB</span>
                             <span>{t('main.dashboard.dashboardCardModal.driveInformation.totalStorage')} {totalStorage}/GB</span>
-                            {!showEmails && (
+                            {!showEmails && driveData && !areAllChildrenFolders(driveData) ?  (
                             <PieChart className="dashboard-card-modal-pie-chart" width={200} height={200}>
                                 <Pie
                                     data={pieChartData}
@@ -261,7 +261,7 @@ const DashboardCardModal: React.FC<DashboardCardModalProps> = ({
                                 </Pie>
                                 <Tooltip content={<CustomTooltip />} />
                             </PieChart>
-                            )}
+                            ): null}
                         </div>
                         <div className={"dashboard-card-modal-drive-files-container"}>
 

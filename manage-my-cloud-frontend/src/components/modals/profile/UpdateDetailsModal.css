@@ -19,5 +19,13 @@
     color: #FFF; /* Set the font color to white when hovered */
 }
 
+@media only screen and (max-width: 768px) {
+
+    .modal-update-details-button{
+        width: 100%;
+    }
+
+}
+
 
 

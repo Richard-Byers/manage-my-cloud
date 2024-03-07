@@ -1,16 +1,17 @@
 import React, {useState} from "react";
 import "./changeProfileImageModal.css";
-import { useTranslation } from 'react-i18next';
+import {useTranslation} from 'react-i18next';
 import Spinner from 'react-spinner-material';
 import {buildAxiosRequestWithHeaders} from "../../helpers/AxiosHelper";
 import {AuthData} from "../../routing/AuthWrapper";
 import "../Modal.css";
+import CloseIcon from "@mui/icons-material/Close";
 
 interface ChangeProfileImageModalProps {
     setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const ChangeProfileImageModal: React.FC<ChangeProfileImageModalProps> = ({ setIsModalOpen }) => {
+const ChangeProfileImageModal: React.FC<ChangeProfileImageModalProps> = ({setIsModalOpen}) => {
     const [imageInput, setImageInput] = useState<{ image: File | null }>({
         image: null,
 
@@ -20,16 +21,16 @@ const ChangeProfileImageModal: React.FC<ChangeProfileImageModalProps> = ({ setIs
 
     const {user, refreshUser} = AuthData();
     const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setMessage("")
         const image = event.target.files ? event.target.files[0] : null;
         setImageInput((prevState) => ({...prevState, image}));
-
     };
 
     const [message, setMessage] = useState("");
     const headers = {
         Authorization: `Bearer ${user?.token}`
     }
-    const { t } = useTranslation();
+    const {t} = useTranslation();
     const handleImageUpload = (e: React.FormEvent) => {
         e.preventDefault();
         const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB
@@ -82,15 +83,16 @@ const ChangeProfileImageModal: React.FC<ChangeProfileImageModalProps> = ({ setIs
         <>
             <div className="modal-overlay" onClick={closeModal}>
                 <div className="modal" onClick={stopPropagation}>
+                    <button className={"modal-close-button"} onClick={closeModal}>
+                        <CloseIcon className="svg_icons"/>
+                    </button>
                     <form className={"profile-modal-form"} onSubmit={handleImageUpload}>
-                        <div className={"profile-modal-description"}>
-                            {isLoading ? t('main.changeProfileImage.uploading') :
-                                <span
-                                    className={message === t('main.changeProfileImage.success') ? "success-message" : "error-message"}>
+                        {isLoading ? t('main.changeProfileImage.uploading') :
+                            <span
+                                className={message === t('main.changeProfileImage.success') ? "success-message" : "error-message"}>
                             {message}
                         </span>
-                            }
-                        </div>
+                        }
                         <label className={"profile-modal-form-label"}>
                             <input className={"profile-modal-form-input"}
                                    type="file"
@@ -101,7 +103,7 @@ const ChangeProfileImageModal: React.FC<ChangeProfileImageModalProps> = ({ setIs
                             {t('main.changeProfileImage.uploadImage')}
                         </button>
                     </form>
-                    {isLoading && <Spinner />} {/* Render the spinner when loading */}
+                    {isLoading && <Spinner/>} {/* Render the spinner when loading */}
                 </div>
             </div>
         </>
