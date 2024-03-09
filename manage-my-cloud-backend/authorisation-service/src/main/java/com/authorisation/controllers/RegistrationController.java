@@ -19,6 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.view.RedirectView;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Optional;
@@ -60,20 +61,20 @@ public class RegistrationController {
     }
 
     @GetMapping("verifyEmail")
-    public String verifyEmail(@RequestParam("token") String token) {
+    public RedirectView verifyEmail(@RequestParam("token") String token) {
         VerificationToken verificationToken = verificationTokenRepository.findByToken(token);
 
         if (verificationToken.getUserEntity().isEnabled()) {
-            return "this account has already been verified, please login";
+            return new RedirectView("http://localhost:3000");
         }
 
         String verificationResult = userService.validateToken(token);
 
         if (verificationResult.equals("valid")) {
-            return "Email has been verified successfully. You can now login";
+            return new RedirectView("http://localhost:3000");
         } else {
             String resendUrl = applicationUrl(request) + "/register/resendVerificationEmail?token=" + token;
-            return "The link is invalid or broken, <a href=\"" + resendUrl + "\">Click Here</a> to resend verification email";
+            return new RedirectView(resendUrl);
         }
     }
 
