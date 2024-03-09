@@ -1,4 +1,5 @@
 import logging
+import os
 import unittest
 
 from selenium import webdriver
@@ -22,6 +23,9 @@ c_handler.setFormatter(c_format)
 
 # Add handlers to the logger
 logger.addHandler(c_handler)
+
+test_suite_email = os.environ['TEST_EMAIL']
+test_email_password = os.environ['TEST_EMAIL_PASSWORD']
 
 
 class TestLandingPage(unittest.TestCase):
@@ -233,6 +237,47 @@ class TestLandingPage(unittest.TestCase):
         self.assertIsNotNone(reset_password_modal_reset_password_button_element,
                              "Reset password modal reset password button element not found")
         logger.info('Finished test: test_reset_password_displays_reset_password_modal')
+
+    def test_login_invalid_credentials_shows_error(self):
+        self.driver.find_element(By.ID, "modal-login-button").click()
+        WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.CLASS_NAME, "modal")))
+
+        self.driver.find_element(By.ID, "login-form-email").send_keys("invalidemail@gmail.com")
+        self.driver.find_element(By.ID, "login-form-password").send_keys("12345")
+
+        WebDriverWait(self.driver, 10).until(EC.text_to_be_present_in_element_value((By.ID, 'login-form-password'), ''))
+
+        self.driver.find_element(By.CLASS_NAME, "modal-form-submit-button").click()
+        WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.CLASS_NAME, "modal-form-error")))
+
+        error_message_element = self.driver.find_element(By.CLASS_NAME, "modal-form-error").text
+
+        # assertions
+        self.assertEqual("Invalid email or password", error_message_element, "Error message not found")
+
+        logger.info('Finished test: test_login_invalid_credentials_shows_error')
+
+    def test_login_valid_credentials_navigates_to_profile(self):
+        self.driver.find_element(By.ID, "modal-login-button").click()
+        WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.CLASS_NAME, "modal")))
+
+        self.driver.find_element(By.ID, "login-form-email").send_keys(test_suite_email)
+        self.driver.find_element(By.ID, "login-form-password").send_keys(test_email_password)
+
+        WebDriverWait(self.driver, 10).until(EC.text_to_be_present_in_element_value((By.ID, 'login-form-password'), ''))
+
+        self.driver.find_element(By.CLASS_NAME, "modal-form-submit-button").click()
+        WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.CLASS_NAME, "main-card-container")))
+
+        profile_card_element = self.driver.find_element(By.CLASS_NAME, "main-card-container")
+
+        # assertions
+        self.assertTrue(profile_card_element.is_displayed(),
+                        "Profile card not displayed.")
+        self.assertIsNotNone(profile_card_element,
+                             "Profile card element not found.")
+
+        logger.info('Finished test: test_login_valid_credentials_navigates_to_profile')
 
     @classmethod
     def tearDownClass(cls):

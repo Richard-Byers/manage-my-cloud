@@ -59,19 +59,19 @@ const Navbar: React.FC = () => {
                 </li>
 
                 <li>
-                    <Link to={ROUTES.DASHBOARD}>
+                    <Link to={ROUTES.DASHBOARD} id={"dashboard-nav-link-mobile"}>
                         <DashboardIcon/>
                         {t("main.navbar.dashboard")}
                     </Link>
                 </li>
                 <li>
-                    <Link to={ROUTES.MANAGE_CONNECTIONS}>
+                    <Link to={ROUTES.MANAGE_CONNECTIONS} id={"manage-connections-nav-link-mobile"}>
                         <SettingsInputComponentIcon/>
                         {t("main.navbar.manageConnections")}
                     </Link>
                 </li>
                 <li>
-                    <Link to={ROUTES.PROFILE}>
+                    <Link to={ROUTES.PROFILE} id={"profile-nav-link-mobile"}>
                         <PersonIcon/>
                         {t("main.navbar.profile")}
                     </Link>
@@ -91,17 +91,17 @@ const Navbar: React.FC = () => {
                     </Link>
                 </li>
                 <li className="hide-on-mobile">
-                    <Link to={ROUTES.DASHBOARD} className="nav-link">
+                    <Link to={ROUTES.DASHBOARD} className="nav-link" id={"dashboard-nav-link"}>
                         {t("main.navbar.dashboard")}
                     </Link>
                 </li>
                 <li className="hide-on-mobile">
-                    <Link to={ROUTES.MANAGE_CONNECTIONS} className="nav-link">
+                    <Link to={ROUTES.MANAGE_CONNECTIONS} className="nav-link" id={"manage-connections-nav-link"}>
                         {t("main.navbar.manageConnections")}
                     </Link>
                 </li>
                 <li className="hide-on-mobile">
-                    <Link to={ROUTES.PROFILE} className="nav-link">
+                    <Link to={ROUTES.PROFILE} className="nav-link" id={"profile-nav-link"}>
                         {t("main.navbar.profile")}
                     </Link>
                 </li>
