@@ -165,8 +165,8 @@ public class UserDriveController {
             String accessToken = decrypt(cloudPlatform.getAccessToken());
             Date accessTokenExpiryDate = cloudPlatform.getAccessTokenExpiryDate();
             try {
-                JsonNode folders = driveInformationService.listAllItemsInOneDrive(accessToken, accessTokenExpiryDate);
-                return ResponseEntity.ok(folders);
+                JsonNode jsonNode = driveInformationService.callEndpointAndGetResponse(null, accessToken, "OneDrive", accessTokenExpiryDate);
+                return ResponseEntity.ok(jsonNode);
             } catch (Exception e) {
                 return ResponseEntity.badRequest().build();
             }
@@ -174,7 +174,7 @@ public class UserDriveController {
             String decryptedRefreshToken = decrypt(cloudPlatform.getRefreshToken());
             String decryptedAccessToken = decrypt(cloudPlatform.getAccessToken());
             try {
-                JsonNode jsonNode = driveInformationService.callEndpointAndGetResponse(decryptedRefreshToken, decryptedAccessToken);
+                JsonNode jsonNode = driveInformationService.callEndpointAndGetResponse(decryptedRefreshToken, decryptedAccessToken, "GoogleDrive", null);
                 return ResponseEntity.ok(jsonNode);
             } catch (Exception e) {
                 return ResponseEntity.badRequest().build();

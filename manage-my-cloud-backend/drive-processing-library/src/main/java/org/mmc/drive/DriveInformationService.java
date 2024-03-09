@@ -330,18 +330,28 @@ public class DriveInformationService implements IDriveInformationService {
         return filesDeletedResponse;
     }
 
-    public JsonNode callEndpointAndGetResponse(String refreshToken, String accessToken) throws IOException, InterruptedException {
-        JsonNode files = fetchAllGoogleDriveFiles(refreshToken, accessToken);
+    public JsonNode callEndpointAndGetResponse(String refreshToken, String accessToken, String provider, Date accessTokenExpiryDate) throws IOException, InterruptedException {
+        String response;
+        if(provider.equals("GoogleDrive")) {
+            JsonNode files = fetchAllGoogleDriveFiles(refreshToken, accessToken);
 
-        ObjectMapper mapper = new ObjectMapper();
-        String prettyJson = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(files);
+            ObjectMapper mapper = new ObjectMapper();
+            String prettyJson = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(files);
 
-        String response = chatDiscussion(prettyJson);
+             response = chatDiscussion(prettyJson, provider);
+        } else {
+            JsonNode files = listAllItemsInOneDrive(accessToken, new Date());
+
+            ObjectMapper mapper = new ObjectMapper();
+            String prettyJson = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(files);
+
+             response = chatDiscussion(prettyJson, provider);
+        }
 
         return mapper.readTree(response);
     }
 
-    private static String chatDiscussion(String files) throws IOException {
+    private static String chatDiscussion(String files, String provider) throws IOException {
         // OpenAI API endpoint
         String url = "https://api.openai.com/v1/chat/completions";
         String openApiKey = System.getenv("OPENAI_API_KEY");
@@ -368,7 +378,12 @@ public class DriveInformationService implements IDriveInformationService {
 
             Map<String, Object> userMessage = new HashMap<>();
             userMessage.put("role", "user");
-            userMessage.put("content", "Return duplicates by name in the data, considering files with brackets as duplicates. For example, 'samefilename.png' and 'samefilename(1).png' should be considered as duplicates. The expected format is: {\"duplicates\": [{\"name\": string, \"count\": integer, \"files\": [{\"id\": string, \"type\": string, \"createdDateTime\": float, \"lastModifiedDateTime\": float, \"webUrl\": string}]}]}. Note that the filename comparison is case-insensitive and ignores any numbers in brackets at the end of the filename: " + files);
+            //If statement is needed here due to how drives rename duplicate files
+            if (provider.equals("GoogleDrive")) {
+                userMessage.put("content", "Return duplicates by name in the data, considering files with brackets as duplicates. For example, 'samefilename.png' and 'samefilename(1).png' should be considered as duplicates. The expected format is: {\"duplicates\": [{\"name\": string, \"count\": integer, \"files\": [{\"id\": string, \"type\": string, \"createdDateTime\": float, \"lastModifiedDateTime\": float, \"webUrl\": string}]}]}. Note that the filename comparison is case-insensitive and ignores any numbers in brackets at the end of the filename: " + files);
+            } else {
+                userMessage.put("content", "Return duplicates by name in the data, considering files with brackets as duplicates. For example, 'samefilename.png' and 'samefilename 1.png' should be considered as duplicates. The expected format is: {\"duplicates\": [{\"name\": string, \"count\": integer, \"files\": [{\"id\": string, \"type\": string, \"createdDateTime\": float, \"lastModifiedDateTime\": float, \"webUrl\": string}]}]}. Note that the filename comparison is case-insensitive and ignores any numbers in brackets at the end of the filename: " + files);
+            }
             messages.add(userMessage);
 
             requestBody.put("messages", messages); // Add the messages parameter
@@ -385,6 +400,11 @@ public class DriveInformationService implements IDriveInformationService {
             // Execute request and get response
             HttpResponse response = client.execute(post);
 
+            //Sometimes we get a 400 error due to some issue with the AI's response so we will use recursion to try again
+            if(response.getStatusLine().getStatusCode() != 200) {
+                chatDiscussion(files, provider);
+            }
+
             // Extract response body
             HttpEntity responseEntity = response.getEntity();
 
@@ -397,6 +417,8 @@ public class DriveInformationService implements IDriveInformationService {
 
             // Return 'content' field
             return content;
+        } catch (IOException e) {
+            throw new IOException(e);
         }
     }
 
