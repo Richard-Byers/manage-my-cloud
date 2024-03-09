@@ -8,17 +8,19 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.google.api.services.drive.model.About;
 import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.FileList;
-import com.google.cloud.vertexai.VertexAI;
-import com.google.cloud.vertexai.api.GenerateContentResponse;
-import com.google.cloud.vertexai.generativeai.ChatSession;
-import com.google.cloud.vertexai.generativeai.GenerativeModel;
-import com.google.cloud.vertexai.generativeai.ResponseHandler;
 import com.microsoft.graph.models.Drive;
 import com.microsoft.graph.models.User;
 import com.microsoft.graph.requests.DriveItemCollectionPage;
 import com.microsoft.graph.requests.GraphServiceClient;
 import com.microsoft.graph.serializer.AdditionalDataManager;
 import okhttp3.Request;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
 import org.mmc.pojo.UserPreferences;
 import org.mmc.response.CustomDriveItem;
 import org.mmc.response.DriveInformationReponse;
@@ -329,39 +331,73 @@ public class DriveInformationService implements IDriveInformationService {
     }
 
     public JsonNode callEndpointAndGetResponse(String refreshToken, String accessToken) throws IOException, InterruptedException {
-        // TODO(developer): Replace these variables before running the sample.
-        String projectId = "finalyearproject-406016";
-        String location = "us-central1";
-        String modelName = "gemini-1.0-pro";
-
         JsonNode files = fetchAllGoogleDriveFiles(refreshToken, accessToken);
 
         ObjectMapper mapper = new ObjectMapper();
         String prettyJson = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(files);
 
-        chatDiscussion(projectId, location, modelName, prettyJson);
+        String response = chatDiscussion(prettyJson);
 
-        return null;
+        return mapper.readTree(response);
     }
 
-    private static String chatDiscussion(String projectId, String location, String modelName, String files)
-            throws IOException {
+    private static String chatDiscussion(String files) throws IOException {
+        // OpenAI API endpoint
+        String url = "https://api.openai.com/v1/chat/completions";
+        String openApiKey = System.getenv("OPENAI_API_KEY");
 
-        // Initialize client that will be used to send requests. This client only needs
-        // to be created once, and can be reused for multiple requests.
-        GenerateContentResponse response;
-        try (VertexAI vertexAI = new VertexAI(projectId, location)) {
+        // Create HTTP client
+        try (CloseableHttpClient client = HttpClients.createDefault()) {
+            // Create POST request
+            HttpPost post = new HttpPost(url);
 
-            GenerativeModel model = new GenerativeModel(modelName, vertexAI);
-            // Create a chat session to be used for interactive conversation.
-            ChatSession chatSession = new ChatSession(model);
+            // Set headers
+            post.setHeader("Content-Type", "application/json");
+            post.setHeader("Authorization", "Bearer " + openApiKey);
 
-            String prompt = "Can you only return duplicates from this JSON? Here is the JSON: " + files;
-            response = chatSession.sendMessage(prompt);
-            System.out.println(ResponseHandler.getText(response));
+            // Create request body object
+            Map<String, Object> requestBody = new HashMap<>();
+            requestBody.put("model", "gpt-3.5-turbo"); // Add the model parameter
 
+            // Create messages array
+            List<Map<String, Object>> messages = new ArrayList<>();
+            Map<String, Object> systemMessage = new HashMap<>();
+            systemMessage.put("role", "system");
+            systemMessage.put("content", "You are a helpful assistant.");
+            messages.add(systemMessage);
+
+            Map<String, Object> userMessage = new HashMap<>();
+            userMessage.put("role", "user");
+            userMessage.put("content", "Return duplicates by name in the data, considering files with brackets as duplicates. For example, 'samefilename.png' and 'samefilename(1).png' should be considered as duplicates. The expected format is: {\"duplicates\": [{\"name\": string, \"count\": integer, \"files\": [{\"id\": string, \"type\": string, \"createdDateTime\": float, \"lastModifiedDateTime\": float, \"webUrl\": string}]}]}. Note that the filename comparison is case-insensitive and ignores any numbers in brackets at the end of the filename: " + files);
+            messages.add(userMessage);
+
+            requestBody.put("messages", messages); // Add the messages parameter
+            requestBody.put("max_tokens", 4096);
+
+            // Convert request body object to JSON string
+            ObjectMapper mapper = new ObjectMapper();
+            String json = mapper.writeValueAsString(requestBody);
+
+            // Set request body
+            StringEntity entity = new StringEntity(json);
+            post.setEntity(entity);
+
+            // Execute request and get response
+            HttpResponse response = client.execute(post);
+
+            // Extract response body
+            HttpEntity responseEntity = response.getEntity();
+
+            // Convert response body to JSON
+            String responseBody = EntityUtils.toString(responseEntity);
+            JsonNode responseJson = mapper.readTree(responseBody);
+
+            // Extract 'content' field from the 'choices' array in the JSON response
+            String content = responseJson.get("choices").get(0).get("message").get("content").asText();
+
+            // Return 'content' field
+            return content;
         }
-        return response.toString();
     }
 
     public DriveInformationReponse mapToDriveInformationResponse(String displayName, String email, Double total, Double used) {
