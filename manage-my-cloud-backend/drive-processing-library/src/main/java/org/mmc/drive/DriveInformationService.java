@@ -4,6 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.google.api.services.drive.model.About;
 import com.google.api.services.drive.model.File;
@@ -338,20 +340,20 @@ public class DriveInformationService implements IDriveInformationService {
             ObjectMapper mapper = new ObjectMapper();
             String prettyJson = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(files);
 
-             response = chatDiscussion(prettyJson, provider);
+             response = chatDiscussion(prettyJson, provider, 0);
         } else {
             JsonNode files = listAllItemsInOneDrive(accessToken, new Date());
 
             ObjectMapper mapper = new ObjectMapper();
             String prettyJson = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(files);
 
-             response = chatDiscussion(prettyJson, provider);
+             response = chatDiscussion(prettyJson, provider, 0);
         }
 
         return mapper.readTree(response);
     }
 
-    private static String chatDiscussion(String files, String provider) throws IOException {
+    private static String chatDiscussion(String files, String provider, int timesTried) throws IOException {
         // OpenAI API endpoint
         String url = "https://api.openai.com/v1/chat/completions";
         String openApiKey = System.getenv("OPENAI_API_KEY");
@@ -400,9 +402,13 @@ public class DriveInformationService implements IDriveInformationService {
             // Execute request and get response
             HttpResponse response = client.execute(post);
 
-            //Sometimes we get a 400 error due to some issue with the AI's response so we will use recursion to try again
+            //Sometimes we get a 400 error due to some issue with the AI's response so we will use recursion to try another 2 times
             if(response.getStatusLine().getStatusCode() != 200) {
-                chatDiscussion(files, provider);
+                timesTried++;
+                if(timesTried < 3) {
+                    return null;
+                }
+                chatDiscussion(files, provider, timesTried);
             }
 
             // Extract response body
@@ -415,11 +421,40 @@ public class DriveInformationService implements IDriveInformationService {
             // Extract 'content' field from the 'choices' array in the JSON response
             String content = responseJson.get("choices").get(0).get("message").get("content").asText();
 
+            JsonNode transformedJson = transformJson(mapper.readTree(content));
+
             // Return 'content' field
-            return content;
+            return transformedJson.toString();
         } catch (IOException e) {
             throw new IOException(e);
         }
+    }
+
+    public static JsonNode transformJson(JsonNode inputJson) {
+        ObjectMapper mapper = new ObjectMapper();
+        ObjectNode outputJson = mapper.createObjectNode();
+        outputJson.put("id", (JsonNode) null);
+        outputJson.put("name", "root");
+        outputJson.put("type", "Folder");
+        outputJson.put("createdDateTime", (JsonNode) null);
+        outputJson.put("lastModifiedDateTime", (JsonNode) null);
+        outputJson.put("webUrl", (JsonNode) null);
+
+        ArrayNode children = outputJson.putArray("children");
+        for (JsonNode duplicate : inputJson.get("duplicates")) {
+            String fileName = duplicate.get("name").asText();
+            for (JsonNode file : duplicate.get("files")) {
+                ObjectNode child = children.addObject();
+                child.put("id", file.get("id"));
+                child.put("name", fileName); // Set the name to the name of the parent object
+                child.put("type", file.get("type"));
+                child.put("createdDateTime", file.get("createdDateTime"));
+                child.put("lastModifiedDateTime", file.get("lastModifiedDateTime"));
+                child.put("webUrl", file.get("webUrl"));
+                child.put("children", (JsonNode) null);
+            }
+        }
+        return outputJson;
     }
 
     public DriveInformationReponse mapToDriveInformationResponse(String displayName, String email, Double total, Double used) {
