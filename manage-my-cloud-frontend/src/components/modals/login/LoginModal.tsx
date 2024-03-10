@@ -1,5 +1,5 @@
-import React, {useState} from "react";
-import {useNavigate} from "react-router-dom";
+import React, {useState, useEffect} from "react";
+import {useNavigate, useSearchParams, useLocation} from "react-router-dom";
 import "./LoginModal.css";
 import "../Modal.css";
 import logo from "../../images/managemycloudlogo.png";
@@ -11,6 +11,7 @@ import {SignUpModal} from "../signUp/SignUpModal";
 import {ResetPasswordModal} from "../resetPassword/ResetPasswordModal";
 import {AuthData} from "../../routing/AuthWrapper";
 import {useTranslation} from "react-i18next";
+
 
 interface LoginProps {
     email: string;
@@ -25,11 +26,23 @@ const LoginModal: React.FC = () => {
     const [showSignUpModal, setShowSignUpModal] = useState(false);
     const [showForgotPasswordModal, setShowForgotPasswordModal] = useState(false);
     const [showError, setShowError] = useState(false);
+    const location = useLocation();
+
+    const [searchParams] = useSearchParams();
+    const token = searchParams.get('token');
+
+    useEffect(() => {
+        setShowModal(location.pathname === '/login');
+    }, [location]);
 
     const [loginInput, setLoginInput] = useState<LoginProps>({
         email: "",
         password: "",
-    });
+    })
+
+    if (!showModal) {
+        return null;
+    }
 
     const modalFormInputLabel = showError ? "modal-form-label-error" : "modal-form-label"
 
@@ -50,12 +63,15 @@ const LoginModal: React.FC = () => {
     };
 
     const toggleSignUpModal = () => {
-        closeModal();
         setShowSignUpModal(!showSignUpModal);
+        console.log(showSignUpModal);
+    };
+
+    const openSignUpModal = () => {
+        setShowSignUpModal(true);
     };
 
     const toggleForgotPasswordModal = () => {
-        closeModal();
         setShowForgotPasswordModal(!showForgotPasswordModal);
     };
 
@@ -63,6 +79,7 @@ const LoginModal: React.FC = () => {
         setShowError(false);
         setShowSignUpModal(false);
         setShowModal(false);
+        navigate("/");
     };
 
     const stopPropagation = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -89,15 +106,12 @@ const LoginModal: React.FC = () => {
 
     return (
         <>
-            <button className={"modal-login-button"} onClick={toggleModal}>
-                {t('main.landingPage.loginModal.getStartedButton')}
-            </button>
-
-            {showModal && (
+            {showModal ? (
                 <div className="modal-overlay" onClick={closeModal}>
                     <div className="modal" onClick={stopPropagation}>
 
-                        <button className={"modal-close-button"} onClick={closeModal}> <CloseIcon className="svg_icons"/> </button>
+                        <button className={"modal-close-button"} onClick={closeModal}><CloseIcon className="svg_icons"/>
+                        </button>
 
                         <div className={"modal-logo"}>
                             <img src={logo} alt={"Manage My Cloud Logo"}/>
@@ -160,6 +174,10 @@ const LoginModal: React.FC = () => {
                         </div>
                     </div>
                 </div>
+            ) : (
+                <button className={"modal-login-button"} onClick={toggleModal}>
+                    {t('main.landingPage.loginModal.getStartedButton')}
+                </button>
             )}
             {showSignUpModal && (<SignUpModal
                     setShowSignUpModal={setShowSignUpModal}/>
