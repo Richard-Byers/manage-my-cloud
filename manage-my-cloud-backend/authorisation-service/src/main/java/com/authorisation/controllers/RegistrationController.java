@@ -65,13 +65,13 @@ public class RegistrationController {
         VerificationToken verificationToken = verificationTokenRepository.findByToken(token);
 
         if (verificationToken.getUserEntity().isEnabled()) {
-            return new RedirectView("http://localhost:3000");
+            return new RedirectView("http://localhost:3000/login");
         }
 
         String verificationResult = userService.validateToken(token);
 
         if (verificationResult.equals("valid")) {
-            return new RedirectView("http://localhost:3000");
+            return new RedirectView("http://localhost:3000/login");
         } else {
             String resendUrl = applicationUrl(request) + "/register/resendVerificationEmail?token=" + token;
             return new RedirectView(resendUrl);
