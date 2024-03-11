@@ -18,6 +18,8 @@ Developed using Python 3.10
   - `TEST_EMAIL`
   - `TEST_EMAIL_PASSWORD` for ease of testing make this password the same as ONEDRIVE_TEST_PASSWORD
   - `ONEDRIVE_TEST_PASSWORD`
+- Frontend server must be running on `http://localhost:3000` or use deployed URL
+- Backend running to handle API requests from frontend.
 
 ## Running the tests:
 -cd into the `pages` directory and run the following command:
