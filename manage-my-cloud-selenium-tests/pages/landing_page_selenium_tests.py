@@ -2,12 +2,13 @@ import logging
 import os
 import unittest
 
-from selenium import webdriver
 from selenium.common import NoSuchElementException
 from selenium.webdriver import ActionChains
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
+
+from helpers import assert_element, setup_driver
 
 # Create a custom logger
 logger = logging.getLogger(__name__)
@@ -31,26 +32,20 @@ test_email_password = os.environ['TEST_EMAIL_PASSWORD']
 class TestLandingPage(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.driver = webdriver.Chrome()
-        cls.driver.maximize_window()
-
-    def setUp(self):
-        self.driver.get("http://localhost:3000")
+        setup_driver(cls)
 
     def test_logo_present_landing_page(self):
         logo_element = self.driver.find_element(By.CLASS_NAME, "landing-page-logo")
 
         # assertions
-        self.assertTrue(logo_element.is_displayed(), "Logo not found")
-        self.assertIsNotNone(logo_element, "Logo element not found")
+        assert_element(logo_element, self, "Logo not displayed on landing page", "Logo is wasn't found")
         logger.info('Finished test: test_logo_present_landing_page')
 
     def test_main_text_present_landing_page(self):
         main_text_element = self.driver.find_element(By.CLASS_NAME, "landing-page-main-text")
 
         # assertions
-        self.assertTrue(main_text_element.is_displayed(), "Landing page main text not found")
-        self.assertIsNotNone(main_text_element, "Landing page main text element not found")
+        assert_element(main_text_element, self, "Main text not displayed on landing page", "Main text is wasn't found")
         self.assertEqual(main_text_element.text, "OPTIMISE YOUR CLOUD STORAGE")
         logger.info('Finished test: test_main_text_present_landing_page')
 
@@ -58,8 +53,7 @@ class TestLandingPage(unittest.TestCase):
         sub_text_element = self.driver.find_element(By.CLASS_NAME, "landing-page-sub-text")
 
         # assertions
-        self.assertTrue(sub_text_element.is_displayed(), "Landing page sub text not found")
-        self.assertIsNotNone(sub_text_element, "Landing page sub text element not found")
+        assert_element(sub_text_element, self, "Sub text not displayed on landing page", "Sub text is wasn't found")
         self.assertEqual(sub_text_element.text, "AND SAVE MONEY")
         logger.info('Finished test: test_sub_text_present_landing_page')
 
@@ -67,8 +61,9 @@ class TestLandingPage(unittest.TestCase):
         sub_text_description_element = self.driver.find_element(By.CLASS_NAME, "landing-page-sub-text-description")
 
         # assertions
-        self.assertTrue(sub_text_description_element.is_displayed(), "Landing page sub text description not found")
-        self.assertIsNotNone(sub_text_description_element, "Landing page sub text description element not found")
+        assert_element(sub_text_description_element, self,
+                       "Landing page sub text description not displayed on landing page",
+                       "Landing page sub text description is wasn't found")
         self.assertEqual(sub_text_description_element.text,
                          "We aim to de-clutter your cloud storage, save you money, and reduce the cloud storage carbon footprint.")
         logger.info('Finished test: test_sub_text_description_present_landing_page')
@@ -77,8 +72,9 @@ class TestLandingPage(unittest.TestCase):
         get_started_button_element = self.driver.find_element(By.CLASS_NAME, "modal-login-button")
 
         # assertions
-        self.assertTrue(get_started_button_element.is_displayed(), "Login button not found")
-        self.assertIsNotNone(get_started_button_element, "Landing page sub text element not found")
+        assert_element(get_started_button_element, self,
+                       "Landing page get started button not displayed on landing page",
+                       "Landing page get started button is wasn't found")
         self.assertEqual(get_started_button_element.text, "Get Started")
         logger.info('Finished test: test_get_started_button_present_landing_page')
 
@@ -95,28 +91,23 @@ class TestLandingPage(unittest.TestCase):
         login_modal_login_button_element = self.driver.find_element(By.CLASS_NAME, "modal-form-submit-button")
 
         # assertions
-        self.assertTrue(login_modal_element.is_displayed(), "Login modal not found")
-        self.assertIsNotNone(login_modal_element, "Login modal element not found")
+        assert_element(login_modal_element, self, "Login modal not displayed", "Login modal not found")
+        assert_element(login_modal_description_element, self, "Login modal description not displayed",
+                       "Login modal description not found")
+        assert_element(login_modal_form_google_login_button_element, self,
+                       "Login modal google login button not displayed", "Login modal google login button not found")
+        assert_element(login_modal_form_element, self, "Login modal form not displayed", "Login modal form not found")
+        assert_element(login_modal_form_email_input_element, self, "Login modal email input not displayed",
+                       "Login modal email input not found")
+        assert_element(login_modal_form_password_input_element, self, "Login modal password input not displayed",
+                       "Login modal password input not found")
+        assert_element(login_modal_login_button_element, self, "Login modal login button not displayed",
+                       "Login modal login button not found")
+        login_modal_overlay_element = self.driver.find_element(By.CLASS_NAME, "modal-overlay")
+        actions = ActionChains(self.driver)
 
-        self.assertTrue(login_modal_description_element.is_displayed(), "Login modal description not found")
-        self.assertIsNotNone(login_modal_description_element, "Login modal description element not found")
-
-        self.assertTrue(login_modal_form_google_login_button_element.is_displayed(),
-                        "Login modal google login button not found")
-        self.assertIsNotNone(login_modal_form_google_login_button_element,
-                             "Login modal google login button element not found")
-
-        self.assertTrue(login_modal_form_element.is_displayed(), "Login modal form not found")
-        self.assertIsNotNone(login_modal_form_element, "Login modal form element not found")
-
-        self.assertTrue(login_modal_form_email_input_element.is_displayed(), "Login modal email input not found")
-        self.assertIsNotNone(login_modal_form_email_input_element, "Login modal email input element not found")
-
-        self.assertTrue(login_modal_form_password_input_element.is_displayed(), "Login modal password input not found")
-        self.assertIsNotNone(login_modal_form_password_input_element, "Login modal password input element not found")
-
-        self.assertTrue(login_modal_login_button_element.is_displayed(), "Login modal login button not found")
-        self.assertIsNotNone(login_modal_login_button_element, "Login modal login button element not found")
+        actions.move_to_element_with_offset(login_modal_overlay_element, 0, 250).click().perform()
+        WebDriverWait(self.driver, 10).until(EC.invisibility_of_element_located((By.CLASS_NAME, "modal")))
         logger.info('Finished test: test_get_started_button_displays_login')
 
     def test_modal_overlay_closes_login_modal_onclick(self):
@@ -155,38 +146,29 @@ class TestLandingPage(unittest.TestCase):
         signup_modal_signup_button_element = self.driver.find_element(By.ID, "signup-modal-submit-button")
 
         # assertions
-        self.assertTrue(signup_modal_element.is_displayed(), "Signup modal not found")
-        self.assertIsNotNone(signup_modal_element, "Signup modal element not found")
+        assert_element(signup_modal_element, self, "Signup modal not displayed", "Signup modal not found")
+        assert_element(signup_modal_description_element, self, "Signup modal description not displayed",
+                       "Signup modal description not found")
+        assert_element(signup_modal_form_element, self, "Signup modal form not displayed",
+                       "Signup modal form not found")
+        assert_element(signup_modal_form_firstname_input_element, self, "Signup modal firstname input not displayed",
+                       "Signup modal firstname input not found")
+        assert_element(signup_modal_form_lastname_input_element, self, "Signup modal lastname input not displayed",
+                       "Signup modal lastname input not found")
+        assert_element(signup_modal_form_email_input_element, self, "Signup modal email input not displayed",
+                       "Signup modal email input not found")
+        assert_element(signup_modal_form_password_input_element, self, "Signup modal password input not displayed",
+                       "Signup modal password input not found")
+        assert_element(signup_modal_form_confirm_password_input_element, self,
+                       "Signup modal confirm password input not displayed",
+                       "Signup modal confirm password input not found")
+        assert_element(signup_modal_signup_button_element, self, "Signup modal signup button not displayed",
+                       "Signup modal signup button not found")
+        login_modal_overlay_element = self.driver.find_element(By.CLASS_NAME, "modal-overlay")
+        actions = ActionChains(self.driver)
 
-        self.assertTrue(signup_modal_description_element.is_displayed(), "Signup modal description not found")
-        self.assertIsNotNone(signup_modal_description_element, "Signup modal description element not found")
-
-        self.assertTrue(signup_modal_form_element.is_displayed(), "Signup modal form not found")
-        self.assertIsNotNone(signup_modal_form_element, "Signup modal form element not found")
-
-        self.assertTrue(signup_modal_form_firstname_input_element.is_displayed(),
-                        "Signup form firstname input not found")
-        self.assertIsNotNone(signup_modal_form_firstname_input_element,
-                             "Signup modal firstname input element not found")
-
-        self.assertTrue(signup_modal_form_lastname_input_element.is_displayed(),
-                        "Signup modal lastname input not found")
-        self.assertIsNotNone(signup_modal_form_lastname_input_element, "Signup modal lastname input element not found")
-
-        self.assertTrue(signup_modal_form_email_input_element.is_displayed(), "Signup modal email input not found")
-        self.assertIsNotNone(signup_modal_form_email_input_element, "Signup modal email input element not found")
-
-        self.assertTrue(signup_modal_form_password_input_element.is_displayed(),
-                        "Signup modal password input not found")
-        self.assertIsNotNone(signup_modal_form_password_input_element, "Signup modal password input element not found")
-
-        self.assertTrue(signup_modal_form_confirm_password_input_element.is_displayed(),
-                        "Signup modal confirm password input not found")
-        self.assertIsNotNone(signup_modal_form_confirm_password_input_element,
-                             "Signup modal confirm password input element not found")
-
-        self.assertTrue(signup_modal_signup_button_element.is_displayed(), "Signup modal signup button not found")
-        self.assertIsNotNone(signup_modal_signup_button_element, "Signup modal signup button element not found")
+        actions.move_to_element_with_offset(login_modal_overlay_element, 0, 350).click().perform()
+        WebDriverWait(self.driver, 10).until(EC.invisibility_of_element_located((By.CLASS_NAME, "modal")))
         logger.info('Finished test: test_signup_displays_signup_modal')
 
     def test_reset_password_displays_reset_password_modal(self):
@@ -208,34 +190,28 @@ class TestLandingPage(unittest.TestCase):
                                                                                       "reset-password-modal-submit-button")
 
         # assertions
-        self.assertTrue(reset_password_modal_element.is_displayed(), "Reset password modal not found")
-        self.assertIsNotNone(reset_password_modal_element, "Reset password modal element not found")
+        assert_element(reset_password_modal_element, self, "Reset password modal not displayed",
+                       "Reset password modal not found")
+        assert_element(signup_modal_description_element, self, "Reset password modal description not displayed",
+                       "Reset password modal description not found")
+        assert_element(reset_password_modal_form_element, self, "Reset password modal form not displayed",
+                       "Reset password modal form not found")
+        assert_element(reset_password_modal_form_email_input_element, self,
+                       "Reset password modal email input not displayed", "Reset password modal email input not found")
+        assert_element(reset_password_modal_form_password_input_element, self,
+                       "Reset password modal password input not displayed",
+                       "Reset password modal password input not found")
+        assert_element(reset_password_modal_form_confirm_password_input_element, self,
+                       "Reset password confirm password input not displayed",
+                       "Reset password confirm password input not found")
+        assert_element(reset_password_modal_reset_password_button_element, self,
+                       "Reset password modal reset password button not displayed",
+                       "Reset password modal reset password button not found")
+        login_modal_overlay_element = self.driver.find_element(By.CLASS_NAME, "modal-overlay")
+        actions = ActionChains(self.driver)
 
-        self.assertTrue(signup_modal_description_element.is_displayed(), "Reset password modal description not found")
-        self.assertIsNotNone(signup_modal_description_element, "Reset password modal description element not found")
-
-        self.assertTrue(reset_password_modal_form_element.is_displayed(), "Reset password modal form not found")
-        self.assertIsNotNone(reset_password_modal_form_element, "Reset password modal form element not found")
-
-        self.assertTrue(reset_password_modal_form_email_input_element.is_displayed(),
-                        "Reset password modal email input not found")
-        self.assertIsNotNone(reset_password_modal_form_email_input_element,
-                             "Reset password modal email input element not found")
-
-        self.assertTrue(reset_password_modal_form_password_input_element.is_displayed(),
-                        "Reset password modal password input not found")
-        self.assertIsNotNone(reset_password_modal_form_password_input_element,
-                             "Reset password modal password input element not found")
-
-        self.assertTrue(reset_password_modal_form_confirm_password_input_element.is_displayed(),
-                        "Reset password confirm password input not found")
-        self.assertIsNotNone(reset_password_modal_form_confirm_password_input_element,
-                             "Reset password confirm password input element not found")
-
-        self.assertTrue(reset_password_modal_reset_password_button_element.is_displayed(),
-                        "Reset password modal reset password button not found")
-        self.assertIsNotNone(reset_password_modal_reset_password_button_element,
-                             "Reset password modal reset password button element not found")
+        actions.move_to_element_with_offset(login_modal_overlay_element, 0, 250).click().perform()
+        WebDriverWait(self.driver, 10).until(EC.invisibility_of_element_located((By.CLASS_NAME, "modal")))
         logger.info('Finished test: test_reset_password_displays_reset_password_modal')
 
     def test_login_invalid_credentials_shows_error(self):
@@ -254,7 +230,11 @@ class TestLandingPage(unittest.TestCase):
 
         # assertions
         self.assertEqual("Invalid email or password", error_message_element, "Error message not found")
+        login_modal_overlay_element = self.driver.find_element(By.CLASS_NAME, "modal-overlay")
+        actions = ActionChains(self.driver)
 
+        actions.move_to_element_with_offset(login_modal_overlay_element, 0, 250).click().perform()
+        WebDriverWait(self.driver, 10).until(EC.invisibility_of_element_located((By.CLASS_NAME, "modal")))
         logger.info('Finished test: test_login_invalid_credentials_shows_error')
 
     def test_login_valid_credentials_navigates_to_profile(self):
@@ -272,11 +252,8 @@ class TestLandingPage(unittest.TestCase):
         profile_card_element = self.driver.find_element(By.CLASS_NAME, "main-card-container")
 
         # assertions
-        self.assertTrue(profile_card_element.is_displayed(),
-                        "Profile card not displayed.")
-        self.assertIsNotNone(profile_card_element,
-                             "Profile card element not found.")
-
+        assert_element(profile_card_element, self, "Profile card not displayed.", "Profile card element not found")
+        WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.ID, "profile-logout-button"))).click()
         logger.info('Finished test: test_login_valid_credentials_navigates_to_profile')
 
     @classmethod

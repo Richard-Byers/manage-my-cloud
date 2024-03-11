@@ -23,7 +23,7 @@ const ProfileImgButton: React.FC = () => {
 
     return (
         <>
-            <button className="profile-img-button" onClick={openModal} style={{backgroundImage: `url(${profileImage})`}}>
+            <button className="profile-img-button" id={"profile-img-button"} onClick={openModal} style={{backgroundImage: `url(${profileImage})`}}>
             </button>
             {isModalOpen && <ChangeProfileImageModal setIsModalOpen={setIsModalOpen} />}
         </>
