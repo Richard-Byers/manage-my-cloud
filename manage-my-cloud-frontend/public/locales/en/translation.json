@@ -27,6 +27,14 @@
           "deleteButton": "Delete",
           "closeRecommendation": "Done",
           "closeRecommendationTryAgain": "Try Again"
+        },
+        "deleteDuplicates": {
+          "title": "File(s) detected by AI that are duplicates",
+          "mainText": "Select the file(s) you would like to delete and click delete.",
+          "noFiles": "You do not have any files that are duplicates.",
+          "deleteButton": "Delete",
+          "closeRecommendation": "Done",
+          "closeRecommendationTryAgain": "Try Again"
         }
       }
     },

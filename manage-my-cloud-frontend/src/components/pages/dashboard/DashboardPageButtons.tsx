@@ -98,10 +98,12 @@ const DashboardPageButtons: React.FC<DashboardPageButtonsProps> = ({
     const [loading, setLoading] = useState(false);
     const [showDeletionModal, setShowDeletionModal] = useState(false);
     const [deleteRecommendedClicked, setDeleteRecommendedClicked] = useState(false);
+    const [deleteDuplicatesClicked, setDeleteDuplicatesClicked] = useState(false);
     const [filesToBeDeleted, setFilesToBeDeleted] = useState<FilesToBeDeleted>({children: []});
     const [successfulDeletionMessage, setSuccessfulDeletionMessage] = useState("");
     const [unsuccessfulDeletionMessage, setUnsuccessfulDeletionMessage] = useState("");
     const [selectAll, setSelectAll] = useState(false);
+    const [showDuplicateModal, setShowDuplicateModal] = useState(false);
 
     useEffect(() => {
         if (deleteRecommendedClicked) {
@@ -114,6 +116,18 @@ const DashboardPageButtons: React.FC<DashboardPageButtonsProps> = ({
             fetchDriveData();
         }
     }, [deleteRecommendedClicked]);
+
+    useEffect(() => {
+        if (deleteDuplicatesClicked) {
+            const fetchDriveData = async () => {
+                const info = await getDuplicates(user, connectionProvider);
+                setDriveData(info);
+                setShowDuplicateModal(true); // Move setShowDeletionModal here
+            };
+
+            fetchDriveData();
+        }
+    }, [deleteDuplicatesClicked]);
 
     const handleSelectAll = (event: React.ChangeEvent<HTMLInputElement>) => {
         setSelectAll(event.target.checked);
@@ -128,6 +142,10 @@ const DashboardPageButtons: React.FC<DashboardPageButtonsProps> = ({
         setDeleteRecommendedClicked(true);
     }
 
+    const handleDuplicateDeletion = async () => {
+        setDeleteDuplicatesClicked(true);
+    }
+
     const closeModal = () => {
         setSowModal(false);
         setShowDeletionModal(false);
@@ -140,6 +158,14 @@ const DashboardPageButtons: React.FC<DashboardPageButtonsProps> = ({
     const closeRecommendationModal = () => {
         setShowDeletionModal(false);
         setDeleteRecommendedClicked(false);
+        setFilesToBeDeleted({children: []})
+        setSuccessfulDeletionMessage("");
+        setUnsuccessfulDeletionMessage("");
+    };
+
+    const closeDuplicateModal = () => {
+        setShowDuplicateModal(false);
+        setDeleteDuplicatesClicked(false);
         setFilesToBeDeleted({children: []})
         setSuccessfulDeletionMessage("");
         setUnsuccessfulDeletionMessage("");
@@ -186,9 +212,111 @@ const DashboardPageButtons: React.FC<DashboardPageButtonsProps> = ({
         setLoading(false);
     }
 
+    async function getDuplicates(user: any, connectionProvider: string): Promise<FileNode> {
+        const headers = {
+            'Authorization': `Bearer ${user.token}`
+        }
+    
+        setLoading(true);
+        const response = await buildAxiosRequestWithHeaders('GET', `/delete-duplicates?email=${user.email}&provider=${connectionProvider}&driveEmail=${driveEmail}`, headers, {})
+    
+        if (response.status !== 200) {
+            setLoading(false);
+            throw new Error(`Request failed with status code ${response.status}`);
+        }
+    
+        if (!response.data) {
+            setLoading(false);
+            throw new Error('Invalid response data');
+        }
+
+        setLoading(false);
+        return response.data;
+    }
+
     return (
         <div className={"dashboard-button-container"}>
-            <button className={"dashboard-button"}>{t('main.dashboard.dashboardPageButtons.deleteDuplicates')}</button>
+            <button className={"dashboard-button"}
+                    onClick={(handleDuplicateDeletion)}>{t('main.dashboard.dashboardPageButtons.deleteDuplicates')}</button>
+                    {loading &&
+            <div className={"modal-overlay"}>
+                <div className={"modal"}>
+                    <LoadingSpinner />
+                </div>
+            </div>
+        }
+                    {showDuplicateModal &&
+                <div className={"modal-overlay"} onClick={closeDuplicateModal}>
+                        <div className={"modal"} onClick={stopPropagation}>
+                            <button className={"modal-close-button"} onClick={closeRecommendationModal}><CloseIcon
+                                className="svg_icons"/>
+                            </button>
+
+                            {/*If items we're deleted then render successfulDeletionMessage*/}
+                            {successfulDeletionMessage !== "" &&
+                                <div className={"recommended-file-button-container"}>
+                                    <p>{successfulDeletionMessage}</p>
+                                    <Success/>
+                                    <button className={"dashboard-button"} onClick={closeModal}>
+                                        {t('main.dashboard.deletionModals.deleteDuplicates.closeRecommendation')}
+                                    </button>
+                                </div>
+                            }
+
+
+                            {successfulDeletionMessage === "" && unsuccessfulDeletionMessage === "" &&
+                                <div className={"dashboard-page-buttons-modal-grid"}>
+                                    <div className={"deletion-duplicates-container"}>
+                                        {driveData && driveData?.children.length > 0 ?
+                                            <>
+                                                <h2> {driveData?.children.length} {t('main.dashboard.deletionModals.deleteDuplicates.title')}</h2>
+                                                <p
+                                                    className={"deletion-duplicates-description"}>{t('main.dashboard.deletionModals.deleteDuplicates.mainText')}</p>
+                                                <p className={"deletion-duplicates-select-all-description"}>
+                                                    Select All
+                                                    <input
+                                                        className={"dashboard-page-buttons-select-all-checkbox"}
+                                                        type="checkbox"
+                                                        onChange={handleSelectAll}/>
+                                                </p>
+                                            </> : <NothingFound/>}
+                                    </div>
+
+                                    {driveData && driveData?.children.length > 0 ?
+                                        <div className={"deletion-duplicates-file-container"}>
+                                            <div className={"deletion-duplicates-files-grid"}>
+                                                {driveData ?
+                                                    <FileTree data={driveData}
+                                                              setFilesToBeDeleted={setFilesToBeDeleted}
+                                                              filesToBeDeleted={filesToBeDeleted}
+                                                              selectAll={selectAll}/> : "No files found"}
+                                            </div>
+                                        </div> : null
+                                    }
+
+                                    {driveData && driveData?.children.length <= 0
+                                        ?
+                                        <div className={"duplicated-file-button-container"}>
+                                            <button className={"dashboard-button"} onClick={closeModal}>
+                                                {t('main.dashboard.deletionModals.deleteDuplicates.closeRecommendation')}
+                                            </button>
+                                        </div>
+                                        :
+                                        <div className={"duplicated-file-button-container"}>
+                                            <button className={"dashboard-button"} onClick={() => {
+                                                deleteRecommendedFiles(user, connectionProvider, filesToBeDeleted, driveEmail)
+                                            }}>
+                                                {t('main.dashboard.deletionModals.deleteRecommended.deleteButton')}
+                                            </button>
+                                        </div>}
+
+                                </div>
+                            }
+                        </div>
+                    
+                </div>
+            }
+
             <button className={"dashboard-button"}
                     onClick={(handleDeleteRecommended)}>{t('main.dashboard.dashboardPageButtons.deleteRecommended')}</button>
             {showDeletionModal &&
@@ -207,18 +335,6 @@ const DashboardPageButtons: React.FC<DashboardPageButtonsProps> = ({
                                     <Success/>
                                     <button className={"dashboard-button"} onClick={closeModal}>
                                         {t('main.dashboard.deletionModals.deleteRecommended.closeRecommendation')}
-                                    </button>
-                                </div>
-                            }
-
-                            {/*If items weren't deleted then render unsuccessfulDeletionMessage*/}
-                            {unsuccessfulDeletionMessage !== "" &&
-                                <div className={"recommended-file-button-container"}>
-                                    <p>{unsuccessfulDeletionMessage}</p>
-                                    <Failure/>
-                                    <p></p>
-                                    <button className={"dashboard-button"} onClick={closeModal}>
-                                        {t('main.dashboard.deletionModals.deleteRecommended.closeRecommendationTryAgain')}
                                     </button>
                                 </div>
                             }

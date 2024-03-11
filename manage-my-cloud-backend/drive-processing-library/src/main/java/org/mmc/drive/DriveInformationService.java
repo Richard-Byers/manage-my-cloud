@@ -421,37 +421,70 @@ public class DriveInformationService implements IDriveInformationService {
             // Extract 'content' field from the 'choices' array in the JSON response
             String content = responseJson.get("choices").get(0).get("message").get("content").asText();
 
-            JsonNode transformedJson = transformJson(mapper.readTree(content));
-
-            // Return 'content' field
-            return transformedJson.toString();
+            if (validateContentFormat(content)) {
+                return transformJson(mapper.readTree(content)).toString();
+            } else {
+                throw new IOException("Invalid response format");
+            }
         } catch (IOException e) {
             throw new IOException(e);
+        }
+    }
+
+    public static boolean validateContentFormat(String content) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            JsonNode jsonNode = objectMapper.readTree(content);
+
+            // Check if the root is an object and contains the "duplicates" array
+            if (!jsonNode.isObject() || !jsonNode.has("duplicates")) {
+                return false;
+            }
+
+            // Check if each object in the "duplicates" array has the required fields
+            for (JsonNode duplicate : jsonNode.get("duplicates")) {
+                if (!duplicate.isObject() || !duplicate.has("name") || !duplicate.has("count") || !duplicate.has("files")) {
+                    return false;
+                }
+
+                // Check if each object in the "files" array has the required fields
+                for (JsonNode file : duplicate.get("files")) {
+                    if (!file.isObject() || !file.has("id") || !file.has("type") || !file.has("createdDateTime") || !file.has("lastModifiedDateTime") || !file.has("webUrl")) {
+                        return false;
+                    }
+                }
+            }
+
+            // If all checks passed, the content matches the required format
+            return true;
+        } catch (Exception e) {
+            // If an exception is thrown, the content does not match the format
+            return false;
         }
     }
 
     public static JsonNode transformJson(JsonNode inputJson) {
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode outputJson = mapper.createObjectNode();
-        outputJson.put("id", (JsonNode) null);
+        outputJson.set("id", (JsonNode) null);
         outputJson.put("name", "root");
         outputJson.put("type", "Folder");
-        outputJson.put("createdDateTime", (JsonNode) null);
-        outputJson.put("lastModifiedDateTime", (JsonNode) null);
-        outputJson.put("webUrl", (JsonNode) null);
+        outputJson.set("createdDateTime", (JsonNode) null);
+        outputJson.set("lastModifiedDateTime", (JsonNode) null);
+        outputJson.set("webUrl", (JsonNode) null);
 
         ArrayNode children = outputJson.putArray("children");
         for (JsonNode duplicate : inputJson.get("duplicates")) {
             String fileName = duplicate.get("name").asText();
             for (JsonNode file : duplicate.get("files")) {
                 ObjectNode child = children.addObject();
-                child.put("id", file.get("id"));
+                child.set("id", file.get("id"));
                 child.put("name", fileName); // Set the name to the name of the parent object
-                child.put("type", file.get("type"));
-                child.put("createdDateTime", file.get("createdDateTime"));
-                child.put("lastModifiedDateTime", file.get("lastModifiedDateTime"));
-                child.put("webUrl", file.get("webUrl"));
-                child.put("children", (JsonNode) null);
+                child.set("type", file.get("type"));
+                child.set("createdDateTime", file.get("createdDateTime"));
+                child.set("lastModifiedDateTime", file.get("lastModifiedDateTime"));
+                child.set("webUrl", file.get("webUrl"));
+                child.set("children", (JsonNode) null);
             }
         }
         return outputJson;
