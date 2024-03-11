@@ -465,7 +465,7 @@ public class DriveInformationService implements IDriveInformationService {
             for (JsonNode file : duplicate.get("files")) {
                 ObjectNode child = children.addObject();
                 child.set("id", file.get("id"));
-                child.put("name", file.get("name")); // Set the name to the name of the parent object
+                child.set("name", file.get("name")); // Set the name to the name of the parent object
                 child.set("type", file.get("type"));
                 child.set("createdDateTime", file.get("createdDateTime"));
                 child.set("lastModifiedDateTime", file.get("lastModifiedDateTime"));
@@ -473,7 +473,6 @@ public class DriveInformationService implements IDriveInformationService {
                 child.set("children", (JsonNode) null);
             }
         }
-        System.out.println(outputJson.toString());
         return outputJson;
     }
 
