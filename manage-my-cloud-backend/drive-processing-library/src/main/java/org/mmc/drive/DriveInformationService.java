@@ -369,9 +369,9 @@ public class DriveInformationService implements IDriveInformationService {
             userMessage.put("role", "user");
             //If statement is needed here due to how drives rename duplicate files
             if (provider.equals("GoogleDrive")) {
-                userMessage.put("content", "Return duplicates by name in the data, considering files with brackets as duplicates. For example, 'samefilename.png' and 'samefilename(1).png' should be considered as duplicates. The expected format is: {\"duplicates\": [{\"name\": string, \"count\": integer, \"files\": [{\"id\": string, \"type\": string, \"createdDateTime\": float, \"lastModifiedDateTime\": float, \"webUrl\": string}]}]}. Note that the filename comparison is case-insensitive and ignores any numbers in brackets at the end of the filename: " + files);
+                userMessage.put("content", "Return duplicates by name (including file extension if exists) in the data, considering files with brackets as duplicates. For example, 'samefilename.png' and 'samefilename(1).png' should be considered as duplicates. The expected format is: {\"duplicates\": [{\"name\": string, \"count\": integer, \"files\": [{\"id\": string, \"name\": string, \"type\": string, \"createdDateTime\": float, \"lastModifiedDateTime\": float, \"webUrl\": string}]}]}. Note that the filename comparison is case-insensitive and ignores any numbers in brackets at the end of the filename: " + files);
             } else {
-                userMessage.put("content", "Return duplicates by name in the data, considering files with brackets as duplicates. For example, 'samefilename.png' and 'samefilename 1.png' should be considered as duplicates. The expected format is: {\"duplicates\": [{\"name\": string, \"count\": integer, \"files\": [{\"id\": string, \"type\": string, \"createdDateTime\": float, \"lastModifiedDateTime\": float, \"webUrl\": string}]}]}. Note that the filename comparison is case-insensitive and ignores any numbers in brackets at the end of the filename: " + files);
+                userMessage.put("content", "Return duplicates by name (including file extension if exists) in the data, considering files with brackets as duplicates. For example, 'samefilename.png' and 'samefilename 1.png' should be considered as duplicates. The expected format is: {\"duplicates\": [{\"name\": string, \"count\": integer, \"files\": [{\"id\": string, \"name\": string, \"type\": string, \"createdDateTime\": float, \"lastModifiedDateTime\": float, \"webUrl\": string}]}]}. Note that the filename comparison is case-insensitive and ignores any numbers in brackets at the end of the filename: " + files);
             }
             messages.add(userMessage);
 
@@ -393,9 +393,9 @@ public class DriveInformationService implements IDriveInformationService {
             if(response.getStatusLine().getStatusCode() != 200) {
                 timesTried++;
                 if(timesTried < 3) {
-                    return null;
+                    chatDiscussion(files, provider, timesTried);
                 }
-                chatDiscussion(files, provider, timesTried);
+                return null;
             }
 
             // Extract response body
@@ -436,7 +436,7 @@ public class DriveInformationService implements IDriveInformationService {
 
                 // Check if each object in the "files" array has the required fields
                 for (JsonNode file : duplicate.get("files")) {
-                    if (!file.isObject() || !file.has("id") || !file.has("type") || !file.has("createdDateTime") || !file.has("lastModifiedDateTime") || !file.has("webUrl")) {
+                    if (!file.isObject() || !file.has("id") || !file.has("name") || !file.has("type") || !file.has("createdDateTime") || !file.has("lastModifiedDateTime") || !file.has("webUrl")) {
                         return false;
                     }
                 }
@@ -462,11 +462,10 @@ public class DriveInformationService implements IDriveInformationService {
 
         ArrayNode children = outputJson.putArray("children");
         for (JsonNode duplicate : inputJson.get("duplicates")) {
-            String fileName = duplicate.get("name").asText();
             for (JsonNode file : duplicate.get("files")) {
                 ObjectNode child = children.addObject();
                 child.set("id", file.get("id"));
-                child.put("name", fileName); // Set the name to the name of the parent object
+                child.put("name", file.get("name")); // Set the name to the name of the parent object
                 child.set("type", file.get("type"));
                 child.set("createdDateTime", file.get("createdDateTime"));
                 child.set("lastModifiedDateTime", file.get("lastModifiedDateTime"));
@@ -474,6 +473,7 @@ public class DriveInformationService implements IDriveInformationService {
                 child.set("children", (JsonNode) null);
             }
         }
+        System.out.println(outputJson.toString());
         return outputJson;
     }
 

@@ -8,7 +8,7 @@ import {buildAxiosRequestWithHeaders} from "../../helpers/AxiosHelper";
 import {AuthData} from "../../routing/AuthWrapper";
 import {Success} from "../../helpers/Success";
 import {Failure} from "../../helpers/Failure";
-import {NothingFound} from "../../helpers/NothingFound";
+import {NothingFoundRecommendations, NothingFoundDuplicates} from "../../helpers/NothingFound";
 
 interface DashboardPageButtonsProps {
     data: FileNode;
@@ -104,6 +104,8 @@ const DashboardPageButtons: React.FC<DashboardPageButtonsProps> = ({
     const [unsuccessfulDeletionMessage, setUnsuccessfulDeletionMessage] = useState("");
     const [selectAll, setSelectAll] = useState(false);
     const [showDuplicateModal, setShowDuplicateModal] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+    const [showErrorModal, setShowErrorModal] = useState(false);
 
     useEffect(() => {
         if (deleteRecommendedClicked) {
@@ -212,23 +214,31 @@ const DashboardPageButtons: React.FC<DashboardPageButtonsProps> = ({
         setLoading(false);
     }
 
-    async function getDuplicates(user: any, connectionProvider: string): Promise<FileNode> {
+    async function getDuplicates(user: any, connectionProvider: string): Promise<FileNode | undefined> {
         const headers = {
             'Authorization': `Bearer ${user.token}`
         }
-    
-        console.log(data);
-        setLoading(true);
-        const response = await buildAxiosRequestWithHeaders('POST', `/get-duplicates?email=${user.email}&provider=${connectionProvider}&driveEmail=${driveEmail}`, headers, data)
-    
-        if (response.status !== 200) {
+            setLoading(true);
+            const response = await buildAxiosRequestWithHeaders('POST', `/get-duplicates?email=${user.email}&provider=${connectionProvider}&driveEmail=${driveEmail}`, headers, data);
+
+        //TODO: Add better error handling
+        if (response.status === 400) {
             setLoading(false);
-            throw new Error(`Request failed with status code ${response.status}`);
+            setError('Bad request');
+            setShowErrorModal(true);
+            return;
+        } else if (response.status !== 200) {
+            setLoading(false);
+            setError(`Request failed with status code ${response.status}`);
+            setShowErrorModal(true);
+            return;
         }
-    
+        
         if (!response.data) {
             setLoading(false);
-            throw new Error('Invalid response data');
+            setError('Invalid response data');
+            setShowErrorModal(true);
+            return;
         }
 
         setLoading(false);
@@ -263,8 +273,6 @@ const DashboardPageButtons: React.FC<DashboardPageButtonsProps> = ({
                                     </button>
                                 </div>
                             }
-
-
                             {successfulDeletionMessage === "" && unsuccessfulDeletionMessage === "" &&
                                 <div className={"dashboard-page-buttons-modal-grid"}>
                                     <div className={"deletion-duplicates-container"}>
@@ -280,9 +288,8 @@ const DashboardPageButtons: React.FC<DashboardPageButtonsProps> = ({
                                                         type="checkbox"
                                                         onChange={handleSelectAll}/>
                                                 </p>
-                                            </> : <NothingFound/>}
+                                            </> : <NothingFoundDuplicates/>}
                                     </div>
-
                                     {driveData && driveData?.children.length > 0 ?
                                         <div className={"deletion-duplicates-file-container"}>
                                             <div className={"deletion-duplicates-files-grid"}>
@@ -294,8 +301,7 @@ const DashboardPageButtons: React.FC<DashboardPageButtonsProps> = ({
                                             </div>
                                         </div> : null
                                     }
-
-                                    {driveData && driveData?.children.length <= 0
+                                    {driveData && driveData?.children.length <= 0 || driveData === undefined
                                         ?
                                         <div className={"duplicated-file-button-container"}>
                                             <button className={"dashboard-button"} onClick={closeModal}>
@@ -356,7 +362,7 @@ const DashboardPageButtons: React.FC<DashboardPageButtonsProps> = ({
                                                         type="checkbox"
                                                         onChange={handleSelectAll}/>
                                                 </p>
-                                            </> : <NothingFound/>}
+                                            </> : <NothingFoundRecommendations/>}
                                     </div>
 
                                     {driveData && driveData?.children.length > 0 ?

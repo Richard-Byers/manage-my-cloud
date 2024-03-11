@@ -29,7 +29,7 @@
           "closeRecommendationTryAgain": "Try Again"
         },
         "deleteDuplicates": {
-          "title": "File(s) detected by AI that are duplicates",
+          "title": "File(s) detected by AI that are duplicates (Disclaimer: Results may not be 100% accurate)",
           "mainText": "Select the file(s) you would like to delete and click delete.",
           "noFiles": "You do not have any files that are duplicates.",
           "deleteButton": "Delete",
