@@ -332,25 +332,12 @@ public class DriveInformationService implements IDriveInformationService {
         return filesDeletedResponse;
     }
 
-    public JsonNode callEndpointAndGetResponse(String refreshToken, String accessToken, String provider, Date accessTokenExpiryDate) throws IOException, InterruptedException {
-        String response;
-        if(provider.equals("GoogleDrive")) {
-            JsonNode files = fetchAllGoogleDriveFiles(refreshToken, accessToken);
+    public JsonNode callEndpointAndGetResponse(String provider, JsonNode files) throws IOException, InterruptedException {
 
-            ObjectMapper mapper = new ObjectMapper();
-            String prettyJson = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(files);
+        ObjectMapper mapper = new ObjectMapper();
+        String prettyJson = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(files);
 
-             response = chatDiscussion(prettyJson, provider, 0);
-        } else {
-            JsonNode files = listAllItemsInOneDrive(accessToken, new Date());
-
-            ObjectMapper mapper = new ObjectMapper();
-            String prettyJson = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(files);
-
-             response = chatDiscussion(prettyJson, provider, 0);
-        }
-
-        return mapper.readTree(response);
+        return mapper.readTree(chatDiscussion(prettyJson, provider, 0));
     }
 
     private static String chatDiscussion(String files, String provider, int timesTried) throws IOException {

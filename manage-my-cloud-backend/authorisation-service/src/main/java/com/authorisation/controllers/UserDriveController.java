@@ -149,10 +149,11 @@ public class UserDriveController {
         return ResponseEntity.badRequest().build();
     }
 
-    @GetMapping("/delete-duplicates")
+    @PostMapping("/get-duplicates")
     public ResponseEntity<JsonNode> getAIDuplicatesResponse(@RequestParam("email") String email,
                                                             @RequestParam("provider") String connectionProvider,
-                                                            @RequestParam("driveEmail") String driveEmail) {
+                                                            @RequestParam("driveEmail") String driveEmail,
+                                                            @RequestBody JsonNode files) {
 
         UserEntity userEntity = userService.findUserByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
         CloudPlatform cloudPlatform = cloudPlatformService.getUserCloudPlatform(userEntity.getEmail(), connectionProvider, driveEmail);
@@ -162,19 +163,15 @@ public class UserDriveController {
         }
 
         if (connectionProvider.equals(ONEDRIVE)) {
-            String accessToken = decrypt(cloudPlatform.getAccessToken());
-            Date accessTokenExpiryDate = cloudPlatform.getAccessTokenExpiryDate();
             try {
-                JsonNode jsonNode = driveInformationService.callEndpointAndGetResponse(null, accessToken, "OneDrive", accessTokenExpiryDate);
+                JsonNode jsonNode = driveInformationService.callEndpointAndGetResponse( ONEDRIVE, files);
                 return ResponseEntity.ok(jsonNode);
             } catch (Exception e) {
                 return ResponseEntity.badRequest().build();
             }
         } else if (connectionProvider.equals(GOOGLEDRIVE)) {
-            String decryptedRefreshToken = decrypt(cloudPlatform.getRefreshToken());
-            String decryptedAccessToken = decrypt(cloudPlatform.getAccessToken());
             try {
-                JsonNode jsonNode = driveInformationService.callEndpointAndGetResponse(decryptedRefreshToken, decryptedAccessToken, "GoogleDrive", null);
+                JsonNode jsonNode = driveInformationService.callEndpointAndGetResponse( GOOGLEDRIVE, files);
                 return ResponseEntity.ok(jsonNode);
             } catch (Exception e) {
                 return ResponseEntity.badRequest().build();

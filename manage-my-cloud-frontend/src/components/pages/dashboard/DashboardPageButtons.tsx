@@ -217,8 +217,9 @@ const DashboardPageButtons: React.FC<DashboardPageButtonsProps> = ({
             'Authorization': `Bearer ${user.token}`
         }
     
+        console.log(data);
         setLoading(true);
-        const response = await buildAxiosRequestWithHeaders('GET', `/delete-duplicates?email=${user.email}&provider=${connectionProvider}&driveEmail=${driveEmail}`, headers, {})
+        const response = await buildAxiosRequestWithHeaders('POST', `/get-duplicates?email=${user.email}&provider=${connectionProvider}&driveEmail=${driveEmail}`, headers, data)
     
         if (response.status !== 200) {
             setLoading(false);
