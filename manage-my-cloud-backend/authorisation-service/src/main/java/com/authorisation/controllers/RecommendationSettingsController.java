@@ -41,6 +41,7 @@ public class RecommendationSettingsController {
             existingSettings.setDeleteImages(newSettings.isDeleteImages());
             existingSettings.setDeleteDocuments(newSettings.isDeleteDocuments());
             existingSettings.setDeleteEmails(newSettings.isDeleteEmails());
+            existingSettings.setDeleteEmailsAfterDays(newSettings.getDeleteEmailsAfterDays());
             existingSettings.setDeleteItemsCreatedAfterDays(newSettings.getDeleteItemsCreatedAfterDays());
             existingSettings.setDeleteItemsNotChangedSinceDays(newSettings.getDeleteItemsNotChangedSinceDays());
 

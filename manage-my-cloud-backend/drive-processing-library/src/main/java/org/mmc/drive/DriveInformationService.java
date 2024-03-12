@@ -10,12 +10,16 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.google.api.services.drive.model.About;
 import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.FileList;
+import com.google.api.services.gmail.Gmail;
+import com.google.api.services.gmail.model.ListMessagesResponse;
+import com.google.api.services.gmail.model.Message;
 import com.microsoft.graph.models.Drive;
 import com.microsoft.graph.models.User;
 import com.microsoft.graph.requests.DriveItemCollectionPage;
 import com.microsoft.graph.requests.GraphServiceClient;
 import com.microsoft.graph.serializer.AdditionalDataManager;
 import okhttp3.Request;
+import org.mmc.pojo.CustomEmail;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -36,8 +40,7 @@ import java.time.ZoneId;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static org.mmc.auth.DriveAuthManager.getGoogleClient;
-import static org.mmc.auth.DriveAuthManager.getOneDriveClient;
+import static org.mmc.auth.DriveAuthManager.*;
 import static org.mmc.enumerations.ItemTypeChecker.DocumentType.isDocumentType;
 import static org.mmc.enumerations.ItemTypeChecker.ImageType.isImageType;
 import static org.mmc.enumerations.ItemTypeChecker.OtherType.isOtherType;
@@ -180,40 +183,56 @@ public class DriveInformationService implements IDriveInformationService {
         boolean recommendVideos = userPreferences.isDeleteVideos();
         boolean recommendImages = userPreferences.isDeleteImages();
         boolean recommendDocuments = userPreferences.isDeleteDocuments();
+        boolean recommendEmails = userPreferences.isDeleteEmails();
         int recommendItemsCreatedDaysAgo = userPreferences.getDeleteItemsCreatedAfterDays();
         int recommendItemsNotChangedDaysAgo = userPreferences.getDeleteItemsNotChangedSinceDays();
+        int recommendEmailsAfterDays = userPreferences.getDeleteEmailsAfterDays();
 
         CustomDriveItem recommendations = new CustomDriveItem();
         recommendations.setName("root");
         recommendations.setType("Folder");
         recommendations.setChildren(Collections.synchronizedList(new ArrayList<>()));
+        recommendations.setEmails(Collections.synchronizedList(new ArrayList<>()));
 
         try {
+            // Iterate through files in drive
             filesInUserDrive.getChildren().parallelStream().forEach(item -> {
-                // Won't delete folders, potential future improvement would be to delete empty folders and add it as another preference option
-                if (!Objects.equals(item.getType(), "Folder")) {
-                    String itemName = item.getName();
-                    OffsetDateTime createdDateTime = item.getCreatedDateTime();
-                    OffsetDateTime lastModifiedDateTime = item.getLastModifiedDateTime();
-                    if (recommendImages && isImageType(itemName) && compareDates(createdDateTime, lastModifiedDateTime, recommendItemsCreatedDaysAgo, recommendItemsNotChangedDaysAgo)) {
-                        // if item is an image and falls outside the date range
-                        recommendations.getChildren().add(item);
-                    } else if (recommendVideos && isVideoType(itemName) && compareDates(createdDateTime, lastModifiedDateTime, recommendItemsCreatedDaysAgo, recommendItemsNotChangedDaysAgo)) {
-                        // if item is a video and falls outside the date range
-                        recommendations.getChildren().add(item);
-                    } else if (recommendDocuments && isDocumentType(itemName) && compareDates(createdDateTime, lastModifiedDateTime, recommendItemsCreatedDaysAgo, recommendItemsNotChangedDaysAgo)) {
-                        // if item is a document and falls outside the date range
-                        recommendations.getChildren().add(item);
-                    } else if (isOtherType(itemName) && compareDates(createdDateTime, lastModifiedDateTime, recommendItemsCreatedDaysAgo, recommendItemsNotChangedDaysAgo)) {
-                        // if item is not an image, video, or document and falls outside the date range
-                        recommendations.getChildren().add(item);
-                    }
-                }
+                processItem(item, recommendations, recommendImages, recommendVideos, recommendDocuments, recommendItemsCreatedDaysAgo, recommendItemsNotChangedDaysAgo);
             });
+
+            // Iterate through Emails
+            if (recommendEmails && filesInUserDrive.getEmails() != null) {
+                filesInUserDrive.getEmails().parallelStream().forEach(item -> {
+                    processEmail(item, recommendations, recommendEmailsAfterDays);
+                });
+            }
 
             return mapper.readTree(mapper.writeValueAsString(recommendations));
         } catch (Exception e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    private void processItem(CustomDriveItem item, CustomDriveItem recommendations, boolean recommendImages, boolean recommendVideos, boolean recommendDocuments, int recommendItemsCreatedDaysAgo, int recommendItemsNotChangedDaysAgo) {
+        if (!Objects.equals(item.getType(), "Folder")) {
+            String itemName = item.getName();
+            OffsetDateTime createdDateTime = item.getCreatedDateTime();
+            OffsetDateTime lastModifiedDateTime = item.getLastModifiedDateTime();
+            if (recommendImages && isImageType(itemName) && compareDates(createdDateTime, lastModifiedDateTime, recommendItemsCreatedDaysAgo, recommendItemsNotChangedDaysAgo)) {
+                recommendations.getChildren().add(item);
+            } else if (recommendVideos && isVideoType(itemName) && compareDates(createdDateTime, lastModifiedDateTime, recommendItemsCreatedDaysAgo, recommendItemsNotChangedDaysAgo)) {
+                recommendations.getChildren().add(item);
+            } else if (recommendDocuments && isDocumentType(itemName) && compareDates(createdDateTime, lastModifiedDateTime, recommendItemsCreatedDaysAgo, recommendItemsNotChangedDaysAgo)) {
+                recommendations.getChildren().add(item);
+            } else if (isOtherType(itemName) && compareDates(createdDateTime, lastModifiedDateTime, recommendItemsCreatedDaysAgo, recommendItemsNotChangedDaysAgo)) {
+                recommendations.getChildren().add(item);
+            }
+        }
+    }
+
+    private void processEmail(CustomEmail item, CustomDriveItem recommendations, int deleteEmailsAfterDays) {
+        if (compareDatesOneDate(item.getReceivedDate(), deleteEmailsAfterDays)) {
+            recommendations.getEmails().add(item);
         }
     }
 
@@ -265,8 +284,9 @@ public class DriveInformationService implements IDriveInformationService {
     public JsonNode fetchAllGoogleDriveFiles(String refreshToken, String accessToken) throws IOException {
 
         com.google.api.services.drive.Drive service = getGoogleClient(refreshToken, accessToken);
+        Gmail gmailClient = getGmailClient(refreshToken, accessToken);
 
-        if (service == null) {
+        if (service == null || gmailClient == null) {
             throw new RuntimeException("Drive not found");
         }
 
@@ -274,6 +294,7 @@ public class DriveInformationService implements IDriveInformationService {
         root.setName("root");
         root.setType("Folder");
         root.setChildren(performFetchAllGoogleDriveFiles(service));
+        root.setEmails(performFetchAllGoogleEmails(gmailClient));
 
         return mapper.valueToTree(root);
     }
@@ -312,9 +333,48 @@ public class DriveInformationService implements IDriveInformationService {
         return allFiles;
     }
 
+    private List<CustomEmail> performFetchAllGoogleEmails(Gmail service) throws IOException {
+        ListMessagesResponse response = service.users().messages().list("me").setQ("in:inbox AND is:read OR in:spam").execute();
+        int emailPagesRetrieved = 0;
+
+        List<CustomEmail> emails = new ArrayList<>();
+        while (response.getMessages() != null) {
+            response.getMessages().parallelStream().forEach(messageSummary -> {
+                try {
+                    Message message = service.users().messages().get("me", messageSummary.getId()).execute();
+                    List<String> labels = message.getLabelIds();
+                    if (labels.contains("INBOX") || labels.contains("SPAM")) {
+                        CustomEmail customItem = new CustomEmail();
+                        customItem.setId(message.getId());
+                        customItem.setWebUrl("https://mail.google.com/mail/u/0/#inbox/" + message.getId());
+                        customItem.setEmailSubject(message.getPayload().getHeaders().stream().filter(header -> header.getName().equals("Subject")).findFirst().get().getValue());
+                        customItem.setReceivedDate(OffsetDateTime.ofInstant(Instant.ofEpochMilli(message.getInternalDate()), ZoneId.systemDefault()));
+                        synchronized (emails) {
+                            emails.add(customItem);
+                        }
+                    }
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+            //Limit the amount of emails retrieved to 500 for performance reasons
+            if (response.getNextPageToken() != null && emailPagesRetrieved < 4) {
+                emailPagesRetrieved++;
+                String pageToken = response.getNextPageToken();
+                response = service.users().messages().list("me").setQ("in:inbox OR in:spam is:read").setPageToken(pageToken).execute();
+            } else {
+                break;
+            }
+        }
+
+        return emails;
+    }
+
     public FilesDeletedResponse deleteRecommendedGoogleDriveFiles(JsonNode filesToDelete, String refreshToken, String accessToken) throws JsonProcessingException {
         AtomicInteger filesDeleted = new AtomicInteger();
+        AtomicInteger emailsDeleted = new AtomicInteger();
         com.google.api.services.drive.Drive service = getGoogleClient(refreshToken, accessToken);
+        Gmail gmailClient = getGmailClient(refreshToken, accessToken);
         CustomDriveItem filesInUserDrive = mapper.treeToValue(filesToDelete, CustomDriveItem.class);
 
         filesInUserDrive.getChildren().parallelStream().forEach(item -> {
@@ -326,9 +386,18 @@ public class DriveInformationService implements IDriveInformationService {
             }
         });
 
+        filesInUserDrive.getEmails().parallelStream().forEach(item -> {
+            try {
+                gmailClient.users().messages().delete("me", item.getId()).execute();
+                emailsDeleted.getAndIncrement();
+            } catch (Exception e) {
+                throw new RuntimeException("Error deleting email item");
+            }
+        });
 
         FilesDeletedResponse filesDeletedResponse = new FilesDeletedResponse();
         filesDeletedResponse.setFilesDeleted(filesDeleted.get());
+        filesDeletedResponse.setEmailsDeleted(emailsDeleted.get());
         return filesDeletedResponse;
     }
 
@@ -493,5 +562,10 @@ public class DriveInformationService implements IDriveInformationService {
                                  int recommendItemsNotChangedDaysAgo) {
         return createdDateTime.isBefore(OffsetDateTime.now().minusDays(recommendItemsCreatedDaysAgo)) ||
                 lastModifiedDateTime.isBefore(OffsetDateTime.now().minusDays(recommendItemsNotChangedDaysAgo));
+    }
+
+    private boolean compareDatesOneDate(OffsetDateTime createdDateTime,
+                                        int recommendItemsCreatedDaysAgo) {
+        return createdDateTime.isBefore(OffsetDateTime.now().minusDays(recommendItemsCreatedDaysAgo));
     }
 }

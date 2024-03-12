@@ -72,5 +72,21 @@
     border: none;
 }
 
+@media only screen and (max-width: 768px) {
+
+    .user-profile-card-data-label{
+        font-size: 1rem;
+    }
+
+    .profile-card-buttons{
+        flex-direction: column;
+    }
+
+    .logout-btn{
+        width: 100%;
+    }
+
+}
+
 
 

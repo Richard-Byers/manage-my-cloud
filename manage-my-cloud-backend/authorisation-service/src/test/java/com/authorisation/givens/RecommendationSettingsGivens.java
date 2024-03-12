@@ -16,6 +16,6 @@ public class RecommendationSettingsGivens {
     }
 
     public static RecommendationSettings generateRecommendationSettings(UserEntity user) {
-        return new RecommendationSettings(1L, user, true, true, true, true, 7, 7);
+        return new RecommendationSettings(1L, user, true, true, true, true, 7, 7, 7);
     }
 }
