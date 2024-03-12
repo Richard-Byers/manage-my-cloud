@@ -401,6 +401,25 @@ public class DriveInformationService implements IDriveInformationService {
         return filesDeletedResponse;
     }
 
+    public FilesDeletedResponse deleteDuplicateGoogleDriveFiles(JsonNode filesToDelete, String refreshToken, String accessToken) throws JsonProcessingException {
+        AtomicInteger filesDeleted = new AtomicInteger();
+        com.google.api.services.drive.Drive service = getGoogleClient(refreshToken, accessToken);
+        CustomDriveItem filesInUserDrive = mapper.treeToValue(filesToDelete, CustomDriveItem.class);
+
+        filesInUserDrive.getChildren().parallelStream().forEach(item -> {
+            try {
+                service.files().delete(item.getId()).execute();
+                filesDeleted.getAndIncrement();
+            } catch (Exception e) {
+                throw new RuntimeException("Error deleting Google Drive files");
+            }
+        });
+
+        FilesDeletedResponse filesDeletedResponse = new FilesDeletedResponse();
+        filesDeletedResponse.setFilesDeleted(filesDeleted.get());
+        return filesDeletedResponse;
+    }
+
     public JsonNode callEndpointAndGetResponse(String provider, JsonNode files) throws IOException, InterruptedException {
 
         ObjectMapper mapper = new ObjectMapper();

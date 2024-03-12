@@ -149,6 +149,7 @@ public class UserDriveController {
         return ResponseEntity.badRequest().build();
     }
 
+
     @PostMapping("/get-duplicates")
     public ResponseEntity<JsonNode> getAIDuplicatesResponse(@RequestParam("email") String email,
                                                             @RequestParam("provider") String connectionProvider,
@@ -179,5 +180,41 @@ public class UserDriveController {
         } else {
             return ResponseEntity.badRequest().build();
         }
+    }
+
+    @PostMapping("/delete-duplicates")
+    public ResponseEntity<FilesDeletedResponse> deleteDuplicatesFiles(@RequestParam("email") String email,
+                                                                       @RequestParam("provider") String connectionProvider,
+                                                                       @RequestParam("driveEmail") String driveEmail,
+                                                                       @RequestBody JsonNode filesToDelete) {
+
+        UserEntity userEntity = userService.findUserByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
+        CloudPlatform cloudPlatform = cloudPlatformService.getUserCloudPlatform(userEntity.getEmail(), connectionProvider, driveEmail);
+
+        if (cloudPlatform == null) {
+            throw new RuntimeException(String.format("Cloud platform not found %s", connectionProvider));
+        }
+
+        if (connectionProvider.equals(ONEDRIVE)) {
+            String accessToken = decrypt(cloudPlatform.getAccessToken());
+            Date accessTokenExpiryDate = cloudPlatform.getAccessTokenExpiryDate();
+            try {
+                FilesDeletedResponse filesDeleted = driveInformationService.deleteRecommendedOneDriveFiles(filesToDelete, accessToken, accessTokenExpiryDate);
+                return ResponseEntity.ok().body(filesDeleted);
+            } catch (Exception e) {
+                return ResponseEntity.badRequest().build();
+            }
+        } else if (connectionProvider.equals(GOOGLEDRIVE)) {
+            String decryptedRefreshToken = decrypt(cloudPlatform.getRefreshToken());
+            String decryptedAccessToken = decrypt(cloudPlatform.getAccessToken());
+            try {
+                FilesDeletedResponse filesDeleted = driveInformationService.deleteDuplicateGoogleDriveFiles(filesToDelete, decryptedRefreshToken, decryptedAccessToken);
+                return ResponseEntity.ok().body(filesDeleted);
+            } catch (Exception e) {
+                return ResponseEntity.badRequest().build();
+            }
+        }
+
+        return ResponseEntity.badRequest().build();
     }
 }
