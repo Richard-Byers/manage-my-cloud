@@ -53,9 +53,9 @@ const DashboardPageButtons: React.FC<DashboardPageButtonsProps> = ({
 
     return (
         <div className={"dashboard-button-container"}>
-            <button className={"dashboard-button"}>{t('main.dashboard.dashboardPageButtons.deleteDuplicates')}</button>
+            <button className={"dashboard-button"} id={"delete-duplicates-button"}>{t('main.dashboard.dashboardPageButtons.deleteDuplicates')}</button>
             <button className={"dashboard-button"}
-                    onClick={(handleDeleteRecommended)}>{t('main.dashboard.dashboardPageButtons.deleteRecommended')}</button>
+                    onClick={(handleDeleteRecommended)} id={"delete-recommended-button"}>{t('main.dashboard.dashboardPageButtons.deleteRecommended')}</button>
             {showDeletionModal &&
                 <DeletionRecommendationsModal data={data}
                                               connectionProvider={CONNECTION_TITLE[connectionProvider]}

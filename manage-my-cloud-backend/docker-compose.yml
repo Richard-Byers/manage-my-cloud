@@ -13,9 +13,8 @@ services:
       - ONEDRIVE_CLIENT_SECRET=
       - ONEDRIVE_REDIRECT_URI=
       - MMC_EMAIL_PASSWORD=
-      - SPRING_PROFILES_ACTIVE=docker
       - GOOGLE_CREDENTIALS_JSON=
-
+      - "SPRING_PROFILES_ACTIVE=dev"
   postgres:
     image: postgres:latest
     container_name: postgres

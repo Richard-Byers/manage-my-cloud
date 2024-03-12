@@ -1,5 +1,5 @@
-import React, {useState, useEffect} from "react";
-import {useNavigate, useSearchParams, useLocation} from "react-router-dom";
+import React, {useState} from "react";
+import {useNavigate} from "react-router-dom";
 import "./LoginModal.css";
 import "../Modal.css";
 import logo from "../../images/managemycloudlogo.png";
@@ -11,7 +11,6 @@ import {SignUpModal} from "../signUp/SignUpModal";
 import {ResetPasswordModal} from "../resetPassword/ResetPasswordModal";
 import {AuthData} from "../../routing/AuthWrapper";
 import {useTranslation} from "react-i18next";
-
 
 interface LoginProps {
     email: string;
@@ -63,8 +62,8 @@ const LoginModal: React.FC = () => {
     };
 
     const toggleSignUpModal = () => {
+        closeModal();
         setShowSignUpModal(!showSignUpModal);
-        console.log(showSignUpModal);
     };
 
     const openSignUpModal = () => {
@@ -72,6 +71,7 @@ const LoginModal: React.FC = () => {
     };
 
     const toggleForgotPasswordModal = () => {
+        closeModal();
         setShowForgotPasswordModal(!showForgotPasswordModal);
     };
 
@@ -106,7 +106,11 @@ const LoginModal: React.FC = () => {
 
     return (
         <>
-            {showModal ? (
+            <button className={"modal-login-button"} id={"modal-login-button"} onClick={toggleModal}>
+                {t('main.landingPage.loginModal.getStartedButton')}
+            </button>
+
+            {showModal && (
                 <div className="modal-overlay" onClick={closeModal}>
                     <div className="modal" onClick={stopPropagation}>
 
@@ -140,7 +144,8 @@ const LoginModal: React.FC = () => {
                                            type="email"
                                            placeholder={"Enter your email Address"}
                                            onClick={stopPropagation}
-                                           onChange={handleEmailChange}/>
+                                           onChange={handleEmailChange}
+                                           id={"login-form-email"}/>
                                     <EmailIcon/>
                                 </label>
                                 <label className={modalFormInputLabel}>
@@ -148,7 +153,8 @@ const LoginModal: React.FC = () => {
                                            type="password"
                                            placeholder={"Enter your password"}
                                            onClick={stopPropagation}
-                                           onChange={handlePasswordChange}/>
+                                           onChange={handlePasswordChange}
+                                           id={"login-form-password"}/>
                                     <LockIcon/>
                                 </label>
                                 {showError && (
@@ -164,10 +170,10 @@ const LoginModal: React.FC = () => {
                             <div className={"separator"}></div>
 
                             <div className={"sign-up-login-container"}>
-                                <button className={"modal-login-reset-signup"} onClick={toggleForgotPasswordModal}>
+                                <button className={"modal-login-reset-signup"} id={"reset-password-button"} onClick={toggleForgotPasswordModal}>
                                     {t('main.landingPage.loginModal.resetPasswordText')}
                                 </button>
-                                <button className={"modal-login-reset-signup"} onClick={toggleSignUpModal}>
+                                <button className={"modal-login-reset-signup"} id={"signup-button"} onClick={toggleSignUpModal}>
                                     {t('main.landingPage.loginModal.signUpText')}
                                 </button>
                             </div>

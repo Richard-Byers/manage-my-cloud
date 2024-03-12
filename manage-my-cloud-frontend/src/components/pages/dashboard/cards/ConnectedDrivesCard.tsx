@@ -53,13 +53,14 @@ const CardContainer: React.FC<ConnectedDrivesCardProps> = ({connectionProvider, 
                                     usedStorage={driveInformation.used}
                                     email={driveInformation.email}
                                     driveEmail={driveEmail}/>}
-            <div className="dashboard-connection-item" onClick={toggleModal}>
+            <div className="dashboard-connection-item" onClick={toggleModal}
+                 id={`${connectionProvider}-connected-item`}>
                 <img src={CONNECTION_LOGOS[connectionProvider]}
                      alt={`Logo for ${connectionProvider}`}/>
-                <div className="item-drive-name">
+                <div className="item-drive-name" id={"drive-name"}>
                     <h2>{driveInformation.displayName}</h2>
                 </div>
-                <div className='item-storage-used'>
+                <div className='item-storage-used' id={"drive-used-storage"}>
                     <h2>{t('main.dashboard.connectedDrivesCard.storageUsed')}:</h2>
                     <h2>{driveInformation.used > 0.0 ? driveInformation.used : "< 0"}GB/{driveInformation.total}GB</h2>
                 </div>
