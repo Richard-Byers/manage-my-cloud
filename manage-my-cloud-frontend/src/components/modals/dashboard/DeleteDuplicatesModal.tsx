@@ -186,24 +186,22 @@ const DeleteDuplicatesModal: React.FC<DeleteDuplicatesProps> = ({
         const headers = {
             'Authorization': `Bearer ${user.token}`
         }
+        try {
             setLoading(true);
             const response = await buildAxiosRequestWithHeaders('POST', `/get-duplicates?email=${user.email}&provider=${connectionProvider}&driveEmail=${driveEmail}`, headers, data);
-
-        //TODO: Add better error handling
-        if (response.status === 400) {
+    
+            if (response.status !== 200) {
+                throw new Error(`Request failed with status code ${response.status}`);
+            }
+    
+            return response.data;
+        } catch (error) {
             setLoading(false);
-            setError('Bad request');
+            setError("");
             setShowErrorModal(true);
-            return;
-        } else if (response.status !== 200) {
+        } finally {
             setLoading(false);
-            setError(`Request failed with status code ${response.status}`);
-            setShowErrorModal(true);
-            return;
         }
-
-        setLoading(false);
-        return response.data;
     }
 
     return (
