@@ -150,8 +150,8 @@ const DeleteDuplicatesModal: React.FC<DeleteDuplicatesProps> = ({
     };
 
     const closeDuplicateModal = () => {
-        setShowDuplicateModal(false);
         setDeleteDuplicatesClicked(false);
+        setShowDeletionModal(false);
         setSelectAll(false);
         setFilesToBeDeleted({children: []});
         setSuccessfulDeletionMessage("");
@@ -169,7 +169,7 @@ const DeleteDuplicatesModal: React.FC<DeleteDuplicatesProps> = ({
         }
 
         setLoading(true);
-        await buildAxiosRequestWithHeaders('POST', `/delete-recommended?email=${user.email}&provider=${connectionProvider}&driveEmail=${driveEmail}`, headers, filesToDelete)
+        await buildAxiosRequestWithHeaders('POST', `/delete-duplicates?email=${user.email}&provider=${connectionProvider}&driveEmail=${driveEmail}`, headers, filesToDelete)
             .then((response) => {
                 setLoading(false);
                 setSuccessfulDeletionMessage(`Successfully deleted ${response.data.filesDeleted} file(s) from your drive.`);
@@ -210,17 +210,30 @@ const DeleteDuplicatesModal: React.FC<DeleteDuplicatesProps> = ({
             <div className={"modal-overlay"} onClick={closeDuplicateModal}>
                 {loading ? <LoadingSpinner/> :
                     <div className={"modal"} onClick={stopPropagation}>
+
                         
                         {/*If items we're deleted then render successfulDeletionMessage*/}
-                        {successfulDeletionMessage !== "" &&
+                    {successfulDeletionMessage !== "" &&
                         <div className={"recommended-file-button-container"}>
-                            <p>{successfulDeletionMessage}</p>
+                            <p id={"deletion-success-message"}>{successfulDeletionMessage}</p>
                             <Success/>
-                            <button className={"dashboard-button"} onClick={closeModal}>
-                                {t('main.dashboard.deletionModals.deleteDuplicates.closeRecommendation')}
+                            <button className={"dashboard-button"} onClick={closeModal} id={"success-deletion-close-button"}>
+                                {t('main.dashboard.deletionModals.deleteRecommended.closeRecommendation')}
                             </button>
                         </div>
-                        }
+                    }
+
+                    {/*If items weren't deleted then render unsuccessfulDeletionMessage*/}
+                    {unsuccessfulDeletionMessage !== "" &&
+                        <div className={"recommended-file-button-container"}>
+                            <p>{unsuccessfulDeletionMessage}</p>
+                            <Failure/>
+                            <p></p>
+                            <button className={"dashboard-button"} onClick={closeModal}>
+                                {t('main.dashboard.deletionModals.deleteRecommended.closeRecommendationTryAgain')}
+                            </button>
+                        </div>
+                    }
                         {successfulDeletionMessage === "" && unsuccessfulDeletionMessage === "" &&
                         <div className={"dashboard-page-buttons-modal-grid"}>
                             <div className={"deletion-duplicates-container"}>

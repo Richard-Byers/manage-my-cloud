@@ -40,6 +40,7 @@ const DashboardPageButtons: React.FC<DashboardPageButtonsProps> = ({
     const { t } = useTranslation();
 
     const [showDeletionModal, setShowDeletionModal] = useState(false);
+    const [showDuplicateDeletionModal, setShowDuplicateDeletionModal] = useState(false);
     const [deleteRecommendedClicked, setDeleteRecommendedClicked] =
         useState(false);
     const [deleteDuplicatesClicked, setDeleteDuplicatesClicked] = useState(false);
@@ -56,11 +57,11 @@ const DashboardPageButtons: React.FC<DashboardPageButtonsProps> = ({
 
     const handleDeleteDuplicates = () => {
         setDeleteDuplicatesClicked(true);
-        setShowDeletionModal(true);
+        setShowDuplicateDeletionModal(true);
     };
 
     const hideDuplicatesDeletionModal = () => {
-        setShowDeletionModal(false);
+        setShowDuplicateDeletionModal(false);
         setDeleteDuplicatesClicked(false);
     };
 
@@ -69,7 +70,7 @@ const DashboardPageButtons: React.FC<DashboardPageButtonsProps> = ({
             <button className={"dashboard-button"} id={"delete-duplicates-button"} onClick={handleDeleteDuplicates}>
                 {t("main.dashboard.dashboardPageButtons.deleteDuplicates")}
             </button>
-            {showDeletionModal && (
+            {showDuplicateDeletionModal && (
                 <DeleteDuplicatesModal
                     data={data}
                     connectionProvider={CONNECTION_TITLE[connectionProvider]}
