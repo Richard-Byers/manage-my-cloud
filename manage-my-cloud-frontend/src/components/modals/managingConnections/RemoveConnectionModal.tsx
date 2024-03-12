@@ -35,7 +35,7 @@ const RemoveConnectionModal: React.FC<RemoveConnectionModalProps> = ({connection
 
     return (
         <>
-            <button className={"remove-connections-unlink-button"} onClick={toggleModal}>Unlink</button>
+            <button className={"remove-connections-unlink-button"} id={"unlink-drive-button"} onClick={toggleModal}>Unlink</button>
             {showModal && (
                 <div className="modal-overlay" onClick={closeModal}>
                     <div className="remove-connections-modal">
@@ -46,7 +46,7 @@ const RemoveConnectionModal: React.FC<RemoveConnectionModalProps> = ({connection
 
                         <p>Are you sure you wish to unlink {connectionProvider} account?</p>
                         <button className={"no-button"} onClick={closeModal}>No</button>
-                        <button className={"yes-button"} onClick={handleUnlink}>Yes</button>
+                        <button className={"yes-button"} id={"confirm-unlink"} onClick={handleUnlink}>Yes</button>
                     </div>
                 </div>
             )}

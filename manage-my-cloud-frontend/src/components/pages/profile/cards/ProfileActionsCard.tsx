@@ -52,9 +52,9 @@ function ProfileActionsCard() {
     return (
         <div className="card-content">
             <button className="actions-button"
-                    onClick={handleUserDataRequest}>{t('main.profileActionsCard.requestData')}</button>
+                    onClick={handleUserDataRequest} id={"request-data-button"}>{t('main.profileActionsCard.requestData')}</button>
             <TermsOfServiceModal show={showTermsOfServiceModal} handleClose={handleTermsOfServiceModal}/>
-            <button className="actions-button">{t('main.profileActionsCard.ContactUs')}</button>
+            <button className="actions-button" id={"contact-us-button"}>{t('main.profileActionsCard.ContactUs')}</button>
             <DeleteAccountModal/>
         </div>
     );

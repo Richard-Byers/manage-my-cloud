@@ -17,17 +17,17 @@ function UserProfileCard() {
             <span className={"preference-section-span"}>Personal Details</span>
             <div className='user-info'>
                 <div
-                    className='user-profile-card-data-label'>{t('main.userProfileCard.firstName')} : {user?.firstName}</div>
+                    className='user-profile-card-data-label' id={"profile-firstname"}>{t('main.userProfileCard.firstName')} : {user?.firstName}</div>
                 <div
-                    className='user-profile-card-data-label'>{t('main.userProfileCard.lastName')} : {user?.lastName}</div>
+                    className='user-profile-card-data-label' id={"profile-lastname"}>{t('main.userProfileCard.lastName')} : {user?.lastName}</div>
                 <div
-                    className='user-profile-card-data-label'>{t('main.userProfileCard.emailAddress')} : {user?.email}</div>
+                    className='user-profile-card-data-label' id={"profile-email"}>{t('main.userProfileCard.emailAddress')} : {user?.email}</div>
 
             </div>
             <span className={"preference-section-span"}>Profile Actions</span>
             <div className={'profile-card-buttons'}>
                 <UpdateDetailsModal/>
-                <button className='logout-btn' onClick={logout}>{t('main.userProfileCard.logout')}</button>
+                <button className='logout-btn' id={"profile-logout-button"} onClick={logout}>{t('main.userProfileCard.logout')}</button>
             </div>
 
         </div>

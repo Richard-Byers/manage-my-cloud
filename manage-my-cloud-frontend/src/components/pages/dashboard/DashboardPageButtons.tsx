@@ -66,7 +66,7 @@ const DashboardPageButtons: React.FC<DashboardPageButtonsProps> = ({
 
     return (
         <div className={"dashboard-button-container"}>
-            <button className={"dashboard-button"} onClick={handleDeleteDuplicates}>
+            <button className={"dashboard-button"} id={"delete-duplicates-button"} onClick={handleDeleteDuplicates}>
                 {t("main.dashboard.dashboardPageButtons.deleteDuplicates")}
             </button>
             {showDeletionModal && (
@@ -81,7 +81,7 @@ const DashboardPageButtons: React.FC<DashboardPageButtonsProps> = ({
                     setDeleteDuplicatesClicked={setDeleteDuplicatesClicked}
                 />
             )}
-            <button className={"dashboard-button"} onClick={handleDeleteRecommended}>
+            <button className={"dashboard-button"}  id={"delete-recommended-button"} onClick={handleDeleteRecommended}>
                 {t("main.dashboard.dashboardPageButtons.deleteRecommended")}
             </button>
             {showDeletionModal && (

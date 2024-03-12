@@ -37,7 +37,7 @@ function TermsOfServiceModal({ show: showModal, handleClose: closeHandle }: Term
     return (
         <>
             <button className="actions-button"
-                    onClick={handleShow}>{t('main.termsOfServiceModal.viewTermsOfService')}</button>
+                    onClick={handleShow} id={"terms-of-service-button"}>{t('main.termsOfServiceModal.viewTermsOfService')}</button>
 
             {show && (
                 <div className="modal-overlay terms-of-service-modal" onClick={handleClose}>
