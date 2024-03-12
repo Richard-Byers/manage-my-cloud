@@ -12,7 +12,7 @@ export const NothingFound: React.FC<NothingFoundProps> = ({caughtUpFor}) => {
 
     return (
         <div className={"nothing-found-container"}>
-            <p>{t("helpers.nothingFound.caughtUpOne")} {caughtUpFor}, {t("helpers.nothingFound.caughtUpTwo")}.</p>
+            <p id={"caught-up-with-message"}>{t("helpers.nothingFound.caughtUpOne")} {caughtUpFor}, {t("helpers.nothingFound.caughtUpTwo")}.</p>
             <Success/>
         </div>
     )

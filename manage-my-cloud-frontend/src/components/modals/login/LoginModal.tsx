@@ -89,7 +89,7 @@ const LoginModal: React.FC = () => {
 
     return (
         <>
-            <button className={"modal-login-button"} onClick={toggleModal}>
+            <button className={"modal-login-button"} id={"modal-login-button"} onClick={toggleModal}>
                 {t('main.landingPage.loginModal.getStartedButton')}
             </button>
 
@@ -97,7 +97,8 @@ const LoginModal: React.FC = () => {
                 <div className="modal-overlay" onClick={closeModal}>
                     <div className="modal" onClick={stopPropagation}>
 
-                        <button className={"modal-close-button"} onClick={closeModal}> <CloseIcon className="svg_icons"/> </button>
+                        <button className={"modal-close-button"} onClick={closeModal}><CloseIcon className="svg_icons"/>
+                        </button>
 
                         <div className={"modal-logo"}>
                             <img src={logo} alt={"Manage My Cloud Logo"}/>
@@ -126,7 +127,8 @@ const LoginModal: React.FC = () => {
                                            type="email"
                                            placeholder={"Enter your email Address"}
                                            onClick={stopPropagation}
-                                           onChange={handleEmailChange}/>
+                                           onChange={handleEmailChange}
+                                           id={"login-form-email"}/>
                                     <EmailIcon/>
                                 </label>
                                 <label className={modalFormInputLabel}>
@@ -134,7 +136,8 @@ const LoginModal: React.FC = () => {
                                            type="password"
                                            placeholder={"Enter your password"}
                                            onClick={stopPropagation}
-                                           onChange={handlePasswordChange}/>
+                                           onChange={handlePasswordChange}
+                                           id={"login-form-password"}/>
                                     <LockIcon/>
                                 </label>
                                 {showError && (
@@ -150,10 +153,10 @@ const LoginModal: React.FC = () => {
                             <div className={"separator"}></div>
 
                             <div className={"sign-up-login-container"}>
-                                <button className={"modal-login-reset-signup"} onClick={toggleForgotPasswordModal}>
+                                <button className={"modal-login-reset-signup"} id={"reset-password-button"} onClick={toggleForgotPasswordModal}>
                                     {t('main.landingPage.loginModal.resetPasswordText')}
                                 </button>
-                                <button className={"modal-login-reset-signup"} onClick={toggleSignUpModal}>
+                                <button className={"modal-login-reset-signup"} id={"signup-button"} onClick={toggleSignUpModal}>
                                     {t('main.landingPage.loginModal.signUpText')}
                                 </button>
                             </div>
