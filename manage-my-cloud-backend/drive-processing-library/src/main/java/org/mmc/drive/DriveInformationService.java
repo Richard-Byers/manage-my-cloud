@@ -404,9 +404,24 @@ public class DriveInformationService implements IDriveInformationService {
     public JsonNode callEndpointAndGetResponse(String provider, JsonNode files) throws IOException, InterruptedException {
 
         ObjectMapper mapper = new ObjectMapper();
-        String prettyJson = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(files);
+
+        JsonNode result = removeEmailFields(files);
+
+        String prettyJson = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(result);
 
         return mapper.readTree(chatDiscussion(prettyJson, provider, 0));
+    }
+
+    //Needed for AI as it seemed to confused the AI request and failed
+    public JsonNode removeEmailFields(JsonNode node) {
+        if (node.isObject()) {
+            ObjectNode objectNode = (ObjectNode) node;
+            objectNode.remove("emails");
+            objectNode.elements().forEachRemaining(this::removeEmailFields);
+        } else if (node.isArray()) {
+            node.elements().forEachRemaining(this::removeEmailFields);
+        }
+        return node;
     }
 
     private static String chatDiscussion(String files, String provider, int timesTried) throws IOException {
@@ -462,7 +477,7 @@ public class DriveInformationService implements IDriveInformationService {
             if(response.getStatusLine().getStatusCode() != 200) {
                 timesTried++;
                 if(timesTried < 3) {
-                    chatDiscussion(files, provider, timesTried);
+                    return chatDiscussion(files, provider, timesTried); // Return the result of the recursive call
                 }
                 return null;
             }
@@ -542,6 +557,7 @@ public class DriveInformationService implements IDriveInformationService {
                 child.set("children", (JsonNode) null);
             }
         }
+
         return outputJson;
     }
 

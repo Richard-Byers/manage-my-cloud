@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import "./DashboardPageButtons.css";
 import { useTranslation } from "react-i18next";
 import DeletionRecommendationsModal from "../../modals/dashboard/DeletionRecommendationsModal";
-import DeleteDuplicatesModel from "../../modals/dashboard/DeleteDuplicatesModal";
+import DeleteDuplicatesModal from "../../modals/dashboard/DeleteDuplicatesModal";
 import { CONNECTION_TITLE } from "../../../constants/ConnectionConstants";
 
 interface DashboardPageButtonsProps {
@@ -59,21 +59,26 @@ const DashboardPageButtons: React.FC<DashboardPageButtonsProps> = ({
         setShowDeletionModal(true);
     };
 
+    const hideDuplicatesDeletionModal = () => {
+        setShowDeletionModal(false);
+        setDeleteDuplicatesClicked(false);
+    };
+
     return (
         <div className={"dashboard-button-container"}>
-            <button className={"dashboard-button"}>
+            <button className={"dashboard-button"} onClick={handleDeleteDuplicates}>
                 {t("main.dashboard.dashboardPageButtons.deleteDuplicates")}
             </button>
             {showDeletionModal && (
-                <DeleteDuplicatesModel
+                <DeleteDuplicatesModal
                     data={data}
                     connectionProvider={CONNECTION_TITLE[connectionProvider]}
                     setShowModal={setShowModal}
                     driveEmail={driveEmail}
                     setHaveFilesBeenDeleted={setHaveFilesBeenDeleted}
-                    setShowDeletionModal={hideDeletionModal}
-                    deleteRecommendedClicked={deleteRecommendedClicked}
-                    setDeleteRecommendedClicked={setDeleteRecommendedClicked}
+                    setShowDeletionModal={hideDuplicatesDeletionModal}
+                    deleteDuplicatesClicked={deleteDuplicatesClicked}
+                    setDeleteDuplicatesClicked={setDeleteDuplicatesClicked}
                 />
             )}
             <button className={"dashboard-button"} onClick={handleDeleteRecommended}>
