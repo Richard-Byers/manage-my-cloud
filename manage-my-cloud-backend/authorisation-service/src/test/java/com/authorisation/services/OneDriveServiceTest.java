@@ -15,6 +15,7 @@ import reactor.core.publisher.Mono;
 import java.util.Date;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -72,6 +73,63 @@ class OneDriveServiceTest {
 
         assertEquals(expectedOneDriveTokenResponse, actualOneDriveTokenResponse);
         verify(cloudPlatformService, times(1)).addCloudPlatform(anyString(), anyString(), anyString(), anyString(), any(Date.class), anyString());
+    }
+
+    @Test
+    void getAndStoreUserTokens_DriveAlreadyLinked_ReturnsOneDriveTokenResponseWithError() {
+        String authCode = "auth_code";
+        String email = "email@example.com";
+        String driveEmail = "emaildrive@example.com";
+        ReflectionTestUtils.setField(oneDriveService, "clientId", "testClientId");
+        ReflectionTestUtils.setField(oneDriveService, "redirectUri", "testRedirectUri");
+        ReflectionTestUtils.setField(oneDriveService, "clientSecret", "testClientSecret");
+
+        OneDriveTokenResponse expectedOneDriveTokenResponse = new OneDriveTokenResponse();
+        expectedOneDriveTokenResponse.setAccessToken("access_token");
+        expectedOneDriveTokenResponse.setRefreshToken("refresh_token");
+        expectedOneDriveTokenResponse.setExpiresIn(3600L);
+
+        when(webClient.post()).thenReturn(requestBodyUriSpec);
+        when(requestBodyUriSpec.uri(anyString())).thenReturn(requestBodySpec);
+        when(requestBodySpec.header(any(), any())).thenReturn(requestBodySpec);
+        when(requestBodySpec.body(any())).thenReturn(requestHeadersSpec);
+        when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
+        when(responseSpec.bodyToMono(ArgumentMatchers.<Class<OneDriveTokenResponse>>notNull()))
+                .thenReturn(Mono.just(expectedOneDriveTokenResponse));
+        when(driveInformationService.getOneDriveEmail(any(), any())).thenReturn(driveEmail);
+        when(cloudPlatformService.isDriveLinked(anyString(), anyString(), anyString())).thenReturn(true);
+
+        OneDriveTokenResponse actualOneDriveTokenResponse = oneDriveService.getAndStoreUserTokens(authCode, email);
+
+        assertEquals("Drive already linked", actualOneDriveTokenResponse.getError());
+    }
+
+    @Test
+    void getAndStoreUserTokens_DriveInformationServiceThrowsException_ReturnsNull() {
+        String authCode = "auth_code";
+        String email = "email@example.com";
+        String driveEmail = "emaildrive@example.com";
+        ReflectionTestUtils.setField(oneDriveService, "clientId", "testClientId");
+        ReflectionTestUtils.setField(oneDriveService, "redirectUri", "testRedirectUri");
+        ReflectionTestUtils.setField(oneDriveService, "clientSecret", "testClientSecret");
+
+        OneDriveTokenResponse expectedOneDriveTokenResponse = new OneDriveTokenResponse();
+        expectedOneDriveTokenResponse.setAccessToken("access_token");
+        expectedOneDriveTokenResponse.setRefreshToken("refresh_token");
+        expectedOneDriveTokenResponse.setExpiresIn(3600L);
+
+        when(webClient.post()).thenReturn(requestBodyUriSpec);
+        when(requestBodyUriSpec.uri(anyString())).thenReturn(requestBodySpec);
+        when(requestBodySpec.header(any(), any())).thenReturn(requestBodySpec);
+        when(requestBodySpec.body(any())).thenReturn(requestHeadersSpec);
+        when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
+        when(responseSpec.bodyToMono(ArgumentMatchers.<Class<OneDriveTokenResponse>>notNull()))
+                .thenReturn(Mono.just(expectedOneDriveTokenResponse));
+        when(driveInformationService.getOneDriveEmail(any(), any())).thenThrow(new RuntimeException("Exception"));
+
+        OneDriveTokenResponse actualOneDriveTokenResponse = oneDriveService.getAndStoreUserTokens(authCode, email);
+
+        assertNull(actualOneDriveTokenResponse);
     }
 
     @Test

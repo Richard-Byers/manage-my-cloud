@@ -4,6 +4,7 @@ import com.authorisation.dto.CredentialsDto;
 import com.authorisation.dto.UserDto;
 import com.authorisation.entities.UserEntity;
 import com.authorisation.services.UserService;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,9 +16,17 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Optional;
 
+import static com.authorisation.TestConstants.TESTER_EMAIL;
+import static com.authorisation.givens.UserEntityGivens.generateUserData;
+import static com.authorisation.givens.UserEntityGivens.generateUserEntityTesterEmail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willThrow;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -48,6 +57,11 @@ class UserControllerTest {
         given(userService.findUserByEmail(testUser.getEmail())).willReturn(Optional.of(testUser));
     }
 
+    @AfterAll
+    public static void tearDown() throws IOException {
+        Files.delete(Paths.get("user-data.txt"));
+    }
+
     @Test
     void updateProfileImg_ValidRequest_ReturnsOk() throws Exception {
         mockMvc.perform(multipart(UPDATE_PROFILE_IMG_URL)
@@ -67,7 +81,7 @@ class UserControllerTest {
     }
 
     @Test
-    void updateProfileImg_UpdateProfileImageThrowsIOException_ReturnsInternalServerError() throws Exception {
+    void updateProfileImg_UpdateProfileImageThrowsRuntimeException_ReturnsInternalServerError() throws Exception {
         given(userService.findUserByEmail(testUser.getEmail())).willReturn(Optional.of(testUser));
         willThrow(new RuntimeException("Error updating profile image")).given(userService).updateProfileImage(testUser, testImage.getBytes());
 
@@ -87,6 +101,47 @@ class UserControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"email\":\"" + credentialsDto.getEmail() + "\",\"password\":\"" + credentialsDto.getPassword() + "\"}"))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    void deleteUser_DeleteUserError_ThrowsRuntimeException() throws Exception {
+        CredentialsDto credentialsDto = new CredentialsDto();
+        credentialsDto.setEmail(testUser.getEmail());
+        credentialsDto.setPassword("password");
+        willThrow(new RuntimeException("User not found")).given(userService).deleteUser(credentialsDto);
+
+        mockMvc.perform(delete(DELETE_USER_URL)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"email\":\"" + credentialsDto.getEmail() + "\",\"password\":\"" + credentialsDto.getPassword() + "\"}"))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void getUserData_ValidRequest_ReturnsUserData() throws Exception {
+        String email = TESTER_EMAIL;
+        String userData = generateUserData();
+        UserEntity user = generateUserEntityTesterEmail();
+        given(userService.findUserByEmail(email)).willReturn(Optional.of(user));
+        given(userService.getUserData(user)).willReturn(userData);
+
+        MvcResult result = mockMvc.perform(post(GET_USER_DATA_URL)
+                        .param("email", email))
+                .andExpect(status().isOk()).andReturn();
+
+        String content = result.getResponse().getContentAsString();
+        assertEquals(userData, content);
+    }
+
+    @Test
+    void getUserData_NullUserData_ReturnNotFound() throws Exception {
+        String email = TESTER_EMAIL;
+        UserEntity user = generateUserEntityTesterEmail();
+        given(userService.findUserByEmail(email)).willReturn(Optional.of(user));
+        given(userService.getUserData(user)).willReturn(null);
+
+        mockMvc.perform(post(GET_USER_DATA_URL)
+                        .param("email", email))
+                .andExpect(status().isNotFound());
     }
 
     @Test

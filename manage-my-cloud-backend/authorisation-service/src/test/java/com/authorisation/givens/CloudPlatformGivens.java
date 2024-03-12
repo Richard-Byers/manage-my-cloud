@@ -53,4 +53,28 @@ public class CloudPlatformGivens {
         return expectedCloudPlatform;
     }
 
+    public static CloudPlatform generateGoogleCloudPlatformEncryptedTokens() {
+
+        String userEmail = "email@example.com";
+        String platformName = "GoogleDrive";
+        String accessToken = encrypt("access_token");
+        String refreshToken = encrypt("refresh_token");
+        Date accessTokenExpiryDate = new Date();
+
+        UserEntity userEntity = new UserEntity();
+        userEntity.setEmail(userEmail);
+        userEntity.setLinkedAccounts(new LinkedAccounts());
+
+        CloudPlatform expectedCloudPlatform = new CloudPlatform();
+        expectedCloudPlatform.setUserEntity(userEntity);
+        expectedCloudPlatform.setPlatformName(platformName);
+        expectedCloudPlatform.setAccessToken(accessToken);
+        expectedCloudPlatform.setRefreshToken(refreshToken);
+        expectedCloudPlatform.setAccessTokenExpiryDate(accessTokenExpiryDate);
+
+
+        return expectedCloudPlatform;
+    }
+
+
 }

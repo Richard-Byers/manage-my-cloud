@@ -22,8 +22,8 @@ import java.io.StringReader;
 
 import static com.authorisation.Constants.GOOGLEDRIVE;
 import static com.authorisation.Constants.ONEDRIVE;
+import static com.authorisation.services.GoogleTokenService.getGoogleTokenResponse;
 
-@RequiredArgsConstructor
 @Service
 public class GoogleAuthService {
 
@@ -52,7 +52,7 @@ public class GoogleAuthService {
         String authCodeOutput = jsonObject.getString("authCode");
 
         try {
-            GoogleTokenResponse tokenResponse = getGoogleTokenResponse(authCodeOutput);
+            GoogleTokenResponse tokenResponse = getGoogleTokenResponse(authCodeOutput, googleCredentialsJson);
 
             String idTokenStr = tokenResponse.getIdToken();
             GoogleIdToken idToken = GoogleIdToken.parse(JacksonFactory.getDefaultInstance(), idTokenStr);
@@ -76,20 +76,6 @@ public class GoogleAuthService {
         return null;
     }
 
-    public GoogleTokenResponse getGoogleTokenResponse(String authCodeOutput) throws IOException {
-        GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(
-                JacksonFactory.getDefaultInstance(), new StringReader(googleCredentialsJson));
-        return new GoogleAuthorizationCodeTokenRequest(
-                new NetHttpTransport(),
-                JacksonFactory.getDefaultInstance(),
-                "https://www.googleapis.com/oauth2/v4/token",
-                clientSecrets.getDetails().getClientId(),
-                clientSecrets.getDetails().getClientSecret(),
-                authCodeOutput,
-                "postmessage")
-                .execute();
-    }
-
     public GoogleDriveLinkResponse linkGoogleAccount(String authCode, String email) {
         String jsonString = authCode.substring(authCode.indexOf("{"));
         JSONObject jsonObject = new JSONObject(jsonString);
@@ -97,7 +83,7 @@ public class GoogleAuthService {
         GoogleDriveLinkResponse googleDriveLinkResponse = new GoogleDriveLinkResponse();
 
         try {
-            GoogleTokenResponse tokenResponse = getGoogleTokenResponse(authCodeOutput);
+            GoogleTokenResponse tokenResponse = getGoogleTokenResponse(authCodeOutput, googleCredentialsJson);
             String driveEmail = driveInformationService.getGoogleDriveEmail(tokenResponse.getRefreshToken(), tokenResponse.getAccessToken());
 
             boolean isDriveLinked = cloudPlatformService.isDriveLinked(email, driveEmail, GOOGLEDRIVE);
