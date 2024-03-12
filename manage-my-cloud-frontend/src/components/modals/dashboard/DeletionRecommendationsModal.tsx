@@ -213,7 +213,6 @@ const DeletionRecommendationsModal: React.FC<DeletionRecommendationModalProps> =
     const closeModal = () => {
         setShowModal(false);
         setShowDeletionModal(false);
-        setShowDeletionModal(false);
         setDeleteRecommendedClicked(false);
         setSelectAll(false);
         setFilesToBeDeleted({children: [], emails: []})

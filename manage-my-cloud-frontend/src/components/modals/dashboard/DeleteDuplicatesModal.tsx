@@ -142,7 +142,6 @@ const DeleteDuplicatesModal: React.FC<DeleteDuplicatesProps> = ({
     const closeModal = () => {
         setShowModal(false);
         setShowDeletionModal(false);
-        setShowDeletionModal(false);
         setDeleteDuplicatesClicked(false);
         setSelectAll(false);
         setFilesToBeDeleted({children: []});
@@ -211,13 +210,13 @@ const DeleteDuplicatesModal: React.FC<DeleteDuplicatesProps> = ({
             <div className={"modal-overlay"} onClick={closeDuplicateModal}>
                 {loading ? <LoadingSpinner/> :
                     <div className={"modal"} onClick={stopPropagation}>
-    
+                        
                         {/*If items we're deleted then render successfulDeletionMessage*/}
                         {successfulDeletionMessage !== "" &&
                         <div className={"recommended-file-button-container"}>
                             <p>{successfulDeletionMessage}</p>
                             <Success/>
-                            <button className={"dashboard-button"} onClick={closeDuplicateModal}>
+                            <button className={"dashboard-button"} onClick={closeModal}>
                                 {t('main.dashboard.deletionModals.deleteDuplicates.closeRecommendation')}
                             </button>
                         </div>
