@@ -1,6 +1,22 @@
 {
   "main": {
     "header": "Manage My Cloud",
+    "welcome": {
+      "welcomeTo": "Welcome to Manage My Cloud"
+    },
+    "tooltip": {
+      "profile": {
+        "drivePreferences": "The options below for videos, images and documents relate to items stored directly inside your drive(s). The options for \"Recommend Items Created After\" and \"Recommend Items Not Edited Since\" will recommend items that match either condition.",
+        "emailPreferences": "Email preferences currently only apply to Google Drive accounts. Only emails that have been read, are in your inbox or spam folder will be recommended for deletion"
+      },
+      "manageConnections": {
+        "addConnectionsModalText": "We currently support One Drive and Google Drive, you can link as many of each as you'd like. After linking your account(s), you may proceed to the dashboard page to see general drive information.",
+        "manageConnectionMain": "This page enables you to link and unlink your cloud storage accounts. Any linked accounts will appear on the dashboard page. Any unlinked accounts may be re-linked at any time."
+      },
+      "dashboard": {
+        "dashboardMain": "The dashboard page displays all of your connected drives and their respective storage usage. Each card is clickable and will display more information about the drive, we will also provide you the ability to delete recommended and duplicate items on that drive."
+      }
+    },
     "dashboard": {
       "title": "Dashboard",
       "manageConnectionsTextBeforeLink": "To add or remove drives, please head to ",
@@ -67,7 +83,10 @@
     },
     "manageConnectionsPage": {
       "title": "Manage Connections",
-      "linkButton": "To link an account press the button below"
+      "linkButton": "To link an account press the button below",
+      "addConnectionModal": {
+        "linkWithSupportedProviderText": "Link with one of our available providers below"
+      }
     },
     "profile": {
       "title": "Profile",

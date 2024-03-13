@@ -18,6 +18,7 @@ public class UserEntity {
     private Long id;
     private String firstName;
     private String lastName;
+    private boolean firstLogin = true;
     @NaturalId(mutable = true)
     @Column(unique = true)
     private String email;

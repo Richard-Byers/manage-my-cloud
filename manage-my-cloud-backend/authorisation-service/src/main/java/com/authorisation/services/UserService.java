@@ -121,6 +121,16 @@ public class UserService implements IUserService {
         return userMapper.toUserDto(user);
     }
 
+    public void updateFirstLogin(String email) {
+        UserEntity user = userEntityRepository.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException("Unknown user", HttpStatus.NOT_FOUND));
+
+        if (user.isFirstLogin()) {
+            user.setFirstLogin(false);
+            userEntityRepository.save(user);
+        }
+    }
+
     @Override
     public Optional<UserEntity> findUserByEmail(String email) {
         return userEntityRepository.findByEmail(email);

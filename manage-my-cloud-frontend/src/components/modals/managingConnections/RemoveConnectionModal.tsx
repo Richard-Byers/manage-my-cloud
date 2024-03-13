@@ -3,6 +3,9 @@ import {AuthData} from "../../routing/AuthWrapper";
 import "./RemoveConnectionModal.css";
 import {buildAxiosRequestWithHeaders} from "../../helpers/AxiosHelper";
 import CloseIcon from "@mui/icons-material/Close";
+import ToolTip from "../../ui_components/ToolTip";
+import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
+import {useTranslation} from "react-i18next";
 
 interface RemoveConnectionModalProps {
     connectionProvider: string
@@ -13,6 +16,10 @@ const RemoveConnectionModal: React.FC<RemoveConnectionModalProps> = ({connection
 
     const {user, refreshUser} = AuthData();
     const [showModal, setShowModal] = useState(false);
+
+    const stopPropagation = (e: React.MouseEvent<HTMLDivElement>) => {
+        e.stopPropagation();
+    };
 
     const toggleModal = () => {
         setShowModal(!showModal);
@@ -35,16 +42,20 @@ const RemoveConnectionModal: React.FC<RemoveConnectionModalProps> = ({connection
 
     return (
         <>
-            <button className={"remove-connections-unlink-button"} id={"unlink-drive-button"} onClick={toggleModal}>Unlink</button>
+            <button className={"remove-connections-unlink-button"} id={"unlink-drive-button"}
+                    onClick={toggleModal}>Unlink
+            </button>
             {showModal && (
                 <div className="modal-overlay" onClick={closeModal}>
-                    <div className="remove-connections-modal">
+                    <div className="remove-connections-modal" onClick={stopPropagation}>
 
                         <button className={"modal-close-button"} onClick={closeModal}>
                             <CloseIcon className="svg_icons"/>
                         </button>
 
-                        <p>Are you sure you wish to unlink {connectionProvider} account?</p>
+                        <p className={"unlink-confirmation-text"} id={"unlink-confirmation-text"}>
+                            Unlink the {driveEmail} {connectionProvider} account?
+                        </p>
                         <button className={"no-button"} onClick={closeModal}>No</button>
                         <button className={"yes-button"} id={"confirm-unlink"} onClick={handleUnlink}>Yes</button>
                     </div>

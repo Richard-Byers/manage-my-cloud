@@ -6,6 +6,9 @@ import {useNavigate} from "react-router-dom";
 import {ROUTES} from "../../../constants/RouteConstants";
 import {useTranslation} from "react-i18next";
 import {AuthData} from "../../routing/AuthWrapper";
+import WelcomeModal from "../../ui_components/WelcomeModal";
+import ToolTip from "../../ui_components/ToolTip";
+import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 
 const DashboardPage = () => {
 
@@ -23,7 +26,12 @@ const DashboardPage = () => {
             <div className={"dashboard-page-content-grid"}>
                 <div className="dashboard-page-title-container">
                     {t('main.dashboard.title')}
+                    <ToolTip
+                        message={t("main.tooltip.dashboard.dashboardMain")}
+                        children={<HelpOutlineIcon/>}
+                    />
                 </div>
+                {user?.firstLogin === false ? null : <WelcomeModal/>}
 
                 {user?.linkedAccounts.linkedAccountsCount === 0 ? null :
                     <div className={"connected-drives-overflow-container"}>

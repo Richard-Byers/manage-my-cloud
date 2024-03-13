@@ -1,0 +1,86 @@
+.welcome-modal{
+    gap: 0.5em;
+    display: flex;
+    background: white;
+    height: 60vh;
+    width: 65vw;
+    border-radius: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    animation: fadeInPopUp 0.3s ease-in-out;
+}
+
+.welcome-modal-art{
+    display: flex;
+    justify-content: center;
+    height: 100%;
+    width: 40%;
+    border-top-right-radius: 20px;
+    border-bottom-right-radius: 20px;
+    background: url("../images/landing/main-background.jpeg") 100% / cover;
+    box-shadow: -15px 0px 13px -6px rgba(0,0,0,0.3);
+}
+
+.welcome-container{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 60%;
+    gap: 2em;
+}
+
+.welcome-container-text-container{
+    font-size: 1rem;
+    display: flex;
+    flex-direction: column;
+    font-family: MontserratRegular, serif;
+    padding: 2em;
+    gap: 0.4em
+}
+
+.welcome-container-text-container h2{
+    margin: 0;
+}
+
+.welcome-container-text-container p{
+    padding: 0;
+    margin: 0;
+}
+
+.welcome-button{
+    margin-top: 20px;
+    width: 8rem;
+    height: 40px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: 0.3s;
+    font-family: MontserratRegular, serif;
+    box-shadow: 6px 9px 5px 0px rgba(0, 0, 0, 0.18);
+    -webkit-box-shadow: 6px 9px 5px 0px rgba(0, 0, 0, 0.18);
+    -moz-box-shadow: 6px 9px 5px 0px rgba(0, 0, 0, 0.18);
+}
+
+.welcome-button:hover{
+    scale: 1.1;
+    background-color: #45a049;
+}
+
+@media only screen and (max-width: 768px) {
+
+    .welcome-modal{
+        flex-direction: column;
+        max-width: 100%;
+        max-height: 100%;
+        width: 100vw;
+        height: 100vh;
+        border-radius: 0;
+        padding: 1em;
+        overflow-y: auto;
+    }
+
+}
