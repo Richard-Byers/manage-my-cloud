@@ -250,8 +250,8 @@ const DeleteDuplicatesModal: React.FC<DeleteDuplicatesProps> = ({
                                     </> : <NothingFoundDuplicates/>}
                             </div>
                             {driveData && driveData?.children.length > 0 ?
-                                <div className={"deletion-duplicates-file-container"}>
-                                    <div className={"deletion-duplicates-files-grid"}>
+                                <div className={"deletion-recommendation-file-container"}>
+                                    <div className={"deletion-recommendation-files-grid"}>
                                         {driveData ?
                                             <FileTree data={driveData}
                                                       setFilesToBeDeleted={setFilesToBeDeleted}

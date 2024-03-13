@@ -459,22 +459,22 @@ public class DriveInformationService implements IDriveInformationService {
 
             // Create request body object
             Map<String, Object> requestBody = new HashMap<>();
-            requestBody.put("model", "gpt-3.5-turbo"); // Add the model parameter
+            requestBody.put("model", "gpt-3.5-turbo");
 
             // Create messages array
             List<Map<String, Object>> messages = new ArrayList<>();
             Map<String, Object> systemMessage = new HashMap<>();
             systemMessage.put("role", "system");
-            systemMessage.put("content", "You are a helpful assistant.");
+            systemMessage.put("content", "You are a helpful assistant analysing a JSON for duplicates by name key.");
             messages.add(systemMessage);
 
             Map<String, Object> userMessage = new HashMap<>();
             userMessage.put("role", "user");
             //If statement is needed here due to how drives rename duplicate files
             if (provider.equals("GoogleDrive")) {
-                userMessage.put("content", "Return duplicates by name (including file extension if exists) in the data, considering files with brackets as duplicates. For example, 'samefilename.png' and 'samefilename(1).png' should be considered as duplicates. The expected format is: {\"duplicates\": [{\"name\": string, \"count\": integer, \"files\": [{\"id\": string, \"name\": string, \"type\": string, \"createdDateTime\": float, \"lastModifiedDateTime\": float, \"webUrl\": string}]}]}. Note that the filename comparison is case-insensitive and ignores any numbers in brackets at the end of the filename: " + files);
+                userMessage.put("content", "Return duplicates by name (including file extension if exists) in the data, considering files with brackets as duplicates. Do not return anything if no duplicates are detected. The expected format is: {\"duplicates\": [{\"name\": string, \"count\": integer, \"files\": [{\"id\": string, \"name\": string, \"type\": string, \"createdDateTime\": float, \"lastModifiedDateTime\": float, \"webUrl\": string}]}]}. Note that the filename comparison is case-insensitive and ignores any numbers in brackets at the end of the filename: " + files);
             } else {
-                userMessage.put("content", "Return duplicates by name (including file extension if exists) in the data, considering files with brackets as duplicates. For example, 'samefilename.png' and 'samefilename 1.png' should be considered as duplicates. The expected format is: {\"duplicates\": [{\"name\": string, \"count\": integer, \"files\": [{\"id\": string, \"name\": string, \"type\": string, \"createdDateTime\": float, \"lastModifiedDateTime\": float, \"webUrl\": string}]}]}. Note that the filename comparison is case-insensitive and ignores any numbers in brackets at the end of the filename: " + files);
+                userMessage.put("content", "Return duplicates by name (including file extension if exists) in the data, considering files with numbers after name as duplicates. Do not return anything if no duplicates are detected. The expected format is: {\"duplicates\": [{\"name\": string, \"count\": integer, \"files\": [{\"id\": string, \"name\": string, \"type\": string, \"createdDateTime\": float, \"lastModifiedDateTime\": float, \"webUrl\": string}]}]}. Note that the filename comparison is case-insensitive and ignores any numbers in brackets at the end of the filename: " + files);
             }
             messages.add(userMessage);
 
