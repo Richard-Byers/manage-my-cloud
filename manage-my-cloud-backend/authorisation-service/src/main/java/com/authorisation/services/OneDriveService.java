@@ -1,5 +1,6 @@
 package com.authorisation.services;
 
+import com.authorisation.entities.CloudPlatform;
 import com.authorisation.response.OneDriveTokenResponse;
 import org.mmc.drive.DriveInformationService;
 import org.slf4j.Logger;
@@ -15,6 +16,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import java.util.Date;
 
 import static com.authorisation.Constants.*;
+import static com.authorisation.util.EncryptionUtil.encrypt;
 
 @Service
 public class OneDriveService implements IOneDriveService {
@@ -73,7 +75,7 @@ public class OneDriveService implements IOneDriveService {
             }
 
             if (isTokenAboutToExpire(oneDriveTokenResponse.getExpiresIn())) {
-                oneDriveTokenResponse = refreshToken(oneDriveTokenResponse.getRefreshToken(), email);
+                oneDriveTokenResponse = refreshToken(oneDriveTokenResponse.getRefreshToken(),driveEmail, email);
             }
 
             storeUserPlatformLink(oneDriveTokenResponse, email, accessExpiryDate, driveEmail);
@@ -104,7 +106,7 @@ public class OneDriveService implements IOneDriveService {
 
     }
 
-    public OneDriveTokenResponse refreshToken(String refreshToken, String email) {
+    public OneDriveTokenResponse refreshToken(String refreshToken, String driveEmail, String email) {
         try {
             String scope = "user.read files.readwrite.all offline_access";
 
@@ -124,9 +126,18 @@ public class OneDriveService implements IOneDriveService {
             if (oneDriveTokenResponse == null) {
                 throw new RuntimeException("OneDrive token response is null");
             }
+            driveEmail = driveInformationService.getOneDriveEmail(oneDriveTokenResponse.getAccessToken(), new Date(System.currentTimeMillis() + (oneDriveTokenResponse.getExpiresIn() * 1000)));
 
-            String driveEmail = driveInformationService.getOneDriveEmail(oneDriveTokenResponse.getAccessToken(), new Date(System.currentTimeMillis() + (oneDriveTokenResponse.getExpiresIn() * 1000)));
-            storeUserPlatformLink(oneDriveTokenResponse, email, new Date(System.currentTimeMillis() + (oneDriveTokenResponse.getExpiresIn() * 1000)), driveEmail);
+            CloudPlatform cloudPlatform = cloudPlatformService.getUserCloudPlatform(email, ONEDRIVE, driveEmail);
+            if (cloudPlatform == null) {
+                throw new RuntimeException("CloudPlatform not found");
+            }
+
+            cloudPlatform.setAccessToken(encrypt(oneDriveTokenResponse.getAccessToken()));
+            cloudPlatform.setRefreshToken(encrypt(oneDriveTokenResponse.getRefreshToken()));  // Encrypt the refresh token
+            cloudPlatform.setAccessTokenExpiryDate(new Date(System.currentTimeMillis() + (oneDriveTokenResponse.getExpiresIn() * 1000)));
+
+            cloudPlatformService.saveCloudPlatform(cloudPlatform);
 
             return oneDriveTokenResponse;
         } catch (Exception e) {

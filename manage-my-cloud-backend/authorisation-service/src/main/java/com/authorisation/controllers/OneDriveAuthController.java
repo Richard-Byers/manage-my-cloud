@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 import static com.authorisation.Constants.EXPIRATION_THRESHOLD_MINUTES;
+import static com.authorisation.util.EncryptionUtil.decrypt;
 
 @RequiredArgsConstructor
 @RestController
@@ -31,16 +32,34 @@ public class OneDriveAuthController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+//    @PostMapping("/onedrive-refresh-access-token")
+//    public ResponseEntity<List<Pair<String, OneDriveTokenResponse>>> refreshAccessToken(@RequestBody Map<String, String> body) {
+//        String email = body.get("email");
+//        List<CloudPlatform> cloudPlatforms = cloudPlatformService.getDriveEmailAndRefreshTokens(email, "OneDrive");
+//        List<Pair<String, OneDriveTokenResponse>> responses = new ArrayList<>();
+//        for (CloudPlatform cloudPlatform : cloudPlatforms) {
+//            // Commented out the check for token expiration and token refresh
+//            // if (cloudPlatform.getAccessTokenExpiryDate().getTime() - System.currentTimeMillis() <= EXPIRATION_THRESHOLD_MINUTES * 60 * 1000) {
+//            //     String refreshToken = decrypt(cloudPlatform.getRefreshToken());
+//            //     OneDriveTokenResponse response = oneDriveService.refreshToken(refreshToken, cloudPlatform.getDriveEmail());
+//            //     responses.add(Pair.of("Token refreshed for " + cloudPlatform.getDriveEmail(), response));
+//            // } else {
+//            OneDriveTokenResponse defaultResponse = new OneDriveTokenResponse();  // Create a new OneDriveTokenResponse with default values
+//            responses.add(Pair.of("Token still valid for " + cloudPlatform.getDriveEmail(), defaultResponse));
+//            // }
+//        }
+//        return new ResponseEntity<>(responses, HttpStatus.OK);
+//    }
+
     @PostMapping("/onedrive-refresh-access-token")
     public ResponseEntity<List<Pair<String, OneDriveTokenResponse>>> refreshAccessToken(@RequestBody Map<String, String> body) {
         String email = body.get("email");
         List<CloudPlatform> cloudPlatforms = cloudPlatformService.getDriveEmailAndRefreshTokens(email, "OneDrive");
         List<Pair<String, OneDriveTokenResponse>> responses = new ArrayList<>();
         for (CloudPlatform cloudPlatform : cloudPlatforms) {
-            // Check if the access token is about to expire
             if (cloudPlatform.getAccessTokenExpiryDate().getTime() - System.currentTimeMillis() <= EXPIRATION_THRESHOLD_MINUTES * 60 * 1000) {
-                // Refresh the access token
-                OneDriveTokenResponse response = oneDriveService.refreshToken(cloudPlatform.getRefreshToken(), cloudPlatform.getDriveEmail());
+                String refreshToken = decrypt(cloudPlatform.getRefreshToken());
+                OneDriveTokenResponse response = oneDriveService.refreshToken(refreshToken, cloudPlatform.getDriveEmail(), email);
                 responses.add(Pair.of("Token refreshed for " + cloudPlatform.getDriveEmail(), response));
             } else {
                 OneDriveTokenResponse defaultResponse = new OneDriveTokenResponse();  // Create a new OneDriveTokenResponse with default values

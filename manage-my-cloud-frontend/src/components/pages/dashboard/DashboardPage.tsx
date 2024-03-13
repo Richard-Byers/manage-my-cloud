@@ -41,26 +41,9 @@ const DashboardPage = () => {
         }
     };
 
+    // Call checkAndUpdateToken when the component is mounted
     useEffect(() => {
-        const checkToken = async () => {
-            if (!document.hidden) {
-                await checkAndUpdateToken();
-            }
-        };
-
-        document.addEventListener('visibilitychange', checkToken);
-
-        // Set up the interval for checking the token
-        intervalRef.current = setInterval(checkAndUpdateToken, 1000 * 60 * 5); // Check every 5 minutes
-
-        return () => {
-            document.removeEventListener('visibilitychange', checkToken);
-
-            // Clean up the interval when the component is unmounted
-            if (intervalRef.current) {
-                clearInterval(intervalRef.current);
-            }
-        };
+        checkAndUpdateToken();
     }, []);
 
     return (
@@ -93,6 +76,7 @@ const DashboardPage = () => {
                     </p>
                 </div>
             </div>
+
         </>
     )
 };

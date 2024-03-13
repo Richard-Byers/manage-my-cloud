@@ -103,4 +103,8 @@ public class CloudPlatformService implements ICloudPlatformService {
         CloudPlatform cloudPlatform = cloudPlatformRepository.findByDriveEmailAndPlatformName(platformName, driveEmail);
         return cloudPlatform.getAccessTokenExpiryDate();
     }
+
+    public void saveCloudPlatform(CloudPlatform cloudPlatform) {
+        cloudPlatformRepository.save(cloudPlatform);
+    }
 }
