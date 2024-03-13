@@ -34,5 +34,4 @@ public class OneDriveTokenResponse {
 
     @JsonProperty("error")
     private String error;
-
 }

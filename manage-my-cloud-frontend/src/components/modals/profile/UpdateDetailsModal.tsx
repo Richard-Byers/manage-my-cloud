@@ -35,7 +35,6 @@ function UpdateDetailsModal() {
             if (!firstName && !lastName) {
                 if (!successMessage) {
                     setErrorMessage(t('main.updateDetailsModal.errorMessage.enterSomething'));
-
                 }
                 return;
             }

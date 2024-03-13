@@ -1,6 +1,7 @@
 package com.authorisation.controllers;
 
 import com.authorisation.response.OneDriveTokenResponse;
+import com.authorisation.services.CloudPlatformService;
 import com.authorisation.services.OneDriveService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -33,6 +34,8 @@ class OneDriveAuthControllerTest {
     private WebApplicationContext context;
     @MockBean
     private OneDriveService oneDriveService;
+    @MockBean
+    private CloudPlatformService cloudPlatformService;
 
     @BeforeEach
     public void setup() {

@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.*;
 public class GoogleAuthController {
 
     @Autowired
-
     private GoogleAuthService googleAuthService;
 
     @PostMapping("/registergoogleuser")
