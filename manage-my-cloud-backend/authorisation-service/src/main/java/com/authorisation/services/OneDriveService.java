@@ -2,6 +2,8 @@ package com.authorisation.services;
 
 import com.authorisation.response.OneDriveTokenResponse;
 import org.mmc.drive.DriveInformationService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -16,6 +18,7 @@ import static com.authorisation.Constants.*;
 
 @Service
 public class OneDriveService implements IOneDriveService {
+    private static final Logger log = LoggerFactory.getLogger(OneDriveService.class);
 
     private final String clientId;
     private final String redirectUri;
@@ -69,6 +72,10 @@ public class OneDriveService implements IOneDriveService {
                 return oneDriveTokenResponse;
             }
 
+            if (isTokenAboutToExpire(oneDriveTokenResponse.getExpiresIn())) {
+                oneDriveTokenResponse = refreshToken(oneDriveTokenResponse.getRefreshToken(), email);
+            }
+
             storeUserPlatformLink(oneDriveTokenResponse, email, accessExpiryDate, driveEmail);
 
             return oneDriveTokenResponse;
@@ -76,6 +83,10 @@ public class OneDriveService implements IOneDriveService {
             e.printStackTrace();
         }
         return null;
+    }
+
+    private boolean isTokenAboutToExpire(Long expiresIn) {
+        return expiresIn < EXPIRATION_THRESHOLD_MINUTES * 60;
     }
 
     public void unlinkOneDrive(String email, String driveEmail) {
@@ -93,5 +104,34 @@ public class OneDriveService implements IOneDriveService {
 
     }
 
+    public OneDriveTokenResponse refreshToken(String refreshToken, String email) {
+        try {
+            String scope = "user.read files.readwrite.all offline_access";
 
+            OneDriveTokenResponse oneDriveTokenResponse = webClient.post()
+                    .uri(MS_AUTH_CODE_URL)
+                    .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+                    .body(BodyInserters.fromFormData("client_id", clientId)
+                            .with("redirect_uri", redirectUri)
+                            .with("scope", scope)
+                            .with("client_secret", clientSecret)
+                            .with("refresh_token", refreshToken)
+                            .with("grant_type", ONEDRIVE_REFRESH_GRANT_TYPE))
+                    .retrieve()
+                    .bodyToMono(OneDriveTokenResponse.class)
+                    .block();
+
+            if (oneDriveTokenResponse == null) {
+                throw new RuntimeException("OneDrive token response is null");
+            }
+
+            String driveEmail = driveInformationService.getOneDriveEmail(oneDriveTokenResponse.getAccessToken(), new Date(System.currentTimeMillis() + (oneDriveTokenResponse.getExpiresIn() * 1000)));
+            storeUserPlatformLink(oneDriveTokenResponse, email, new Date(System.currentTimeMillis() + (oneDriveTokenResponse.getExpiresIn() * 1000)), driveEmail);
+
+            return oneDriveTokenResponse;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 }

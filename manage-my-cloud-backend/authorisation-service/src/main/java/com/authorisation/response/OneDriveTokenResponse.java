@@ -1,5 +1,6 @@
 package com.authorisation.response;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -10,6 +11,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class OneDriveTokenResponse {
 
     @JsonProperty("token_type")
@@ -32,4 +34,5 @@ public class OneDriveTokenResponse {
 
     @JsonProperty("error")
     private String error;
+
 }

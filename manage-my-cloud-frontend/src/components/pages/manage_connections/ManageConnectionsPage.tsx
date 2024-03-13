@@ -35,6 +35,42 @@ const ManageConnectionsPage = () => {
         }
     }, []);
 
+    const checkAndUpdateToken = async () => {
+        console.log('checkAndUpdateToken function called');
+        const userEmail = user?.email;
+        const headers = {
+            Authorization: `Bearer ${user?.token}`
+        };
+        if (userEmail && user?.linkedAccounts.linkedDriveAccounts.some(account => account.accountType === 'OneDrive')) {
+            try {
+                const response = await buildAxiosRequestWithHeaders('POST', `/onedrive-refresh-access-token`, headers, {email: userEmail});
+                if (response.status === 200) {
+                    for (let i = 0; i < response.data.length; i++) {
+                        if (response.data[i].status === 200) {
+                            refreshUser(user?.email);
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Failed to refresh access token:', error);
+            }
+        }
+    };
+
+    useEffect(() => {
+        const checkToken = async () => {
+            if (!document.hidden) {
+                await checkAndUpdateToken();
+            }
+        };
+        // Check the token when the page becomes visible
+        document.addEventListener('visibilitychange', checkToken);
+
+        return () => {
+            document.removeEventListener('visibilitychange', checkToken);
+        };
+    }, []);
+
     return (
         <div>
             <Navbar/>
@@ -55,13 +91,13 @@ const ManageConnectionsPage = () => {
                 }
 
                 {user?.linkedAccounts.linkedAccountsCount === 0 ? null :
-                <div className="overflow-container">
-                    {user?.linkedAccounts.linkedAccountsCount === 0 ? null
-                        :
-                        user?.linkedAccounts.linkedDriveAccounts.map(({accountEmail, accountType}) => (
-                            <Connection key={accountEmail} accountEmail={accountEmail} accountType={accountType}/>
-                        ))}
-                </div>
+                    <div className="overflow-container">
+                        {user?.linkedAccounts.linkedAccountsCount === 0 ? null
+                            :
+                            user?.linkedAccounts.linkedDriveAccounts.map(({accountEmail, accountType}) => (
+                                <Connection key={accountEmail} accountEmail={accountEmail} accountType={accountType}/>
+                            ))}
+                    </div>
                 }
 
                 {user?.linkedAccounts.linkedAccountsCount !== undefined && user?.linkedAccounts.linkedAccountsCount >= 1 ? (
