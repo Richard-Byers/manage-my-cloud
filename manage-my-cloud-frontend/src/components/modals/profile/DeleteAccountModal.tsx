@@ -80,7 +80,7 @@ function DeleteAccountModal() {
 
     return (
         <>
-            <button className="actions-button" onClick={() => setShowModal(true)}>Delete Account</button>
+            <button className="actions-button" onClick={() => setShowModal(true)} id={"delete-account-button"}>Delete Account</button>
             {showModal && (
                 <div className="modal-overlay" onClick={resetModal}>
                     <div className="modal" onClick={e => e.stopPropagation()}>

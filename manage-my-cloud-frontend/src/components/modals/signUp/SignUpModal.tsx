@@ -113,9 +113,10 @@ export const SignUpModal: React.FC<SignUpProps> = ({
     return (
         <>
             <div className="modal-overlay" onClick={closeSignUpModal}>
-                <div className="modal" onClick={stopPropagation}>
+                <div className="modal" id={"signup-modal"} onClick={stopPropagation}>
 
-                    <button className={"modal-close-button"} onClick={closeSignUpModal}><CloseIcon className={"svg_icons"}/></button>
+                    <button className={"modal-close-button"} onClick={closeSignUpModal}><CloseIcon
+                        className={"svg_icons"}/></button>
 
                     <div className={"modal-logo-signup"}>
                         <img src={logo} alt={"Manage My Cloud Logo"}/>
@@ -132,13 +133,14 @@ export const SignUpModal: React.FC<SignUpProps> = ({
                             {t("main.landingPage.signUpModal.mainTextTwo")}
                         </div>
 
-                        <form className={"modal-form"}>
+                        <form className={"modal-form"} id={"signup-modal-form"}>
                             <label className={"modal-form-label"}>
                                 <input className={"modal-form-input"}
                                        type="text"
                                        placeholder={"Enter your First Name"}
                                        onClick={stopPropagation}
-                                       onChange={handleFirstNameChange}/>
+                                       onChange={handleFirstNameChange}
+                                       id={"signup-firstname-input"}/>
                                 <BadgeIcon/>
                             </label>
                             <label className={"modal-form-label"}>
@@ -146,7 +148,8 @@ export const SignUpModal: React.FC<SignUpProps> = ({
                                        type="text"
                                        placeholder={"Enter your Last Name"}
                                        onClick={stopPropagation}
-                                       onChange={handleLastNameChange}/>
+                                       onChange={handleLastNameChange}
+                                       id={"signup-lastname-input"}/>
                                 <BadgeIcon/>
                             </label>
                             <label className={"modal-form-label"}>
@@ -154,7 +157,8 @@ export const SignUpModal: React.FC<SignUpProps> = ({
                                        type="email"
                                        placeholder={"Enter your email Address"}
                                        onClick={stopPropagation}
-                                       onChange={handleEmailChange}/>
+                                       onChange={handleEmailChange}
+                                       id={"signup-email-input"}/>
                                 <EmailIcon/>
                             </label>
                             <label className={"modal-form-label"}>
@@ -162,7 +166,8 @@ export const SignUpModal: React.FC<SignUpProps> = ({
                                        type="password"
                                        placeholder={"Enter your password"}
                                        onClick={stopPropagation}
-                                       onChange={handlePasswordChange}/>
+                                       onChange={handlePasswordChange}
+                                       id={"signup-password-input"}/>
                                 <LockIcon/>
                             </label>
 
@@ -171,7 +176,8 @@ export const SignUpModal: React.FC<SignUpProps> = ({
                                        type="password"
                                        placeholder={"Confirm your password"}
                                        onClick={stopPropagation}
-                                       onChange={handleConfirmPasswordChange}/>
+                                       onChange={handleConfirmPasswordChange}
+                                       id={"signup-confirm-password-input"}/>
                                 <LockIcon/>
                             </label>
 
@@ -189,7 +195,7 @@ export const SignUpModal: React.FC<SignUpProps> = ({
                                 </div>
                             )}
 
-                            <button className={"modal-form-submit-button"} type="submit"
+                            <button className={"modal-form-submit-button"} id={"signup-modal-submit-button"} type="submit"
                                     onClick={handleSignupSubmission}>
                                 {t("main.landingPage.signUpModal.signUpButton")}
                             </button>

@@ -11,10 +11,10 @@ interface ConnectionProps {
 const Connection: React.FC<ConnectionProps> = ({accountType, accountEmail}) => {
 
     return (
-        <div className={"connection-container"}>
+        <div className={"connection-container"} id={`${accountType}-container`}>
             <img src={CONNECTION_LOGOS[accountType]} alt={`Logo for ${accountType}`}/>
-            <p>{CONNECTION_TITLE[accountType]}</p>
-            <p>{accountEmail}</p>
+            <p id={"linked-drive-type"}>{CONNECTION_TITLE[accountType]}</p>
+            <p id={"linked-drive-email"}>{accountEmail}</p>
             <RemoveConnectionModal connectionProvider={CONNECTION_TITLE[accountType]} driveEmail={accountEmail}/>
         </div>
     )
