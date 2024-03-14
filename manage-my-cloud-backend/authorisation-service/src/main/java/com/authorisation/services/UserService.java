@@ -226,7 +226,7 @@ public class UserService implements IUserService {
         }
     }
 
-    private byte[] loadGoogleProfileImage(String imageUrl) {
+    protected byte[] loadGoogleProfileImage(String imageUrl) {
         try {
             URL url = new URL(imageUrl);
             BufferedImage img = ImageIO.read(url);
