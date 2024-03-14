@@ -25,8 +25,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
@@ -85,6 +91,7 @@ public class UserService implements IUserService {
         newUser.setEnabled(true);
         newUser.setAccountType("GOOGLE");
         newUser.setLinkedAccounts(new LinkedAccounts());
+        newUser.setProfileImage(loadGoogleProfileImage(pictureUrl));
         userEntityRepository.save(newUser);
 
         RecommendationSettings recommendationSettings = new RecommendationSettings();
@@ -209,12 +216,37 @@ public class UserService implements IUserService {
 
     private byte[] loadDefaultProfileImage() {
         // Load the default profile image from the classpath
+
         try {
             ClassPathResource imageResource = new ClassPathResource("DefaultProfileImage.jpg");
             InputStream inputStream = imageResource.getInputStream();
             return inputStream.readAllBytes();
         } catch (IOException e) {
             throw new RuntimeException("Error loading default profile image", e);
+        }
+    }
+
+    private byte[] loadGoogleProfileImage(String imageUrl) {
+        try {
+            URL url = new URL(imageUrl);
+            BufferedImage img = ImageIO.read(url);
+
+            // Create a temporary file and write the image to it
+            Path tempFile = Files.createTempFile("profileImage", ".tmp");
+            ImageIO.write(img, "jpg", tempFile.toFile());
+
+            // Read the temporary file into a byte array
+            byte[] imageBytes;
+            try (InputStream in = new FileInputStream(tempFile.toFile())) {
+                imageBytes = in.readAllBytes();
+            }
+
+            // Delete the temporary file
+            Files.delete(tempFile);
+
+            return imageBytes;
+        } catch (IOException e) {
+            throw new RuntimeException("Error loading profile image from URL", e);
         }
     }
 
