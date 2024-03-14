@@ -5,13 +5,21 @@ import ProfileActionsCard from './cards/ProfileActionsCard';
 import UserProfileCard from "./cards/UserProfileCard";
 import ProfilePreferencesCard from "./cards/ProfilePreferencesCard";
 import {useTranslation} from 'react-i18next';
+import {AuthData} from "../../routing/AuthWrapper";
 
 const ProfilePage = () => {
     const {t} = useTranslation();
     const [activeCard, setActiveCard] = useState('userProfile');
+    const {user, refreshUser} = AuthData();
 
     useEffect(() => {
         document.body.style.overflow = "hidden";
+    }, []);
+
+    useEffect(() => {
+        if (user && user.email) {
+            refreshUser(user.email);
+        }
     }, []);
 
     const handleCardChange = (cardName: React.SetStateAction<string>) => {
