@@ -20,6 +20,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.view.RedirectView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Optional;
@@ -63,19 +64,22 @@ public class RegistrationController {
     @GetMapping("verifyEmail")
     public RedirectView verifyEmail(@RequestParam("token") String token) {
         VerificationToken verificationToken = verificationTokenRepository.findByToken(token);
+        String redirectUrl;
 
         if (verificationToken.getUserEntity().isEnabled()) {
-            return new RedirectView("http://localhost:3000/login");
-        }
-
-        String verificationResult = userService.validateToken(token);
-
-        if (verificationResult.equals("valid")) {
-            return new RedirectView("http://localhost:3000/login");
+            redirectUrl = "http://localhost:3000/login?message=already_verified";
         } else {
-            String resendUrl = applicationUrl(request) + "/register/resendVerificationEmail?token=" + token;
-            return new RedirectView(resendUrl);
+            String verificationResult = userService.validateToken(token);
+
+            if ("valid".equals(verificationResult)) {
+                redirectUrl = "http://localhost:3000/login?message=verification_success";
+            } else {
+                String resendUrl = applicationUrl(request) + "/register/resendVerificationEmail?token=" + token;
+                redirectUrl = resendUrl + "&message=resend_verification";
+            }
         }
+
+        return new RedirectView(redirectUrl);
     }
 
     @GetMapping("/resendVerificationEmail")

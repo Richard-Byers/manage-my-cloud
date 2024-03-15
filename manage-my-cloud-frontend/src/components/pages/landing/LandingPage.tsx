@@ -1,17 +1,16 @@
 import manageMyCloudLogo from "../../images/managemycloudlogo.svg";
 import React from "react";
-import { useNavigate } from "react-router-dom"; // Import useNavigate
+import { useNavigate } from "react-router-dom";
 import "./LandingPage.css";
 import LoginModal from "../../modals/login/LoginModal";
 import { useTranslation } from 'react-i18next';
 
 const LandingPage: React.FC = () => {
     const { t } = useTranslation();
-    const navigate = useNavigate(); // Use navigate
+    const navigate = useNavigate();
 
-    // Function to handle click event
     const handleGetStartedClick = () => {
-        navigate('/login'); // Navigate to /login
+        navigate('/login');
     };
 
     return (

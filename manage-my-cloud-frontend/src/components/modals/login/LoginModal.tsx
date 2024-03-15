@@ -1,5 +1,5 @@
-import React, {useState} from "react";
-import {useNavigate} from "react-router-dom";
+import React, {useState, useEffect} from "react";
+import {useNavigate, useLocation, useSearchParams} from "react-router-dom";
 import "./LoginModal.css";
 import "../Modal.css";
 import logo from "../../images/managemycloudlogo.png";
@@ -62,16 +62,15 @@ const LoginModal: React.FC = () => {
     };
 
     const toggleSignUpModal = () => {
-        closeModal();
         setShowSignUpModal(!showSignUpModal);
     };
+
 
     const openSignUpModal = () => {
         setShowSignUpModal(true);
     };
 
     const toggleForgotPasswordModal = () => {
-        closeModal();
         setShowForgotPasswordModal(!showForgotPasswordModal);
     };
 
@@ -106,9 +105,11 @@ const LoginModal: React.FC = () => {
 
     return (
         <>
+        {location.pathname !== '/login' && (
             <button className={"modal-login-button"} id={"modal-login-button"} onClick={toggleModal}>
                 {t('main.landingPage.loginModal.getStartedButton')}
             </button>
+        )}
 
             {showModal && (
                 <div className="modal-overlay" onClick={closeModal}>
@@ -170,31 +171,29 @@ const LoginModal: React.FC = () => {
                             <div className={"separator"}></div>
 
                             <div className={"sign-up-login-container"}>
-                                <button className={"modal-login-reset-signup"} id={"reset-password-button"} onClick={toggleForgotPasswordModal}>
+                                <button className={"modal-login-reset-signup"} id={"reset-password-button"}
+                                        onClick={toggleForgotPasswordModal}>
                                     {t('main.landingPage.loginModal.resetPasswordText')}
                                 </button>
-                                <button className={"modal-login-reset-signup"} id={"signup-button"} onClick={toggleSignUpModal}>
+                                <button className={"modal-login-reset-signup"} id={"signup-button"}
+                                        onClick={toggleSignUpModal}>
                                     {t('main.landingPage.loginModal.signUpText')}
                                 </button>
                             </div>
                         </div>
                     </div>
                 </div>
-            ) : (
-                <button className={"modal-login-button"} onClick={toggleModal}>
-                    {t('main.landingPage.loginModal.getStartedButton')}
-                </button>
+
             )}
             {showSignUpModal && (<SignUpModal
                     setShowSignUpModal={setShowSignUpModal}/>
             )}
-
             {showForgotPasswordModal && (
                 <ResetPasswordModal
                     setForgotPasswordModal={setShowForgotPasswordModal}/>
             )}
         </>
     );
-};
 
+}
 export default LoginModal;
