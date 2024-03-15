@@ -133,12 +133,6 @@ const DeleteDuplicatesModal: React.FC<DeleteDuplicatesProps> = ({
         }
     }
 
-
-    const handleDuplicateDeletion = async () => {
-        console.log("hello");
-        setDeleteDuplicatesClicked(true);
-    }
-
     const closeModal = () => {
         setShowModal(false);
         setShowDeletionModal(false);
@@ -169,7 +163,7 @@ const DeleteDuplicatesModal: React.FC<DeleteDuplicatesProps> = ({
         }
 
         setLoading(true);
-        await buildAxiosRequestWithHeaders('POST', `/delete-recommended?email=${user.email}&provider=${connectionProvider}&driveEmail=${driveEmail}&isEmail=false`, headers, filesToDelete)
+        await buildAxiosRequestWithHeaders('POST', `/delete-recommended?email=${user.email}&provider=${connectionProvider}&driveEmail=${driveEmail}`, headers, filesToDelete)
             .then((response) => {
                 setLoading(false);
                 setSuccessfulDeletionMessage(`Successfully deleted ${response.data.filesDeleted} file(s) from your drive.`);

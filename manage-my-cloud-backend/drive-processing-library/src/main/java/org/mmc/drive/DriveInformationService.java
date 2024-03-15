@@ -371,7 +371,8 @@ public class DriveInformationService implements IDriveInformationService {
         return emails;
     }
 
-    public FilesDeletedResponse deleteRecommendedGoogleDriveFiles(JsonNode filesToDelete, String refreshToken, String accessToken, boolean isEmail) throws JsonProcessingException {
+    public FilesDeletedResponse deleteRecommendedGoogleDriveFiles(JsonNode filesToDelete, String refreshToken, String accessToken) throws JsonProcessingException {
+        System.out.println(filesToDelete.toString());
         AtomicInteger filesDeleted = new AtomicInteger();
         AtomicInteger emailsDeleted = new AtomicInteger();
         FilesDeletedResponse filesDeletedResponse = new FilesDeletedResponse();
@@ -388,7 +389,7 @@ public class DriveInformationService implements IDriveInformationService {
             }
         });
 
-        if (isEmail) {
+        if (filesInUserDrive.getEmails() != null) {
             filesInUserDrive.getEmails().parallelStream().forEach(item -> {
                 try {
                     gmailClient.users().messages().delete("me", item.getId()).execute();
