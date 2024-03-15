@@ -7,6 +7,7 @@ import {ROUTES} from "../../../constants/RouteConstants";
 import {useTranslation} from "react-i18next";
 import {AuthData} from "../../routing/AuthWrapper";
 import {buildAxiosRequestWithHeaders} from "../../helpers/AxiosHelper";
+import {TokenUpdater} from "../../helpers/TokenUpdater"
 
 const DashboardPage = () => {
 
@@ -19,31 +20,8 @@ const DashboardPage = () => {
         navigate(ROUTES.MANAGE_CONNECTIONS);
     }
 
-    const checkAndUpdateToken = async () => {
-        console.log('checkAndUpdateToken function called');
-        const userEmail = user?.email;
-        const headers = {
-            Authorization: `Bearer ${user?.token}`
-        };
-        if (userEmail && user?.linkedAccounts.linkedDriveAccounts.some(account => account.accountType === 'OneDrive')) {
-            try {
-                const response = await buildAxiosRequestWithHeaders('POST', `/onedrive-refresh-access-token`, headers, {email: userEmail});
-                if (response.status === 200) {
-                    for (let i = 0; i < response.data.length; i++) {
-                        if (response.data[i].status === 200) {
-                            refreshUser(user?.email);
-                        }
-                    }
-                }
-            } catch (error) {
-                console.error('Failed to refresh access token:', error);
-            }
-        }
-    };
-
-    // Call checkAndUpdateToken when the component is mounted
     useEffect(() => {
-        checkAndUpdateToken();
+        TokenUpdater.checkAndUpdateToken();
     }, []);
 
     return (

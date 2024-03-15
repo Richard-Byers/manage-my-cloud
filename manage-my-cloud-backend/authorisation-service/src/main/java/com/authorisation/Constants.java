@@ -20,5 +20,6 @@ public class Constants {
     public static final String ONEDRIVE_REFRESH_GRANT_TYPE = "refresh_token";
 
     public static final long EXPIRATION_THRESHOLD_MINUTES = 5;
+    public static final long EXPIRATION_THRESHOLD_MILLISECONDS = EXPIRATION_THRESHOLD_MINUTES * 60 * 1000;
 
 }
