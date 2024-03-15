@@ -269,7 +269,7 @@ const DeletionRecommendationsModal: React.FC<DeletionRecommendationModalProps> =
         }
 
         setLoading(true);
-        await buildAxiosRequestWithHeaders('POST', `/delete-recommended?email=${user.email}&provider=${connectionProvider}&driveEmail=${driveEmail}`, headers, filesToDelete)
+        await buildAxiosRequestWithHeaders('POST', `/delete-recommended?email=${user.email}&provider=${connectionProvider}&driveEmail=${driveEmail}&isEmail=true`, headers, filesToDelete)
             .then((response) => {
                 setLoading(false);
                 setHaveFilesBeenDeleted(true);

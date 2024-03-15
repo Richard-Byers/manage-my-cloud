@@ -370,9 +370,10 @@ public class DriveInformationService implements IDriveInformationService {
         return emails;
     }
 
-    public FilesDeletedResponse deleteRecommendedGoogleDriveFiles(JsonNode filesToDelete, String refreshToken, String accessToken) throws JsonProcessingException {
+    public FilesDeletedResponse deleteRecommendedGoogleDriveFiles(JsonNode filesToDelete, String refreshToken, String accessToken, boolean isEmail) throws JsonProcessingException {
         AtomicInteger filesDeleted = new AtomicInteger();
         AtomicInteger emailsDeleted = new AtomicInteger();
+        FilesDeletedResponse filesDeletedResponse = new FilesDeletedResponse();
         com.google.api.services.drive.Drive service = getGoogleClient(refreshToken, accessToken);
         Gmail gmailClient = getGmailClient(refreshToken, accessToken);
         CustomDriveItem filesInUserDrive = mapper.treeToValue(filesToDelete, CustomDriveItem.class);
@@ -386,36 +387,18 @@ public class DriveInformationService implements IDriveInformationService {
             }
         });
 
-        filesInUserDrive.getEmails().parallelStream().forEach(item -> {
-            try {
-                gmailClient.users().messages().delete("me", item.getId()).execute();
-                emailsDeleted.getAndIncrement();
-            } catch (Exception e) {
-                throw new RuntimeException("Error deleting email item");
-            }
-        });
+        if (isEmail) {
+            filesInUserDrive.getEmails().parallelStream().forEach(item -> {
+                try {
+                    gmailClient.users().messages().delete("me", item.getId()).execute();
+                    emailsDeleted.getAndIncrement();
+                } catch (Exception e) {
+                    throw new RuntimeException("Error deleting email item");
+                }
+            });
+            filesDeletedResponse.setEmailsDeleted(emailsDeleted.get());
+        }
 
-        FilesDeletedResponse filesDeletedResponse = new FilesDeletedResponse();
-        filesDeletedResponse.setFilesDeleted(filesDeleted.get());
-        filesDeletedResponse.setEmailsDeleted(emailsDeleted.get());
-        return filesDeletedResponse;
-    }
-
-    public FilesDeletedResponse deleteDuplicateGoogleDriveFiles(JsonNode filesToDelete, String refreshToken, String accessToken) throws JsonProcessingException {
-        AtomicInteger filesDeleted = new AtomicInteger();
-        com.google.api.services.drive.Drive service = getGoogleClient(refreshToken, accessToken);
-        CustomDriveItem filesInUserDrive = mapper.treeToValue(filesToDelete, CustomDriveItem.class);
-
-        filesInUserDrive.getChildren().parallelStream().forEach(item -> {
-            try {
-                service.files().delete(item.getId()).execute();
-                filesDeleted.getAndIncrement();
-            } catch (Exception e) {
-                throw new RuntimeException("Error deleting Google Drive files");
-            }
-        });
-
-        FilesDeletedResponse filesDeletedResponse = new FilesDeletedResponse();
         filesDeletedResponse.setFilesDeleted(filesDeleted.get());
         return filesDeletedResponse;
     }

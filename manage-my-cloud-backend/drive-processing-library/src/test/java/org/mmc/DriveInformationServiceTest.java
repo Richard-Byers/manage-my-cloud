@@ -447,7 +447,7 @@ public class DriveInformationServiceTest {
             when(users.messages()).thenReturn(messages);
             when(messages.delete(anyString(), anyString())).thenReturn(deleteMessage);
 
-            FilesDeletedResponse filesDeletedResponse = driveInformationService.deleteRecommendedGoogleDriveFiles(itemsToDelete, refreshToken, accessToken);
+            FilesDeletedResponse filesDeletedResponse = driveInformationService.deleteRecommendedGoogleDriveFiles(itemsToDelete, refreshToken, accessToken, true);
 
             //then
             assertEquals(3, filesDeletedResponse.getFilesDeleted());
