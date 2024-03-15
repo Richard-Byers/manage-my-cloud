@@ -387,7 +387,7 @@ class UserDriveControllerTest {
 
         //when
         ServletException exception = assertThrows(ServletException.class, () -> mockMvc.perform(post("/delete-recommended")
-                        .param("email", email).param("provider", "OneDrive").param("driveEmail", driveEmail).contentType("application/json")
+                        .param("email", email).param("provider", "OneDrive").param("driveEmail", driveEmail).param("isEmail", "true").contentType("application/json")
                         .content(objectMapper.writeValueAsString(expectedJsonNode)).with(csrf()))
                 //then
                 .andExpect(status().isOk()));
@@ -414,7 +414,7 @@ class UserDriveControllerTest {
 
         //when
         mockMvc.perform(post("/delete-recommended")
-                        .param("email", email).param("provider", "OneDrive").param("driveEmail", driveEmail).contentType("application/json")
+                        .param("email", email).param("provider", "OneDrive").param("driveEmail", driveEmail).param("isEmail", "true").contentType("application/json")
                         .content(objectMapper.writeValueAsString(expectedJsonNode)).with(csrf()))
                 //then
                 .andExpect(status().isBadRequest());
@@ -437,7 +437,7 @@ class UserDriveControllerTest {
 
         //when
         mockMvc.perform(post("/delete-recommended")
-                        .param("email", email).param("provider", "random").param("driveEmail", driveEmail).contentType("application/json")
+                        .param("email", email).param("provider", "random").param("driveEmail", driveEmail).param("isEmail", "true").contentType("application/json")
                         .content(objectMapper.writeValueAsString(expectedJsonNode)).with(csrf()))
                 //then
                 .andExpect(status().isBadRequest());
