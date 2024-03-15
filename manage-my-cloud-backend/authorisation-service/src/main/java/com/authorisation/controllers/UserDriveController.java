@@ -11,6 +11,7 @@ import org.mmc.pojo.UserPreferences;
 import org.mmc.response.DriveInformationReponse;
 import org.mmc.response.FilesDeletedResponse;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
@@ -26,6 +27,7 @@ public class UserDriveController {
     private final DriveInformationService driveInformationService;
     private final UserService userService;
     private final CloudPlatformService cloudPlatformService;
+    private final SimpMessagingTemplate simpMessagingTemplate;
 
     @GetMapping("/drive-information")
     public ResponseEntity<DriveInformationReponse> getUserDriveInformation(@RequestParam("email") String email,
@@ -78,7 +80,7 @@ public class UserDriveController {
             String accessToken = decrypt(cloudPlatform.getAccessToken());
             Date accessTokenExpiryDate = cloudPlatform.getAccessTokenExpiryDate();
             try {
-                JsonNode folders = driveInformationService.listAllItemsInOneDrive(accessToken, accessTokenExpiryDate);
+                JsonNode folders = driveInformationService.listAllItemsInOneDrive(accessToken, accessTokenExpiryDate, simpMessagingTemplate, userEntity.getEmail());
                 return ResponseEntity.ok(folders);
             } catch (Exception e) {
                 return ResponseEntity.badRequest().build();
@@ -87,7 +89,7 @@ public class UserDriveController {
             String decryptedRefreshToken = decrypt(cloudPlatform.getRefreshToken());
             String decryptedAccessToken = decrypt(cloudPlatform.getAccessToken());
             try {
-                JsonNode jsonNode = driveInformationService.fetchAllGoogleDriveFiles(decryptedRefreshToken, decryptedAccessToken);
+                JsonNode jsonNode = driveInformationService.fetchAllGoogleDriveFiles(decryptedRefreshToken, decryptedAccessToken, simpMessagingTemplate, userEntity.getEmail());
                 return ResponseEntity.ok(jsonNode);
             } catch (Exception e) {
                 return ResponseEntity.badRequest().build();
@@ -106,7 +108,7 @@ public class UserDriveController {
         UserPreferences userPreferences = userService.getUserRecommendationSettings(userEntity.getEmail());
 
         try {
-            JsonNode recommendedFiles = driveInformationService.returnItemsToDelete(filesInDrive, userPreferences);
+            JsonNode recommendedFiles = driveInformationService.returnItemsToDelete(filesInDrive, userPreferences, simpMessagingTemplate, userEntity.getEmail());
             return ResponseEntity.ok(recommendedFiles);
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
@@ -130,7 +132,11 @@ public class UserDriveController {
             String accessToken = decrypt(cloudPlatform.getAccessToken());
             Date accessTokenExpiryDate = cloudPlatform.getAccessTokenExpiryDate();
             try {
-                FilesDeletedResponse filesDeleted = driveInformationService.deleteRecommendedOneDriveFiles(filesToDelete, accessToken, accessTokenExpiryDate);
+                FilesDeletedResponse filesDeleted = driveInformationService.deleteRecommendedOneDriveFiles(filesToDelete,
+                        accessToken,
+                        accessTokenExpiryDate,
+                        simpMessagingTemplate,
+                        userEntity.getEmail());
                 return ResponseEntity.ok().body(filesDeleted);
             } catch (Exception e) {
                 return ResponseEntity.badRequest().build();
@@ -139,7 +145,11 @@ public class UserDriveController {
             String decryptedRefreshToken = decrypt(cloudPlatform.getRefreshToken());
             String decryptedAccessToken = decrypt(cloudPlatform.getAccessToken());
             try {
-                FilesDeletedResponse filesDeleted = driveInformationService.deleteRecommendedGoogleDriveFiles(filesToDelete, decryptedRefreshToken, decryptedAccessToken);
+                FilesDeletedResponse filesDeleted = driveInformationService.deleteRecommendedGoogleDriveFiles(filesToDelete,
+                        decryptedRefreshToken,
+                        decryptedAccessToken,
+                        simpMessagingTemplate,
+                        userEntity.getEmail());
                 return ResponseEntity.ok().body(filesDeleted);
             } catch (Exception e) {
                 return ResponseEntity.badRequest().build();

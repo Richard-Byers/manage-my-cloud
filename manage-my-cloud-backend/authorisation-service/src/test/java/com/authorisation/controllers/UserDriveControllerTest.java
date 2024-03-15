@@ -1,11 +1,9 @@
 package com.authorisation.controllers;
 
-import com.authorisation.controllers.UserDriveController;
 import com.authorisation.entities.CloudPlatform;
 import com.authorisation.entities.UserEntity;
 import com.authorisation.services.CloudPlatformService;
 import com.authorisation.services.UserService;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
@@ -21,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -61,6 +60,8 @@ class UserDriveControllerTest {
     private CloudPlatformService cloudPlatformService;
     @MockBean
     private DriveInformationService driveInformationService;
+    @MockBean
+    private SimpMessagingTemplate simpMessagingTemplate;
     ObjectMapper objectMapper = new ObjectMapper();
 
     @BeforeEach
@@ -187,7 +188,10 @@ class UserDriveControllerTest {
 
         when(userService.findUserByEmail(email)).thenReturn(Optional.of(userEntity));
         when(cloudPlatformService.getUserCloudPlatform(email, "OneDrive", driveEmail)).thenReturn(cloudPlatform);
-        when(driveInformationService.listAllItemsInOneDrive(decrypt(cloudPlatform.getAccessToken()), cloudPlatform.getAccessTokenExpiryDate())).thenReturn(expectedJsonNode);
+        when(driveInformationService.listAllItemsInOneDrive(decrypt(cloudPlatform.getAccessToken()),
+                cloudPlatform.getAccessTokenExpiryDate(),
+                simpMessagingTemplate,
+                email)).thenReturn(expectedJsonNode);
 
         //when
         MvcResult mvcResult = mockMvc.perform(get("/drive-items")
@@ -247,7 +251,7 @@ class UserDriveControllerTest {
 
         when(userService.findUserByEmail(email)).thenReturn(Optional.of(userEntity));
         when(cloudPlatformService.getUserCloudPlatform(email, "OneDrive", driveEmail)).thenReturn(cloudPlatform);
-        when(driveInformationService.listAllItemsInOneDrive(any(), any())).thenThrow(new RuntimeException("Drive not found"));
+        when(driveInformationService.listAllItemsInOneDrive(any(), any(), any(), any())).thenThrow(new RuntimeException("Drive not found"));
 
         //when
         mockMvc.perform(get("/drive-items")
@@ -290,7 +294,7 @@ class UserDriveControllerTest {
 
         when(userService.findUserByEmail(email)).thenReturn(Optional.of(userEntity));
         when(userService.getUserRecommendationSettings(email)).thenReturn(preferences);
-        when(driveInformationService.returnItemsToDelete(expectedJsonNode, preferences)).thenReturn(expectedJsonNode);
+        when(driveInformationService.returnItemsToDelete(expectedJsonNode, preferences, simpMessagingTemplate, email)).thenReturn(expectedJsonNode);
 
         //when
         MvcResult mvcResult = mockMvc.perform(post("/recommend-deletions")
@@ -314,7 +318,7 @@ class UserDriveControllerTest {
 
         when(userService.findUserByEmail(email)).thenReturn(Optional.of(userEntity));
         when(userService.getUserRecommendationSettings(email)).thenReturn(preferences);
-        when(driveInformationService.returnItemsToDelete(expectedJsonNode, preferences)).thenThrow(new RuntimeException("Error"));
+        when(driveInformationService.returnItemsToDelete(expectedJsonNode, preferences, simpMessagingTemplate, email)).thenThrow(new RuntimeException("Error"));
 
         //when
         mockMvc.perform(post("/recommend-deletions")
@@ -340,7 +344,11 @@ class UserDriveControllerTest {
         when(userService.findUserByEmail(email)).thenReturn(Optional.of(userEntity));
         when(userService.getUserRecommendationSettings(email)).thenReturn(preferences);
         when(cloudPlatformService.getUserCloudPlatform(email, "OneDrive", driveEmail)).thenReturn(cloudPlatform);
-        when(driveInformationService.deleteRecommendedOneDriveFiles(expectedJsonNode, accessToken, cloudPlatform.getAccessTokenExpiryDate())).thenReturn(expectedFilesDeletedResponse);
+        when(driveInformationService.deleteRecommendedOneDriveFiles(expectedJsonNode,
+                accessToken,
+                cloudPlatform.getAccessTokenExpiryDate(),
+                simpMessagingTemplate,
+                email)).thenReturn(expectedFilesDeletedResponse);
 
         //when
         MvcResult mvcResult = mockMvc.perform(post("/delete-recommended")
@@ -410,7 +418,11 @@ class UserDriveControllerTest {
         when(userService.findUserByEmail(email)).thenReturn(Optional.of(userEntity));
         when(userService.getUserRecommendationSettings(email)).thenReturn(preferences);
         when(cloudPlatformService.getUserCloudPlatform(email, "OneDrive", driveEmail)).thenReturn(cloudPlatform);
-        when(driveInformationService.deleteRecommendedOneDriveFiles(expectedJsonNode, accessToken, cloudPlatform.getAccessTokenExpiryDate())).thenThrow(new RuntimeException("Error"));
+        when(driveInformationService.deleteRecommendedOneDriveFiles(expectedJsonNode,
+                accessToken,
+                cloudPlatform.getAccessTokenExpiryDate(),
+                simpMessagingTemplate,
+                email)).thenThrow(new RuntimeException("Error"));
 
         //when
         mockMvc.perform(post("/delete-recommended")

@@ -1,4 +1,3 @@
-import LoadingSpinner from "../../helpers/LoadingSpinner";
 import CloseIcon from "@mui/icons-material/Close";
 import {Success} from "../../helpers/Success";
 import {Failure} from "../../helpers/Failure";
@@ -10,6 +9,11 @@ import {AuthData} from "../../routing/AuthWrapper";
 import {useTranslation} from "react-i18next";
 import {buildAxiosRequestWithHeaders} from "../../helpers/AxiosHelper";
 import {getFileType} from "../../../constants/FileTypesConstants";
+import ToolTip from "../../ui_components/ToolTip";
+import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
+import {Client} from "@stomp/stompjs";
+import SockJS from "sockjs-client";
+import LoadingProgress from "../../ui_components/LoadingProgress";
 
 interface DeletionRecommendationModalProps {
     data: FileNode;
@@ -177,6 +181,7 @@ const DeletionRecommendationsModal: React.FC<DeletionRecommendationModalProps> =
     const [selectAll, setSelectAll] = useState(false);
     const [showEmails, setShowEmails] = React.useState(false);
     const [showDriveData, setShowDriveData] = React.useState(true);
+    const [progress, setProgress] = useState<number>(0);
 
     useEffect(() => {
         if (deleteRecommendedClicked) {
@@ -252,14 +257,28 @@ const DeletionRecommendationsModal: React.FC<DeletionRecommendationModalProps> =
             'Authorization': `Bearer ${user.token}`
         }
 
+        const client = new Client({
+            webSocketFactory: () => new SockJS('http://localhost:8080/recommendation-progress'),
+            onConnect: () => {
+                client.subscribe(`/user/${user?.email}/queue/recommendation-progress`, (message) => {
+                    const progress = JSON.parse(message.body);
+                    setProgress(progress);
+                });
+            }
+        });
+
+        await client.activate();
+
         setLoading(true);
         const response = await buildAxiosRequestWithHeaders('POST', `/recommend-deletions?email=${user.email}`, headers, data)
 
         if (!response.data) {
             setLoading(false);
+            await client.deactivate();
             throw new Error('Invalid response data');
         }
         setLoading(false);
+        await client.deactivate();
         return response.data;
     }
 
@@ -269,24 +288,38 @@ const DeletionRecommendationsModal: React.FC<DeletionRecommendationModalProps> =
             'Authorization': `Bearer ${user.token}`
         }
 
+        const client = new Client({
+            webSocketFactory: () => new SockJS('http://localhost:8080/deletion-progress'),
+            onConnect: () => {
+                client.subscribe(`/user/${user?.email}/queue/deletion-progress`, (message) => {
+                    const progress = JSON.parse(message.body);
+                    setProgress(progress);
+                });
+            }
+        });
+
+        await client.activate();
+
         setLoading(true);
         await buildAxiosRequestWithHeaders('POST', `/delete-recommended?email=${user.email}&provider=${connectionProvider}&driveEmail=${driveEmail}`, headers, filesToDelete)
             .then((response) => {
                 setLoading(false);
+                client.deactivate();
                 setHaveFilesBeenDeleted(true);
                 setSuccessfulDeletionMessage(`Successfully deleted ${response.data.filesDeleted} file(s) and ${response.data.emailsDeleted} email(s) from your drive.`);
             })
             .catch((error) => {
                 setLoading(false);
+                client.deactivate();
                 setUnsuccessfulDeletionMessage("Item(s) were not deleted");
             });
-
+        await client.deactivate();
         setLoading(false);
     }
 
     return (
         <div className={"modal-overlay"} onClick={closeRecommendationModal}>
-            {loading ? <LoadingSpinner/> :
+            {loading ? <LoadingProgress filled={progress}/> :
                 <div className={"modal"} onClick={stopPropagation} id={"deletion-recommendation-modal"}>
 
                     <button className={"modal-close-button"} onClick={closeRecommendationModal}><CloseIcon
@@ -298,7 +331,8 @@ const DeletionRecommendationsModal: React.FC<DeletionRecommendationModalProps> =
                         <div className={"recommended-file-button-container"}>
                             <p id={"deletion-success-message"}>{successfulDeletionMessage}</p>
                             <Success/>
-                            <button className={"dashboard-button"} onClick={closeModal} id={"success-deletion-close-button"}>
+                            <button className={"dashboard-button"} onClick={closeModal}
+                                    id={"success-deletion-close-button"}>
                                 {t('main.dashboard.deletionModals.deleteRecommended.closeRecommendation')}
                             </button>
                         </div>
@@ -333,9 +367,16 @@ const DeletionRecommendationsModal: React.FC<DeletionRecommendationModalProps> =
 
                                         {showDriveData && driveData?.children.length > 0 ?
                                             <>
-                                                <h2 id={"item-recommendation-count"}>
-                                                    {driveData?.children.length} {t('main.dashboard.deletionModals.deleteRecommended.title')}
-                                                </h2>
+                                                <div className={"item-recommendation-count-container"}>
+                                                    <h2 id={"item-recommendation-count"}>
+                                                        {driveData?.children.length} {t('main.dashboard.deletionModals.deleteRecommended.title')}
+                                                    </h2>
+                                                    <ToolTip
+                                                        message={t("main.tooltip.dashboard.deleteRecommendedFiles")}
+                                                        children={<HelpOutlineIcon/>}
+                                                    />
+                                                </div>
+
                                                 <p
                                                     className={"deletion-recommendation-description"}>{t('main.dashboard.deletionModals.deleteRecommended.mainText')}</p>
                                                 <p className={"deletion-recommendation-select-all-description"}
@@ -383,7 +424,13 @@ const DeletionRecommendationsModal: React.FC<DeletionRecommendationModalProps> =
 
                                         {showEmails && driveData?.emails.length > 0 ?
                                             <>
-                                                <h2> {driveData?.emails.length} {t('main.dashboard.deletionModals.deleteRecommended.titleEmail')}</h2>
+                                                <div className={"item-recommendation-count-container"}>
+                                                    <h2> {driveData?.emails.length} {t('main.dashboard.deletionModals.deleteRecommended.titleEmail')}</h2>
+                                                    <ToolTip
+                                                        message={t("main.tooltip.dashboard.deleteRecommendedEmails")}
+                                                        children={<HelpOutlineIcon/>}
+                                                    />
+                                                </div>
                                                 <p
                                                     className={"deletion-recommendation-description"}>
                                                     {t('main.dashboard.deletionModals.deleteRecommended.mainTextEmail')}

@@ -5,7 +5,7 @@
     flex-direction: column;
     color: black;
     border-radius: 8px;
-    gap: 10px;
+    gap: 0.6em;
     padding: 1rem;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
     text-align: center;
@@ -50,7 +50,7 @@
 
 .link-with-supported-providers-text{
     display: flex;
-    font-family: MontserratBold, serif;
+    font-family: MontserratMedium, serif;
     gap: 0.1em;
 }
 

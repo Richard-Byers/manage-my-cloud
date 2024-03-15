@@ -6,6 +6,8 @@ import CloseIcon from "@mui/icons-material/Close";
 import ToolTip from "../../ui_components/ToolTip";
 import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 import {useTranslation} from "react-i18next";
+import OneDriveLogo from "../../images/manage-connections/OneDriveLogo.png";
+import GoogleDriveLogo from "../../images/manage-connections/GoogleDriveLogo.png";
 
 const AddConnectionsModal = () => {
     const {t} = useTranslation();
@@ -40,8 +42,8 @@ const AddConnectionsModal = () => {
                         <p className={"link-with-supported-providers-text"} id={"link-with-supported-providers-text"}>
                             {t("main.manageConnectionsPage.addConnectionModal.linkWithSupportedProviderText")}
                             <ToolTip
-                            message={t("main.tooltip.manageConnections.addConnectionsModalText")}
-                            children={<HelpOutlineIcon/>}/>
+                                message={t("main.tooltip.manageConnections.addConnectionsModalText")}
+                                children={<HelpOutlineIcon/>}/>
                         </p>
 
                         <LinkOneDrive/>

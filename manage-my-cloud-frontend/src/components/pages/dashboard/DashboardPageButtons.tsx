@@ -3,6 +3,8 @@ import './DashboardPageButtons.css';
 import {useTranslation} from "react-i18next";
 import DeletionRecommendationsModal from "../../modals/dashboard/DeletionRecommendationsModal";
 import {CONNECTION_TITLE} from "../../../constants/ConnectionConstants";
+import ToolTip from "../../ui_components/ToolTip";
+import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 
 interface DashboardPageButtonsProps {
     data: FileNode;

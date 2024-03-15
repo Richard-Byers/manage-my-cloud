@@ -22,6 +22,7 @@ import org.mmc.pojo.UserPreferences;
 import org.mmc.response.CustomDriveItem;
 import org.mmc.response.DriveInformationReponse;
 import org.mmc.response.FilesDeletedResponse;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import java.io.IOException;
 import java.text.DecimalFormat;
@@ -132,7 +133,7 @@ public class DriveInformationService implements IDriveInformationService {
         return mapToDriveInformationResponse(userName, email, totalStorageInGigabytes, usedStorageInGigabytes);
     }
 
-    public JsonNode listAllItemsInOneDrive(String userAccessToken, Date expiryDate) throws JsonProcessingException {
+    public JsonNode listAllItemsInOneDrive(String userAccessToken, Date expiryDate, SimpMessagingTemplate simpMessagingTemplate, String email) throws JsonProcessingException {
         this.graphClient = getOneDriveClient(userAccessToken, expiryDate);
 
         DriveItemCollectionPage driveItems = graphClient.me().drive().root().children().buildRequest().get();
@@ -141,35 +142,68 @@ public class DriveInformationService implements IDriveInformationService {
         root.setName("root");
         root.setType("Folder");
         root.setChildren(Collections.synchronizedList(new ArrayList<>()));
+        AtomicInteger totalItemCount = new AtomicInteger();
+        AtomicInteger itemsProcessed = new AtomicInteger();
 
-        if (driveItems == null) {
-            return mapper.readTree(mapper.writeValueAsString(root));
+        while (driveItems != null) {
+            totalItemCount.getAndAdd(driveItems.getCurrentPage().size());
+
+            if (driveItems.getNextPage() != null) {
+                driveItems = driveItems.getNextPage().buildRequest().get();
+            } else {
+                driveItems = null;
+            }
         }
 
-        driveItems.getCurrentPage().parallelStream().forEach(item -> {
-            CustomDriveItem customItem = new CustomDriveItem();
-            customItem.setId(item.id);
-            customItem.setName(item.name);
-            customItem.setType(item.folder == null ? item.file.mimeType : "Folder");
-            customItem.setLastModifiedDateTime(item.lastModifiedDateTime);
-            customItem.setCreatedDateTime(item.createdDateTime);
-            customItem.setWebUrl(item.webUrl);
-            customItem.setChildren(Collections.synchronizedList(new ArrayList<>()));
+        driveItems = graphClient.me().drive().root().children().buildRequest().get();
 
-            if (item.folder != null) {
-                listAllSubItemsOneDrive(item.id, root);
+        while (driveItems != null) {
+            driveItems.getCurrentPage().parallelStream().forEach(item -> {
+                CustomDriveItem customItem = new CustomDriveItem();
+                customItem.setId(item.id);
+                customItem.setName(item.name);
+                if (item.folder == null && item.file != null) {
+                    customItem.setType(item.file.mimeType);
+                } else if (item.folder != null) {
+                    customItem.setType("Folder");
+                } else {
+                    customItem.setType("Unknown");
+                }
+                customItem.setLastModifiedDateTime(item.lastModifiedDateTime);
+                customItem.setCreatedDateTime(item.createdDateTime);
+                customItem.setWebUrl(item.webUrl);
+                customItem.setChildren(Collections.synchronizedList(new ArrayList<>()));
+
+                if (item.folder != null) {
+                    listAllSubItemsOneDrive(item.id, root);
+                }
+
+                root.getChildren().add(customItem);
+                itemsProcessed.getAndIncrement();
+                simpMessagingTemplate.convertAndSendToUser(email, "/queue/progress", itemsProcessed.get() * 100 / totalItemCount.get());
+            });
+
+            if (driveItems.getNextPage() != null) {
+                driveItems = driveItems.getNextPage().buildRequest().get();
+            } else {
+                driveItems = null;
             }
-
-            root.getChildren().add(customItem);
-        });
+        }
 
         String jsonString = mapper.writeValueAsString(root);
         return mapper.readTree(jsonString);
     }
 
-    public JsonNode returnItemsToDelete(JsonNode filesInDrive, UserPreferences userPreferences) throws IOException {
-
+    public JsonNode returnItemsToDelete(JsonNode filesInDrive, UserPreferences userPreferences, SimpMessagingTemplate simpMessagingTemplate, String email) throws IOException {
+        AtomicInteger totalItemCount = new AtomicInteger();
         CustomDriveItem filesInUserDrive = mapper.treeToValue(filesInDrive, CustomDriveItem.class);
+        if (filesInUserDrive.getEmails() != null) {
+            totalItemCount.getAndAdd(filesInUserDrive.getEmails().size());
+        }
+        if (filesInUserDrive.getChildren() != null) {
+            totalItemCount.getAndAdd(filesInUserDrive.getChildren().size());
+        }
+        AtomicInteger itemsProcessed = new AtomicInteger();
 
         boolean recommendVideos = userPreferences.isDeleteVideos();
         boolean recommendImages = userPreferences.isDeleteImages();
@@ -189,12 +223,16 @@ public class DriveInformationService implements IDriveInformationService {
             // Iterate through files in drive
             filesInUserDrive.getChildren().parallelStream().forEach(item -> {
                 processItem(item, recommendations, recommendImages, recommendVideos, recommendDocuments, recommendItemsCreatedDaysAgo, recommendItemsNotChangedDaysAgo);
+                itemsProcessed.getAndIncrement();
+                simpMessagingTemplate.convertAndSendToUser(email, "/queue/recommendation-progress", itemsProcessed.get() * 100 / totalItemCount.get());
             });
 
             // Iterate through Emails
             if (recommendEmails && filesInUserDrive.getEmails() != null) {
                 filesInUserDrive.getEmails().parallelStream().forEach(item -> {
                     processEmail(item, recommendations, recommendEmailsAfterDays);
+                    itemsProcessed.getAndIncrement();
+                    simpMessagingTemplate.convertAndSendToUser(email, "/queue/recommendation-progress", itemsProcessed.get() * 100 / totalItemCount.get());
                 });
             }
 
@@ -227,15 +265,25 @@ public class DriveInformationService implements IDriveInformationService {
         }
     }
 
-    public FilesDeletedResponse deleteRecommendedOneDriveFiles(JsonNode filesToDelete, String userAccessToken, Date expiryDate) throws JsonProcessingException {
+    public FilesDeletedResponse deleteRecommendedOneDriveFiles(JsonNode filesToDelete,
+                                                               String userAccessToken,
+                                                               Date expiryDate,
+                                                               SimpMessagingTemplate simpMessagingTemplate,
+                                                               String email) throws JsonProcessingException {
         this.graphClient = getOneDriveClient(userAccessToken, expiryDate);
         CustomDriveItem filesInUserDrive = mapper.treeToValue(filesToDelete, CustomDriveItem.class);
         AtomicInteger filesDeleted = new AtomicInteger();
+        AtomicInteger totalItemCount = new AtomicInteger();
+
+        if (filesInUserDrive.getChildren() != null) {
+            totalItemCount.getAndAdd(filesInUserDrive.getChildren().size());
+        }
 
         filesInUserDrive.getChildren().parallelStream().forEach(item -> {
             try {
                 graphClient.me().drive().items(item.getId()).buildRequest().delete();
                 filesDeleted.getAndIncrement();
+                simpMessagingTemplate.convertAndSendToUser(email, "/queue/deletion-progress", filesDeleted.get() * 100 / totalItemCount.get());
             } catch (Exception e) {
                 throw new RuntimeException("Error deleting OneDrive files");
             }
@@ -272,26 +320,33 @@ public class DriveInformationService implements IDriveInformationService {
 
     //Helper Methods
 
-    public JsonNode fetchAllGoogleDriveFiles(String refreshToken, String accessToken) throws IOException {
+    public JsonNode fetchAllGoogleDriveFiles(String refreshToken, String accessToken, SimpMessagingTemplate simpMessagingTemplate, String email) throws IOException {
 
         com.google.api.services.drive.Drive service = getGoogleClient(refreshToken, accessToken);
         Gmail gmailClient = getGmailClient(refreshToken, accessToken);
+        AtomicInteger totalItemCount = new AtomicInteger();
 
         if (service == null || gmailClient == null) {
             throw new RuntimeException("Drive not found");
         }
 
+        getTotalItemCount(service, gmailClient, totalItemCount);
+
         CustomDriveItem root = new CustomDriveItem();
         root.setName("root");
         root.setType("Folder");
-        root.setChildren(performFetchAllGoogleDriveFiles(service));
-        root.setEmails(performFetchAllGoogleEmails(gmailClient));
+        root.setChildren(performFetchAllGoogleDriveFiles(service, totalItemCount, simpMessagingTemplate, email));
+        root.setEmails(performFetchAllGoogleEmails(gmailClient, totalItemCount, simpMessagingTemplate, email));
 
         return mapper.valueToTree(root);
     }
 
-    private List<CustomDriveItem> performFetchAllGoogleDriveFiles(com.google.api.services.drive.Drive service) throws IOException {
+    private List<CustomDriveItem> performFetchAllGoogleDriveFiles(com.google.api.services.drive.Drive service,
+                                                                  AtomicInteger totalItemCount,
+                                                                  SimpMessagingTemplate simpMessagingTemplate,
+                                                                  String email) throws IOException {
         List<CustomDriveItem> allFiles = new ArrayList<>();
+        AtomicInteger itemsProcessed = new AtomicInteger();
 
         // Define the fields included in the response
         String fields = "nextPageToken, files(id, name, mimeType, createdTime, modifiedTime, webViewLink)";
@@ -317,6 +372,8 @@ public class DriveInformationService implements IDriveInformationService {
                 customItem.setWebUrl(file.getWebViewLink());
 
                 allFiles.add(customItem);
+                itemsProcessed.getAndIncrement();
+                simpMessagingTemplate.convertAndSendToUser(email, "/queue/progress", itemsProcessed.get() * 100 / totalItemCount.get());
             }
             request.setPageToken(fileList.getNextPageToken());
         } while (fileList.getNextPageToken() != null && fileList.getNextPageToken().length() > 0);
@@ -324,9 +381,13 @@ public class DriveInformationService implements IDriveInformationService {
         return allFiles;
     }
 
-    private List<CustomEmail> performFetchAllGoogleEmails(Gmail service) throws IOException {
+    private List<CustomEmail> performFetchAllGoogleEmails(Gmail service,
+                                                          AtomicInteger totalItemCount,
+                                                          SimpMessagingTemplate simpMessagingTemplate,
+                                                          String email) throws IOException {
         ListMessagesResponse response = service.users().messages().list("me").setQ("in:inbox AND is:read OR in:spam").execute();
         int emailPagesRetrieved = 0;
+        AtomicInteger itemsProcessed = new AtomicInteger();
 
         List<CustomEmail> emails = new ArrayList<>();
         while (response.getMessages() != null) {
@@ -342,8 +403,10 @@ public class DriveInformationService implements IDriveInformationService {
                         customItem.setReceivedDate(OffsetDateTime.ofInstant(Instant.ofEpochMilli(message.getInternalDate()), ZoneId.systemDefault()));
                         synchronized (emails) {
                             emails.add(customItem);
+                            itemsProcessed.getAndIncrement();
                         }
                     }
+                    simpMessagingTemplate.convertAndSendToUser(email, "/queue/progress", itemsProcessed.get() * 100 / totalItemCount.get());
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
@@ -361,17 +424,53 @@ public class DriveInformationService implements IDriveInformationService {
         return emails;
     }
 
-    public FilesDeletedResponse deleteRecommendedGoogleDriveFiles(JsonNode filesToDelete, String refreshToken, String accessToken) throws JsonProcessingException {
+    private void getTotalItemCount(com.google.api.services.drive.Drive service, Gmail gmailClient, AtomicInteger totalItemCount) {
+        try {
+            int emailPagesRetrieved = 0;
+            FileList fileList = service.files().list().setQ("mimeType != 'application/vnd.google-apps.folder' and 'me' in owners").execute();
+            totalItemCount.getAndAdd(fileList.getFiles().size());
+            ListMessagesResponse response = gmailClient.users().messages().list("me").setQ("in:inbox AND is:read OR in:spam").execute();
+            while (response.getMessages() != null) {
+                totalItemCount.getAndAdd(response.getMessages().size());
+                if (response.getNextPageToken() != null && emailPagesRetrieved < 4) {
+                    emailPagesRetrieved++;
+                    String pageToken = response.getNextPageToken();
+                    response = gmailClient.users().messages().list("me").setQ("in:inbox OR in:spam is:read").setPageToken(pageToken).execute();
+                } else {
+                    break;
+                }
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public FilesDeletedResponse deleteRecommendedGoogleDriveFiles(JsonNode filesToDelete,
+                                                                  String refreshToken,
+                                                                  String accessToken,
+                                                                  SimpMessagingTemplate simpMessagingTemplate,
+                                                                  String email) throws JsonProcessingException {
         AtomicInteger filesDeleted = new AtomicInteger();
         AtomicInteger emailsDeleted = new AtomicInteger();
+        AtomicInteger totalItemCount = new AtomicInteger();
         com.google.api.services.drive.Drive service = getGoogleClient(refreshToken, accessToken);
         Gmail gmailClient = getGmailClient(refreshToken, accessToken);
         CustomDriveItem filesInUserDrive = mapper.treeToValue(filesToDelete, CustomDriveItem.class);
+
+        if (filesInUserDrive.getChildren() != null) {
+            totalItemCount.getAndAdd(filesInUserDrive.getChildren().size());
+        }
+
+        if (filesInUserDrive.getEmails() != null) {
+            totalItemCount.getAndAdd(filesInUserDrive.getEmails().size());
+        }
 
         filesInUserDrive.getChildren().parallelStream().forEach(item -> {
             try {
                 service.files().delete(item.getId()).execute();
                 filesDeleted.getAndIncrement();
+                simpMessagingTemplate.convertAndSendToUser(email, "/queue/deletion-progress", filesDeleted.get() * 100 / totalItemCount.get());
+
             } catch (Exception e) {
                 throw new RuntimeException("Error deleting Google Drive files");
             }
@@ -381,6 +480,7 @@ public class DriveInformationService implements IDriveInformationService {
             try {
                 gmailClient.users().messages().delete("me", item.getId()).execute();
                 emailsDeleted.getAndIncrement();
+                simpMessagingTemplate.convertAndSendToUser(email, "/queue/deletion-progress", emailsDeleted.get() * 100 / totalItemCount.get());
             } catch (Exception e) {
                 throw new RuntimeException("Error deleting email item");
             }
