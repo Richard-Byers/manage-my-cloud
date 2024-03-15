@@ -4,8 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.google.api.services.drive.model.About;
 import com.google.api.services.drive.model.File;
@@ -27,10 +25,12 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
+import org.mmc.Constants;
 import org.mmc.pojo.UserPreferences;
 import org.mmc.response.CustomDriveItem;
 import org.mmc.response.DriveInformationReponse;
 import org.mmc.response.FilesDeletedResponse;
+import org.mmc.util.JsonUtils;
 
 import java.io.IOException;
 import java.text.DecimalFormat;
@@ -53,6 +53,7 @@ public class DriveInformationService implements IDriveInformationService {
     private static final DecimalFormat ZERO_DECIMAL_FORMAT = new DecimalFormat("#");
     ObjectMapper mapper = JsonMapper.builder().addModule(new JavaTimeModule()).build();
     private GraphServiceClient<Request> graphClient;
+
 
     public DriveInformationReponse getOneDriveInformation(String userAccessToken, Date expiryDate) {
 
@@ -403,30 +404,15 @@ public class DriveInformationService implements IDriveInformationService {
         return filesDeletedResponse;
     }
 
-    public JsonNode callEndpointAndGetResponse(String provider, JsonNode files) throws IOException, InterruptedException {
+    public JsonNode getDuplicatesFoundByAI(String provider, JsonNode files) throws IOException, InterruptedException {
 
         ObjectMapper mapper = new ObjectMapper();
-
-        JsonNode result = removeEmailFields(files);
-
+        JsonNode result = JsonUtils.removeEmailFields(files);
         String prettyJson = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(result);
-
-        return mapper.readTree(chatDiscussion(prettyJson, provider, 0));
+        return mapper.readTree(chatDiscussionWithAI(prettyJson, provider, 0));
     }
 
-    //Needed for AI as it seemed to confused the AI request and failed
-    public JsonNode removeEmailFields(JsonNode node) {
-        if (node.isObject()) {
-            ObjectNode objectNode = (ObjectNode) node;
-            objectNode.remove("emails");
-            objectNode.elements().forEachRemaining(this::removeEmailFields);
-        } else if (node.isArray()) {
-            node.elements().forEachRemaining(this::removeEmailFields);
-        }
-        return node;
-    }
-
-    private static String chatDiscussion(String files, String provider, int timesTried) throws IOException {
+    private static String chatDiscussionWithAI(String files, String provider, int timesTried) throws IOException {
         // OpenAI API endpoint
         String url = "https://api.openai.com/v1/chat/completions";
         String openApiKey = System.getenv("OPENAI_API_KEY");
@@ -455,9 +441,9 @@ public class DriveInformationService implements IDriveInformationService {
             userMessage.put("role", "user");
             //If statement is needed here due to how drives rename duplicate files
             if (provider.equals("GoogleDrive")) {
-                userMessage.put("content", "Analyze the provided data and identify potential duplicates based on the 'name' key (including file extension if exists), considering files with brackets as duplicates. If no potential duplicates are detected or if there is no data, return an empty 'duplicates' array. Do not generate or make up any files that do not exist in the provided data. The expected format is: {\"duplicates\": [{\"name\": string, \"count\": integer, \"files\": [{\"id\": string, \"name\": string, \"type\": string, \"createdDateTime\": float, \"lastModifiedDateTime\": float, \"webUrl\": string}]}]}. Note that the filename comparison is case-insensitive and ignores any numbers in brackets at the end of the filename: " + files);
+                userMessage.put("content", Constants.GOOGLE_CHAT_GPT_PROMPT + files);
             } else {
-                userMessage.put("content", "Analyze the provided data and identify potential duplicates based on the 'name' key (including file extension if exists), considering files which share the same name and have number after them. If no potential duplicates are detected or if there is no data, return an empty 'duplicates' array. Do not generate or make up any files that do not exist in the provided data. The expected format is: {\"duplicates\": [{\"name\": string, \"count\": integer, \"files\": [{\"id\": string, \"name\": string, \"type\": string, \"createdDateTime\": float, \"lastModifiedDateTime\": float, \"webUrl\": string}]}]}. Note that the filename comparison is case-insensitive and ignores any numbers in brackets at the end of the filename: " + files);
+                userMessage.put("content", Constants.MICROSOFT_CHAT_GPT_PROMPT + files);
             }
             messages.add(userMessage);
 
@@ -479,7 +465,7 @@ public class DriveInformationService implements IDriveInformationService {
             if(response.getStatusLine().getStatusCode() != 200) {
                 timesTried++;
                 if(timesTried < 3) {
-                    return chatDiscussion(files, provider, timesTried); // Return the result of the recursive call
+                    return chatDiscussionWithAI(files, provider, timesTried); // Return the result of the recursive call
                 }
                 return null;
             }
@@ -494,73 +480,14 @@ public class DriveInformationService implements IDriveInformationService {
             // Extract 'content' field from the 'choices' array in the JSON response
             String content = responseJson.get("choices").get(0).get("message").get("content").asText();
 
-            if (validateContentFormat(content)) {
-                return transformJson(mapper.readTree(content)).toString();
+            if (JsonUtils.validateContentFormat(content)) {
+                return JsonUtils.transformJson(mapper.readTree(content)).toString();
             } else {
                 throw new IOException("Invalid response format");
             }
         } catch (IOException e) {
             throw new IOException(e);
         }
-    }
-
-    public static boolean validateContentFormat(String content) {
-        ObjectMapper objectMapper = new ObjectMapper();
-        try {
-            JsonNode jsonNode = objectMapper.readTree(content);
-
-            // Check if the root is an object and contains the "duplicates" array
-            if (!jsonNode.isObject() || !jsonNode.has("duplicates")) {
-                return false;
-            }
-
-            // Check if each object in the "duplicates" array has the required fields
-            for (JsonNode duplicate : jsonNode.get("duplicates")) {
-                if (!duplicate.isObject() || !duplicate.has("name") || !duplicate.has("count") || !duplicate.has("files")) {
-                    return false;
-                }
-
-                // Check if each object in the "files" array has the required fields
-                for (JsonNode file : duplicate.get("files")) {
-                    if (!file.isObject() || !file.has("id") || !file.has("name") || !file.has("type") || !file.has("createdDateTime") || !file.has("lastModifiedDateTime") || !file.has("webUrl")) {
-                        return false;
-                    }
-                }
-            }
-
-            // If all checks passed, the content matches the required format
-            return true;
-        } catch (Exception e) {
-            // If an exception is thrown, the content does not match the format
-            return false;
-        }
-    }
-
-    public static JsonNode transformJson(JsonNode inputJson) {
-        ObjectMapper mapper = new ObjectMapper();
-        ObjectNode outputJson = mapper.createObjectNode();
-        outputJson.set("id", (JsonNode) null);
-        outputJson.put("name", "root");
-        outputJson.put("type", "Folder");
-        outputJson.set("createdDateTime", (JsonNode) null);
-        outputJson.set("lastModifiedDateTime", (JsonNode) null);
-        outputJson.set("webUrl", (JsonNode) null);
-
-        ArrayNode children = outputJson.putArray("children");
-        for (JsonNode duplicate : inputJson.get("duplicates")) {
-            for (JsonNode file : duplicate.get("files")) {
-                ObjectNode child = children.addObject();
-                child.set("id", file.get("id"));
-                child.set("name", file.get("name")); // Set the name to the name of the parent object
-                child.set("type", file.get("type"));
-                child.set("createdDateTime", file.get("createdDateTime"));
-                child.set("lastModifiedDateTime", file.get("lastModifiedDateTime"));
-                child.set("webUrl", file.get("webUrl"));
-                child.set("children", (JsonNode) null);
-            }
-        }
-
-        return outputJson;
     }
 
     public DriveInformationReponse mapToDriveInformationResponse(String displayName, String email, Double total, Double used) {

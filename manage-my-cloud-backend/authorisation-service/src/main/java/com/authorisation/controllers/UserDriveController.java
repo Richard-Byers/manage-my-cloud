@@ -166,14 +166,14 @@ public class UserDriveController {
 
         if (connectionProvider.equals(ONEDRIVE)) {
             try {
-                JsonNode jsonNode = driveInformationService.callEndpointAndGetResponse( ONEDRIVE, files);
+                JsonNode jsonNode = driveInformationService.getDuplicatesFoundByAI( ONEDRIVE, files);
                 return ResponseEntity.ok(jsonNode);
             } catch (Exception e) {
                 return ResponseEntity.badRequest().build();
             }
         } else if (connectionProvider.equals(GOOGLEDRIVE)) {
             try {
-                JsonNode jsonNode = driveInformationService.callEndpointAndGetResponse( GOOGLEDRIVE, files);
+                JsonNode jsonNode = driveInformationService.getDuplicatesFoundByAI( GOOGLEDRIVE, files);
                 return ResponseEntity.ok(jsonNode);
             } catch (Exception e) {
                 return ResponseEntity.badRequest().build();
