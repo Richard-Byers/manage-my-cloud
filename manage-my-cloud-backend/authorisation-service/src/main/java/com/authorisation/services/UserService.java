@@ -83,7 +83,6 @@ public class UserService implements IUserService {
 
         var newUser = new UserEntity();
 
-        newUser.setGoogleProfileImageUrl(pictureUrl);
         newUser.setEmail(email);
         newUser.setFirstName(firstname);
         newUser.setLastName(lastName);
