@@ -282,8 +282,7 @@ public class DriveInformationService implements IDriveInformationService {
 
     //Helper Methods
 
-    public JsonNode fetchAllGoogleDriveFiles(String refreshToken, String accessToken) throws IOException {
-
+    public JsonNode fetchAllGoogleDriveFiles(String refreshToken, String accessToken, boolean isGmail) throws IOException {
         com.google.api.services.drive.Drive service = getGoogleClient(refreshToken, accessToken);
         Gmail gmailClient = getGmailClient(refreshToken, accessToken);
 
@@ -295,7 +294,15 @@ public class DriveInformationService implements IDriveInformationService {
         root.setName("root");
         root.setType("Folder");
         root.setChildren(performFetchAllGoogleDriveFiles(service));
-        root.setEmails(performFetchAllGoogleEmails(gmailClient));
+
+
+        if (isGmail) {
+            root.setGmail(true);
+            root.setEmails(performFetchAllGoogleEmails(gmailClient));
+
+        } else {
+            root.setGmail(false);
+        }
 
         return mapper.valueToTree(root);
     }

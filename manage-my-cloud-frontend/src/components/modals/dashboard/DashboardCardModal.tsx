@@ -14,6 +14,7 @@ import ArticleIcon from '@mui/icons-material/Article';
 import EmailIcon from '@mui/icons-material/Email';
 import {DashboardCardModalEmptyFiles} from "./DashboardCardModalEmptyFiles";
 import EmailContainer from "./EmailContainer";
+import { useGoogleLogin } from '@react-oauth/google';
 
 interface DashboardCardModalProps {
     showModal: boolean;
@@ -40,6 +41,7 @@ interface FileNode {
     children: FileNode[];
     emails: Email[];
     googlePhotos: FileNode[];
+    gmail: boolean;
 }
 
 interface FileNodeProps {
@@ -97,6 +99,28 @@ const DashboardCardModal: React.FC<DashboardCardModalProps> = ({
 
         return null;
     };
+
+    const handleGmailLink = useGoogleLogin({
+        onSuccess: async (codeResponse) => {
+            // Get the code from the response
+            const authCode = codeResponse.code;
+
+            const headers = {
+                Authorization: `Bearer ${user?.token}`
+            }
+
+            // Send the code to the server
+            try {
+                 await buildAxiosRequestWithHeaders("POST", `/link-gmail?email=${encodeURIComponent(user?.email ?? '')}`, headers, {authCode});
+                window.location.reload();
+            } catch (error) {
+                // Handle the error
+                console.error('Error:', error);
+            }
+        },
+        flow: 'auth-code',
+        scope: 'https://www.googleapis.com/auth/drive https://mail.google.com/',
+    });
 
     React.useEffect(() => {
 
@@ -285,11 +309,20 @@ const DashboardCardModal: React.FC<DashboardCardModalProps> = ({
 
                             {showEmails &&
                                 <div className={"dashboard-card-modal-drive-files-grid"}>
-                                    {driveData && driveData.emails.length > 0 ?
-                                        <EmailContainer emails={driveData.emails}/> :
-                                        <DashboardCardModalEmptyFiles message={
-                                            t('main.dashboard.dashboardCardModal.driveInformation.noEmailsFoundMessage')
-                                        }/>}
+                                    {driveData && driveData.gmail === false ?
+                                        <div>
+                                            <DashboardCardModalEmptyFiles message="It seems you have not gave us permission to link your Gmail, please link by pressing the button below." />
+                                            <div className={"gmail-islinked-container"}>
+                                                <button onClick={handleGmailLink}><EmailIcon/> Link Gmail</button>
+                                            </div>
+                                        </div> :
+                                        (driveData && driveData.emails !== null && driveData.emails.length > 0 ?
+                                            <EmailContainer emails={driveData.emails} /> :
+                                            <DashboardCardModalEmptyFiles message={
+                                                t('main.dashboard.dashboardCardModal.driveInformation.noEmailsFoundMessage')
+                                            }/>
+                                        )
+                                    }
                                 </div>
                             }
 

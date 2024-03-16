@@ -228,14 +228,14 @@ const DeleteDuplicatesModal: React.FC<DeleteDuplicatesProps> = ({
                     }
                         {successfulDeletionMessage === "" && unsuccessfulDeletionMessage === "" &&
                         <div className={"dashboard-page-buttons-modal-grid"}>
-                            <div className={"deletion-duplicates-container"}>
+                            <div className={"deletion-recommendation-container"}>
                                 {driveData && driveData?.children.length > 0 ?
                                     <>
                                         <h2> {driveData?.children.length} {t('main.dashboard.deletionModals.deleteDuplicates.title')}</h2>
                                         <p
                                             className={"deletion-duplicates-description"}>{t('main.dashboard.deletionModals.deleteDuplicates.mainText')}</p>
-                                        <p className={"deletion-duplicates-select-all-description"}>
-                                            Select All
+                                       <p className={"deletion-recommendation-select-all-description"}>
+                                                    {t('main.dashboard.deletionModals.deleteRecommended.selectAll')}
                                             <input
                                                 className={"dashboard-page-buttons-select-all-checkbox"}
                                                 type="checkbox"

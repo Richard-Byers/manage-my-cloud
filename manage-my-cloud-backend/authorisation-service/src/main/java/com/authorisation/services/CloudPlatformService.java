@@ -23,7 +23,7 @@ public class CloudPlatformService implements ICloudPlatformService {
     private final CloudPlatformRepository cloudPlatformRepository;
     private final UserEntityRepository userEntityRepository;
 
-    public CloudPlatform addCloudPlatform(String userEmail, String platformName, String accessToken, String refreshToken, Date accessTokenExpiryDate, String driveEmail) {
+    public CloudPlatform addCloudPlatform(String userEmail, String platformName, String accessToken, String refreshToken, Date accessTokenExpiryDate, String driveEmail, boolean isGmail) {
         UserEntity userEntity = userEntityRepository.findByEmail(userEmail).orElseThrow(() -> new RuntimeException("User not found"));
         LinkedAccounts linkedAccounts = userEntity.getLinkedAccounts();
 
@@ -49,6 +49,24 @@ public class CloudPlatformService implements ICloudPlatformService {
         cloudPlatform.setRefreshToken(encryptedRefreshToken);
         cloudPlatform.setAccessTokenExpiryDate(accessTokenExpiryDate);
         cloudPlatform.setDriveEmail(driveEmail);
+        cloudPlatform.setGmail(isGmail);
+
+        return cloudPlatformRepository.save(cloudPlatform);
+    }
+
+    public CloudPlatform updateCloudPlatform(String userEmail, String platformName, String accessToken, String refreshToken, Date accessTokenExpiryDate, String driveEmail, boolean isGmail) {
+        CloudPlatform cloudPlatform = cloudPlatformRepository.findByUserEntityEmailAndPlatformNameAndDriveEmail(userEmail, platformName, driveEmail);
+        if (cloudPlatform == null) {
+            throw new RuntimeException("CloudPlatform not found");
+        }
+
+        String encryptedAccessToken = encrypt(accessToken);
+        String encryptedRefreshToken = encrypt(refreshToken);
+
+        cloudPlatform.setAccessToken(encryptedAccessToken);
+        cloudPlatform.setRefreshToken(encryptedRefreshToken);
+        cloudPlatform.setAccessTokenExpiryDate(accessTokenExpiryDate);
+        cloudPlatform.setGmail(isGmail);
 
         return cloudPlatformRepository.save(cloudPlatform);
     }
@@ -82,6 +100,11 @@ public class CloudPlatformService implements ICloudPlatformService {
     }
 
     boolean isDriveLinked(String userEmail, String driveEmail, String platformName) {
+        CloudPlatform cloudPlatform = cloudPlatformRepository.findByUserEntityEmailAndDriveEmailAndPlatformName(userEmail, driveEmail, platformName);
+        return cloudPlatform != null;
+    }
+
+    boolean isGmailLinked(String userEmail, String driveEmail, String platformName) {
         CloudPlatform cloudPlatform = cloudPlatformRepository.findByUserEntityEmailAndDriveEmailAndPlatformName(userEmail, driveEmail, platformName);
         return cloudPlatform != null;
     }

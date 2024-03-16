@@ -1,8 +1,6 @@
 package org.mmc;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.api.client.json.Json;
 import com.google.api.services.drive.model.About;
 import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.model.Message;
@@ -13,10 +11,8 @@ import org.junit.Test;
 import org.mmc.auth.DriveAuthManager;
 import org.mmc.drive.DriveInformationService;
 import org.mmc.pojo.UserPreferences;
-import org.mmc.response.CustomDriveItem;
 import org.mmc.response.DriveInformationReponse;
 import org.mmc.response.FilesDeletedResponse;
-import org.mmc.util.JsonUtils;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
@@ -25,7 +21,6 @@ import java.util.Date;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mmc.givens.DriveGivens.*;
@@ -414,7 +409,7 @@ public class DriveInformationServiceTest {
             when(messages.get(anyString(), anyString())).thenReturn(getMessages);
             when(getMessages.execute()).thenReturn(message);
 
-            JsonNode driveFiles = driveInformationService.fetchAllGoogleDriveFiles(refreshToken, accessToken);
+            JsonNode driveFiles = driveInformationService.fetchAllGoogleDriveFiles(refreshToken, accessToken, true);
 
             //then
             assertEquals(1, driveFiles.get("children").size());

@@ -17,7 +17,7 @@ public interface IDriveInformationService {
     DriveInformationReponse getGoogleDriveInformation(String email, String refreshToken, String accessToken) throws IOException;
 
     JsonNode listAllItemsInOneDrive(String userAccessToken, Date expiryDate) throws JsonProcessingException;
-    JsonNode fetchAllGoogleDriveFiles(String refreshToken, String accessToken) throws IOException;
+    JsonNode fetchAllGoogleDriveFiles(String refreshToken, String accessToken, boolean isGmail) throws IOException;
     DriveInformationReponse mapToDriveInformationResponse(String displayName, String email, Double total, Double used);
 
     JsonNode returnItemsToDelete(JsonNode filesInDrive, UserPreferences userPreferences) throws IOException;

@@ -50,7 +50,7 @@ class CloudPlatformServiceTest {
         when(userEntityRepository.findByEmail(userEmail)).thenReturn(java.util.Optional.of(userEntity));
         when(cloudPlatformRepository.save(any(CloudPlatform.class))).thenReturn(expectedCloudPlatform);
 
-        CloudPlatform actualCloudPlatform = cloudPlatformService.addCloudPlatform(userEmail, platformName, accessToken, refreshToken, null, driveEmail);
+        CloudPlatform actualCloudPlatform = cloudPlatformService.addCloudPlatform(userEmail, platformName, accessToken, refreshToken, null, driveEmail, true);
 
         assertEquals(expectedCloudPlatform, actualCloudPlatform);
         verify(userEntityRepository, times(1)).save(userEntity);

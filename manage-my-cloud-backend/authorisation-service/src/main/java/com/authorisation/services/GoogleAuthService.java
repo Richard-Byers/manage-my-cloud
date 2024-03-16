@@ -3,13 +3,19 @@ package com.authorisation.services;
 import com.authorisation.config.UserAuthenticationProvider;
 import com.authorisation.dto.UserDto;
 import com.authorisation.response.GoogleDriveLinkResponse;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeTokenRequest;
 import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleTokenResponse;
 import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import lombok.RequiredArgsConstructor;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 import org.json.JSONObject;
 import org.mmc.drive.DriveInformationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +27,6 @@ import java.io.IOException;
 import java.io.StringReader;
 
 import static com.authorisation.Constants.GOOGLEDRIVE;
-import static com.authorisation.Constants.ONEDRIVE;
 
 @RequiredArgsConstructor
 @Service
@@ -78,10 +83,10 @@ public class GoogleAuthService {
 
     public GoogleTokenResponse getGoogleTokenResponse(String authCodeOutput) throws IOException {
         GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(
-                JacksonFactory.getDefaultInstance(), new StringReader(googleCredentialsJson));
+                GsonFactory.getDefaultInstance(), new StringReader(googleCredentialsJson));
         return new GoogleAuthorizationCodeTokenRequest(
                 new NetHttpTransport(),
-                JacksonFactory.getDefaultInstance(),
+                GsonFactory.getDefaultInstance(),
                 "https://www.googleapis.com/oauth2/v4/token",
                 clientSecrets.getDetails().getClientId(),
                 clientSecrets.getDetails().getClientSecret(),
@@ -98,7 +103,13 @@ public class GoogleAuthService {
 
         try {
             GoogleTokenResponse tokenResponse = getGoogleTokenResponse(authCodeOutput);
+            String scope = getAccessTokenScope(tokenResponse.getAccessToken());
             String driveEmail = driveInformationService.getGoogleDriveEmail(tokenResponse.getRefreshToken(), tokenResponse.getAccessToken());
+            boolean isGmail = false;
+
+            if (scope.contains("https://mail.google.com/") || scope.contains("https://www.googleapis.com/auth/gmail.modify")) {
+                isGmail = true;
+            }
 
             boolean isDriveLinked = cloudPlatformService.isDriveLinked(email, driveEmail, GOOGLEDRIVE);
 
@@ -107,7 +118,7 @@ public class GoogleAuthService {
                 return googleDriveLinkResponse;
             }
 
-            storeUserPlatformLink(tokenResponse, email, driveEmail);
+            storeUserPlatformLink(tokenResponse, email, driveEmail, isGmail);
 
             return googleDriveLinkResponse;
         } catch (Exception e) {
@@ -117,12 +128,71 @@ public class GoogleAuthService {
         return null;
     }
 
-    public void storeUserPlatformLink(GoogleTokenResponse tokenResponse, String email, String driveEmail) {
+    public GoogleDriveLinkResponse linkGmail(String authCode, String email) {
+        String jsonString = authCode.substring(authCode.indexOf("{"));
+        JSONObject jsonObject = new JSONObject(jsonString);
+        String authCodeOutput = jsonObject.getString("authCode");
+        GoogleDriveLinkResponse googleDriveLinkResponse = new GoogleDriveLinkResponse();
+
+        try {
+            GoogleTokenResponse tokenResponse = getGoogleTokenResponse(authCodeOutput);
+            String scope = getAccessTokenScope(tokenResponse.getAccessToken());
+            String driveEmail = driveInformationService.getGoogleDriveEmail(tokenResponse.getRefreshToken(), tokenResponse.getAccessToken());
+            boolean isGmail = false;
+
+            if (scope.contains("https://mail.google.com/") || scope.contains("https://www.googleapis.com/auth/gmail.modify")) {
+                isGmail = true;
+            }
+
+            UpdateUserPlatformLink(tokenResponse, email, driveEmail, isGmail);
+
+            return googleDriveLinkResponse;
+        } catch (Exception e) {
+            // Log the exception
+            System.out.println(e);
+        }
+        return null;
+    }
+
+
+    public String getAccessTokenScope(String accessToken) {
+        OkHttpClient client = new OkHttpClient();
+        ObjectMapper mapper = new ObjectMapper();
+
+        Request request = new Request.Builder()
+                .url("https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=" + accessToken)
+                .build();
+
+        try (Response response = client.newCall(request).execute()) {
+            if (!response.isSuccessful()) {
+                throw new IOException("Unexpected code " + response);
+            }
+
+            // Parse the response body into a JsonNode
+            JsonNode jsonNode = mapper.readTree(response.body().string());
+
+            // Return the "scope" value as a String
+            return jsonNode.get("scope").asText();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public void storeUserPlatformLink(GoogleTokenResponse tokenResponse, String email, String driveEmail, Boolean isGmail) {
         cloudPlatformService.addCloudPlatform(
                 email,
                 GOOGLEDRIVE,
                 tokenResponse.getAccessToken(),
-                tokenResponse.getRefreshToken(), null, driveEmail);
+                tokenResponse.getRefreshToken(), null, driveEmail, isGmail);
+    }
+
+    public void UpdateUserPlatformLink(GoogleTokenResponse tokenResponse, String email, String driveEmail, Boolean isGmail) {
+        cloudPlatformService.updateCloudPlatform(
+                email,
+                GOOGLEDRIVE,
+                tokenResponse.getAccessToken(),
+                tokenResponse.getRefreshToken(), null, driveEmail, isGmail);
     }
 
     public void unlinkGoogleDrive(String email, String driveEmail) {
