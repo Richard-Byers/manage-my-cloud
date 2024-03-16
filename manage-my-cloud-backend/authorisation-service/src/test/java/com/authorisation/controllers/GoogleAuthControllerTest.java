@@ -63,5 +63,11 @@ public class GoogleAuthControllerTest {
                         .content(authCodeJson)
                         .param("email", email))
                 .andExpect(status().isOk());
+
+        mockMvc.perform(post("/link-gmail")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(authCodeJson)
+                        .param("email", email))
+                .andExpect(status().isOk());
     }
 }

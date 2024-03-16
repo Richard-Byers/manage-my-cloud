@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.authorisation.givens.CloudPlatformGivens.generateCloudPlatform;
+import static com.authorisation.util.EncryptionUtil.decrypt;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
@@ -54,6 +55,33 @@ class CloudPlatformServiceTest {
 
         assertEquals(expectedCloudPlatform, actualCloudPlatform);
         verify(userEntityRepository, times(1)).save(userEntity);
+    }
+
+    @Test
+    void updateCloudPlatform() {
+        String userEmail = "email@example.com";
+        String driveEmail = "email@example.com";
+        String platformName = "OneDrive";
+        String accessToken = "new_access_token";
+        String refreshToken = "new_refresh_token";
+        boolean isGmail = true;
+
+        UserEntity userEntity = new UserEntity();
+        userEntity.setEmail(userEmail);
+
+        CloudPlatform existingCloudPlatform = generateCloudPlatform();
+        existingCloudPlatform.setUserEntity(userEntity);
+        existingCloudPlatform.setPlatformName(platformName);
+        existingCloudPlatform.setDriveEmail(driveEmail);
+
+        when(cloudPlatformRepository.findByUserEntityEmailAndPlatformNameAndDriveEmail(userEmail, platformName, driveEmail)).thenReturn(existingCloudPlatform);
+        when(cloudPlatformRepository.save(any(CloudPlatform.class))).thenAnswer(i -> i.getArguments()[0]);
+
+        CloudPlatform updatedCloudPlatform = cloudPlatformService.updateCloudPlatform(userEmail, platformName, accessToken, refreshToken, null, driveEmail, isGmail);
+
+        assertEquals(accessToken, decrypt(updatedCloudPlatform.getAccessToken()));
+        assertEquals(refreshToken, decrypt(updatedCloudPlatform.getRefreshToken()));
+        assertEquals(isGmail, updatedCloudPlatform.isGmail());
     }
 
     @Test
