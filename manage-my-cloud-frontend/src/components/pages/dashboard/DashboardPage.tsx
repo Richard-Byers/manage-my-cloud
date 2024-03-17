@@ -1,21 +1,28 @@
 import Navbar from "../../nav/Navbar";
-import React from "react";
+import React, {useEffect, useRef} from "react";
 import ConnectedDrivesCard from "./cards/ConnectedDrivesCard";
 import './DashboardPage.css';
 import {useNavigate} from "react-router-dom";
 import {ROUTES} from "../../../constants/RouteConstants";
 import {useTranslation} from "react-i18next";
 import {AuthData} from "../../routing/AuthWrapper";
+import {buildAxiosRequestWithHeaders} from "../../helpers/AxiosHelper";
+import {TokenUpdater} from "../../helpers/TokenUpdater"
 
 const DashboardPage = () => {
 
     const navigate = useNavigate();
     const {t} = useTranslation();
-    const {user} = AuthData();
+    const {user, refreshUser} = AuthData();
+    const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
     function navigateToManageConnections() {
         navigate(ROUTES.MANAGE_CONNECTIONS);
     }
+
+    useEffect(() => {
+        TokenUpdater.checkAndUpdateToken();
+    }, []);
 
     return (
         <>
@@ -47,8 +54,8 @@ const DashboardPage = () => {
                     </p>
                 </div>
             </div>
-        </>
 
+        </>
     )
 };
 

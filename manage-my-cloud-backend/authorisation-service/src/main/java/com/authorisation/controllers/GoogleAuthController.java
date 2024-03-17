@@ -2,7 +2,6 @@ package com.authorisation.controllers;
 
 import com.authorisation.dto.UserDto;
 import com.authorisation.response.GoogleDriveLinkResponse;
-import com.authorisation.response.GoogleDriveLinkResponse;
 import com.authorisation.services.GoogleAuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

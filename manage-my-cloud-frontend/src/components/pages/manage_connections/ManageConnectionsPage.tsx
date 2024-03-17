@@ -6,6 +6,7 @@ import {AuthData} from "../../routing/AuthWrapper";
 import AddConnectionsModal from "../../modals/managingConnections/AddConnectionsModal"
 import {buildAxiosRequestWithHeaders} from "../../helpers/AxiosHelper";
 import Connection from "./Connection";
+import {TokenUpdater} from "../../helpers/TokenUpdater"
 
 const ManageConnectionsPage = () => {
     const {t} = useTranslation();
@@ -35,6 +36,20 @@ const ManageConnectionsPage = () => {
         }
     }, []);
 
+    useEffect(() => {
+        const checkToken = async () => {
+            if (!document.hidden) {
+                await TokenUpdater.checkAndUpdateToken();
+            }
+        };
+        // Check the token when the page becomes visible
+        document.addEventListener('visibilitychange', checkToken);
+
+        return () => {
+            document.removeEventListener('visibilitychange', checkToken);
+        };
+    }, []);
+
     return (
         <div>
             <Navbar/>
@@ -55,13 +70,13 @@ const ManageConnectionsPage = () => {
                 }
 
                 {user?.linkedAccounts.linkedAccountsCount === 0 ? null :
-                <div className="overflow-container">
-                    {user?.linkedAccounts.linkedAccountsCount === 0 ? null
-                        :
-                        user?.linkedAccounts.linkedDriveAccounts.map(({accountEmail, accountType}) => (
-                            <Connection key={accountEmail} accountEmail={accountEmail} accountType={accountType}/>
-                        ))}
-                </div>
+                    <div className="overflow-container">
+                        {user?.linkedAccounts.linkedAccountsCount === 0 ? null
+                            :
+                            user?.linkedAccounts.linkedDriveAccounts.map(({accountEmail, accountType}) => (
+                                <Connection key={accountEmail} accountEmail={accountEmail} accountType={accountType}/>
+                            ))}
+                    </div>
                 }
 
                 {user?.linkedAccounts.linkedAccountsCount !== undefined && user?.linkedAccounts.linkedAccountsCount >= 1 ? (

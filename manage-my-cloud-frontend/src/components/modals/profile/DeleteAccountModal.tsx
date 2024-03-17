@@ -30,17 +30,20 @@ function DeleteAccountModal() {
         e.preventDefault();
         setIsDeleting(true);
         if (password === "" && confirmPassword === "") {
+            setIsDeleting(false);
             setErrorMessage(t('main.deleteAccountModal.errorMessage.enterBothPasswords'));
             return;
         }
 
         if (password === "" || confirmPassword === "") {
             setErrorMessage(t('main.deleteAccountModal.errorMessage.fillBothPasswords'));
+            setIsDeleting(false);
             return;
         }
 
         if (password !== confirmPassword) {
             setErrorMessage(t('main.deleteAccountModal.errorMessage.passwordsDoNotMatch'));
+            setIsDeleting(false);
             return;
         }
 
@@ -57,7 +60,9 @@ function DeleteAccountModal() {
                     resetModal();
                 }, 2000);
             } catch (error) {
+                setIsDeleting(false);
                 const err = error as any;
+
                 if (err.response && err.response.data === 'Invalid password') {
                     setErrorMessage(t('main.deleteAccountModal.errorMessage.invalidPassword'));
                 } else {
@@ -70,6 +75,7 @@ function DeleteAccountModal() {
     };
     const closeModal = () => {
         setShowModal(false);
+        resetModal();
     };
 
     return (
@@ -118,7 +124,7 @@ function DeleteAccountModal() {
                                     </button>
                                     <button
                                         className="modal-form-submit-button"
-                                        onClick={() => setShowModal(false)}
+                                        onClick={() => closeModal()}
                                         disabled={isDeleting}
                                     >{t('main.deleteAccountModal.cancel')}</button>
                                 </div>
