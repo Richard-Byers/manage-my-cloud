@@ -13,8 +13,5 @@ public interface CloudPlatformRepository extends JpaRepository<CloudPlatform, Lo
     List<CloudPlatform> findAllByUserEntityEmail(String email);
     CloudPlatform findByUserEntityEmailAndPlatformNameAndDriveEmail(String email, String platformName, String driveEmail);
     CloudPlatform findByUserEntityEmailAndDriveEmailAndPlatformName(String email, String driveEmail, String platformName);
-    List<CloudPlatform> findAllByUserEntityEmailAndPlatformName(String userEmail, String platformName);
-    CloudPlatform findByDriveEmailAndPlatformName(String driveEmail, String platformName);
-
 
 }

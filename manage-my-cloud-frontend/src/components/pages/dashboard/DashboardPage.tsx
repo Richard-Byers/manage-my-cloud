@@ -1,13 +1,11 @@
 import Navbar from "../../nav/Navbar";
-import React, {useEffect, useRef} from "react";
+import React from "react";
 import ConnectedDrivesCard from "./cards/ConnectedDrivesCard";
 import './DashboardPage.css';
 import {useNavigate} from "react-router-dom";
 import {ROUTES} from "../../../constants/RouteConstants";
 import {useTranslation} from "react-i18next";
 import {AuthData} from "../../routing/AuthWrapper";
-import {buildAxiosRequestWithHeaders} from "../../helpers/AxiosHelper";
-import {TokenUpdater} from "../../helpers/TokenUpdater"
 import WelcomeModal from "../../ui_components/WelcomeModal";
 import ToolTip from "../../ui_components/ToolTip";
 import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
@@ -16,16 +14,11 @@ const DashboardPage = () => {
 
     const navigate = useNavigate();
     const {t} = useTranslation();
-    const {user, refreshUser} = AuthData();
-    const intervalRef = useRef<NodeJS.Timeout | null>(null);
+    const {user} = AuthData();
 
     function navigateToManageConnections() {
         navigate(ROUTES.MANAGE_CONNECTIONS);
     }
-
-    useEffect(() => {
-        TokenUpdater.checkAndUpdateToken();
-    }, []);
 
     return (
         <>
@@ -62,8 +55,8 @@ const DashboardPage = () => {
                     </p>
                 </div>
             </div>
-
         </>
+
     )
 };
 

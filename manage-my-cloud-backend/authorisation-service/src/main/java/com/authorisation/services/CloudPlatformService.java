@@ -11,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
-import java.util.List;
 
 import static com.authorisation.Constants.GOOGLEDRIVE;
 import static com.authorisation.Constants.ONEDRIVE;
@@ -91,20 +90,4 @@ public class CloudPlatformService implements ICloudPlatformService {
         return cloudPlatformRepository.findByUserEntityEmailAndPlatformNameAndDriveEmail(userEmail, platformName, driveEmail);
     }
 
-    public List<CloudPlatform> getDriveEmailAndRefreshTokens(String userEmail, String platformName) {
-        List<CloudPlatform> cloudPlatforms = cloudPlatformRepository.findAllByUserEntityEmailAndPlatformName(userEmail, platformName);
-        if (cloudPlatforms.isEmpty()) {
-            throw new RuntimeException(String.format("Cloud platform not found for user %s and platform %s", userEmail, platformName));
-        }
-        return cloudPlatforms;
-    }
-
-    public Date getExpiresIn(String platformName, String driveEmail) {
-        CloudPlatform cloudPlatform = cloudPlatformRepository.findByDriveEmailAndPlatformName(platformName, driveEmail);
-        return cloudPlatform.getAccessTokenExpiryDate();
-    }
-
-    public void saveCloudPlatform(CloudPlatform cloudPlatform) {
-        cloudPlatformRepository.save(cloudPlatform);
-    }
 }
