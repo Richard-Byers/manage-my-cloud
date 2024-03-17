@@ -7,6 +7,7 @@ import LoadingSpinner from "../../../helpers/LoadingSpinner";
 import StorageProgressBar from "../storage_bar/StorageProgressBar";
 import DashboardCardModal from "../../../modals/dashboard/DashboardCardModal";
 import {useTranslation} from "react-i18next";
+import ErrorModal from "../../../modals/dashboard/ErrorModal";
 
 interface DriveInformation {
     displayName: string,
@@ -26,19 +27,38 @@ const CardContainer: React.FC<ConnectedDrivesCardProps> = ({connectionProvider, 
     const {t} = useTranslation();
     const [driveInformation, setDriveInformation] = React.useState<DriveInformation | null>(null);
     const [dashboardModal, setShowDashboardModal] = useState(false);
+    const [showErrorModal, setShowErrorModal] = useState(false);
+    const [errorMessage, setErrorMessage] = useState('');
 
     const toggleModal = () => {
         setShowDashboardModal(!dashboardModal);
     }
 
+    const handleCloseErrorModal = () => {
+        setShowErrorModal(false);
+        window.location.href = 'http://localhost:3000/manage-connections';
+    }
+
     React.useEffect(() => {
         const fetchDriveInformation = async () => {
-            const info = await getUserDrives(user, connectionProvider, driveEmail);
-            setDriveInformation(info);
+            try {
+                const info = await getUserDrives(user, connectionProvider, driveEmail);
+                setDriveInformation(info);
+            } catch (error) {
+                if (error instanceof Error) {
+                    setErrorMessage(error.message);
+                    setShowErrorModal(true);
+                }
+            }
         };
-
         fetchDriveInformation();
-    }, [user, connectionProvider]);
+    }, [user, connectionProvider, driveEmail]);
+
+    if (showErrorModal) {
+        return (
+            <ErrorModal showModal={showErrorModal} handleClose={handleCloseErrorModal} errorMessage={errorMessage}/>
+        );
+    }
 
     if (!driveInformation) {
         return <LoadingSpinner/>
@@ -46,14 +66,14 @@ const CardContainer: React.FC<ConnectedDrivesCardProps> = ({connectionProvider, 
 
     return (
         <>
-            {driveInformation && dashboardModal &&
+                        {driveInformation && dashboardModal &&
                 <DashboardCardModal setShowModal={setShowDashboardModal} showModal={dashboardModal}
                                     connectionProvider={connectionProvider}
                                     totalStorage={driveInformation.total}
                                     usedStorage={driveInformation.used}
                                     email={driveInformation.email}
                                     driveEmail={driveEmail}/>}
-            <div className="dashboard-connection-item" onClick={toggleModal}
+                        <div className="dashboard-connection-item" onClick={toggleModal}
                  id={`${connectionProvider}-connected-item`}>
                 <img src={CONNECTION_LOGOS[connectionProvider]}
                      alt={`Logo for ${connectionProvider}`}/>
@@ -71,13 +91,20 @@ const CardContainer: React.FC<ConnectedDrivesCardProps> = ({connectionProvider, 
 }
 
 async function getUserDrives(user: any, connectionProvider: string, driveEmail: string): Promise<DriveInformation> {
-
     const headers = {
         'Authorization': `Bearer ${user.token}`
     }
 
     const connectionProviderTitle = CONNECTION_TITLE[connectionProvider];
     const response = await buildAxiosRequestWithHeaders('GET', `/drive-information?email=${user.email}&provider=${connectionProviderTitle}&driveEmail=${driveEmail}`, headers, {});
+
+    if (response.status !== 200) {
+        if (connectionProvider === 'GoogleDrive') {
+            throw new Error('Something went wrong when fetching information about your Google Drive belonging to the email: ' + driveEmail + '. Please check if Manage My Cloud has permission to access your Google Drive in your Google account settings.');
+        } else {
+            throw new Error('Something went wrong when fetching information about your OneDrive belonging to the email: ' + driveEmail + '. Please check if Manage My Cloud has permission to access your OneDrive in your Microsoft account settings.');
+        }
+    }
 
     if (!response.data) {
         throw new Error('Invalid response data');
@@ -88,7 +115,6 @@ async function getUserDrives(user: any, connectionProvider: string, driveEmail: 
         total: response.data.total,
         used: response.data.used,
     };
-
 }
 
 export default CardContainer

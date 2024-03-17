@@ -1,0 +1,84 @@
+.modal {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 23%;
+    height: 34vh;
+    background-color: rgb(254, 254, 254);
+    padding: 1em;
+    font-weight: 700;
+    text-align: center;
+    border-radius: 10px;
+    box-shadow: 10px 10px 5px 0px rgba(0, 0, 0, 0.18);
+    -webkit-box-shadow: 10px 10px 5px 0px rgba(0, 0, 0, 0.18);
+    -moz-box-shadow: 10px 10px 5px 0px rgba(0, 0, 0, 0.18);
+    transition: transform 0.2s ease-in-out;
+}
+
+.modal-content {
+    position: relative;
+    padding: 20px;
+    width: 80%;
+    max-width: 500px;
+    box-sizing: border-box;
+    font-size: 1.05rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-family: 'MontserratRegular', sans-serif;
+    font-weight: 700;
+}
+
+.modal-content button {
+    background-color: #4CAF50; /* green */
+    color: white; /* white text */
+    padding: 15px 32px; /* vertical padding of 15px, horizontal padding of 32px */
+    text-align: center; /* center the text */
+    text-decoration: none; /* remove underline */
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer; /* change cursor to pointer when hovering over the button */
+    border: none; /* remove border */
+    border-radius: 12px; /* rounded corners */
+    font-family: 'MontserratRegular', sans-serif;
+    font-weight: 700;
+}
+
+@media only screen and (max-width: 940px) {
+    .modal {
+        width: 75%;
+        height: auto;
+    }
+}
+
+@media only screen and (max-width: 940px) {
+    .modal-content {
+        font-size: 0.7rem;
+        font-family: 'MontserratRegular', sans-serif;
+        font-weight: 700;
+    }
+}
+
+@media only screen and (max-width: 768px) {
+    .modal {
+        width: 75%;
+        height: auto;
+    }
+}
+
+@media only screen and (max-width: 768px) {
+    .modal-content {
+        font-size: 0.7rem;
+        font-family: 'MontserratRegular', sans-serif;
+        font-weight: 700;
+    }
+}
+
+@media only screen and (max-width: 500px) {
+    .modal-content {
+        font-size: 0.7rem;
+    }
+}
