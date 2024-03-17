@@ -2,7 +2,7 @@ import LoadingSpinner from "../../helpers/LoadingSpinner";
 import CloseIcon from "@mui/icons-material/Close";
 import {Success} from "../../helpers/Success";
 import {Failure} from "../../helpers/Failure";
-import {NothingFound} from "../../helpers/NothingFound";
+import {NothingFoundRecommendations} from "../../helpers/NothingFound";
 import ArticleIcon from "@mui/icons-material/Article";
 import EmailIcon from "@mui/icons-material/Email";
 import React, {useEffect, useState} from "react";
@@ -213,7 +213,6 @@ const DeletionRecommendationsModal: React.FC<DeletionRecommendationModalProps> =
     const closeModal = () => {
         setShowModal(false);
         setShowDeletionModal(false);
-        setShowDeletionModal(false);
         setDeleteRecommendedClicked(false);
         setSelectAll(false);
         setFilesToBeDeleted({children: [], emails: []})
@@ -287,7 +286,7 @@ const DeletionRecommendationsModal: React.FC<DeletionRecommendationModalProps> =
     return (
         <div className={"modal-overlay"} onClick={closeRecommendationModal}>
             {loading ? <LoadingSpinner/> :
-                <div className={"modal"} onClick={stopPropagation}>
+                <div className={"modal"} onClick={stopPropagation} id={"deletion-recommendation-modal"}>
 
                     <button className={"modal-close-button"} onClick={closeRecommendationModal}><CloseIcon
                         className="svg_icons"/>
@@ -296,9 +295,9 @@ const DeletionRecommendationsModal: React.FC<DeletionRecommendationModalProps> =
                     {/*If items we're deleted then render successfulDeletionMessage*/}
                     {successfulDeletionMessage !== "" &&
                         <div className={"recommended-file-button-container"}>
-                            <p>{successfulDeletionMessage}</p>
+                            <p id={"deletion-success-message"}>{successfulDeletionMessage}</p>
                             <Success/>
-                            <button className={"dashboard-button"} onClick={closeModal}>
+                            <button className={"dashboard-button"} onClick={closeModal} id={"success-deletion-close-button"}>
                                 {t('main.dashboard.deletionModals.deleteRecommended.closeRecommendation')}
                             </button>
                         </div>
@@ -333,16 +332,20 @@ const DeletionRecommendationsModal: React.FC<DeletionRecommendationModalProps> =
 
                                         {showDriveData && driveData?.children.length > 0 ?
                                             <>
-                                                <h2> {driveData?.children.length} {t('main.dashboard.deletionModals.deleteRecommended.title')}</h2>
+                                                <h2 id={"item-recommendation-count"}>
+                                                    {driveData?.children.length} {t('main.dashboard.deletionModals.deleteRecommended.title')}
+                                                </h2>
                                                 <p
                                                     className={"deletion-recommendation-description"}>{t('main.dashboard.deletionModals.deleteRecommended.mainText')}</p>
-                                                <p className={"deletion-recommendation-select-all-description"}>
+                                                <p className={"deletion-recommendation-select-all-description"}
+                                                   id={"recommendation-description"}>
                                                     {t('main.dashboard.deletionModals.deleteRecommended.selectAll')}
                                                     <input
                                                         className={"dashboard-page-buttons-select-all-checkbox"}
                                                         type="checkbox"
                                                         checked={selectAll}
-                                                        onChange={handleSelectAll}/>
+                                                        onChange={handleSelectAll}
+                                                        id={"select-all-checkbox"}/>
                                                 </p>
                                                 <div className={"dashboard-card-modal-drive-files-grid"}>
                                                     {driveData ?
@@ -361,14 +364,14 @@ const DeletionRecommendationsModal: React.FC<DeletionRecommendationModalProps> =
                                                 <div className={"recommended-file-button-container"}>
                                                     <button className={"dashboard-button"} onClick={() => {
                                                         deleteRecommendedFiles(user, connectionProvider, filesToBeDeleted, driveEmail)
-                                                    }}>
+                                                    }} id={"delete-recommendations-button"}>
                                                         {t('main.dashboard.deletionModals.deleteRecommended.deleteButton')}
                                                     </button>
                                                 </div>
                                             </>
                                             : showDriveData &&
                                             <>
-                                                <NothingFound caughtUpFor={"Drive Files"}/>
+                                                <NothingFoundRecommendations caughtUpFor={"Drive Files"}/>
                                                 <div className={"recommended-file-button-container"}>
                                                     <button className={"dashboard-button"} onClick={closeModal}>
                                                         {t('main.dashboard.deletionModals.deleteRecommended.closeRecommendation')}
@@ -416,7 +419,7 @@ const DeletionRecommendationsModal: React.FC<DeletionRecommendationModalProps> =
                                             </>
                                             : showEmails &&
                                             <>
-                                                <NothingFound caughtUpFor={"Emails"}/>
+                                                <NothingFoundRecommendations caughtUpFor={"Emails"}/>
                                                 <div className={"recommended-file-button-container"}>
                                                     <button className={"dashboard-button"} onClick={closeModal}>
                                                         {t('main.dashboard.deletionModals.deleteRecommended.closeRecommendation')}
@@ -427,9 +430,10 @@ const DeletionRecommendationsModal: React.FC<DeletionRecommendationModalProps> =
 
                                     </> :
                                     <>
-                                        <NothingFound caughtUpFor={"Everything"}/>
+                                        <NothingFoundRecommendations caughtUpFor={"Everything"}/>
                                         <div className={"recommended-file-button-container"}>
-                                            <button className={"dashboard-button"} onClick={closeModal}>
+                                            <button className={"dashboard-button"} onClick={closeModal}
+                                                    id={"recommendation-done-button"}>
                                                 {t('main.dashboard.deletionModals.deleteRecommended.closeRecommendation')}
                                             </button>
                                         </div>

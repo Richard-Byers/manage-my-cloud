@@ -35,7 +35,7 @@ public class CloudPlatformService implements ICloudPlatformService {
                 userEntity.setLinkedAccounts(linkedAccounts);
             }
             linkedAccounts.getLinkedDriveAccounts().add(new Account(driveEmail, platformName));
-            linkedAccounts.setLinkedAccountsCount(linkedAccounts.getLinkedAccountsCount() + 1);
+            linkedAccounts.setLinkedAccountsCount((linkedAccounts.getLinkedAccountsCount()) + 1);
         } else {
             throw new RuntimeException("Platform not supported");
         }
@@ -72,7 +72,7 @@ public class CloudPlatformService implements ICloudPlatformService {
                 }
             }
 
-            linkedAccounts.setLinkedAccountsCount(linkedAccounts.getLinkedAccountsCount() - 1);
+            linkedAccounts.setLinkedAccountsCount((linkedAccounts.getLinkedAccountsCount()) - 1);
         } else {
             throw new RuntimeException("Platform not supported");
         }

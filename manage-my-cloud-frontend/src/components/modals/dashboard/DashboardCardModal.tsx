@@ -229,7 +229,7 @@ const DashboardCardModal: React.FC<DashboardCardModalProps> = ({
     return (
         <div className={"modal-overlay"} onClick={closeModal}>
             {loading ? <LoadingSpinner/> :
-                <div className={"modal"} onClick={stopPropagation}>
+                <div className={"modal"} onClick={stopPropagation} id={"connected-drive-modal"}>
 
                     <button className={"modal-close-button"} onClick={closeModal}>
                         <CloseIcon className="svg_icons"/>

@@ -13,6 +13,7 @@ services:
       - ONEDRIVE_CLIENT_SECRET=
       - ONEDRIVE_REDIRECT_URI=
       - MMC_EMAIL_PASSWORD=
+      - GOOGLE_CREDENTIALS_JSON=
       - "SPRING_PROFILES_ACTIVE=dev"
   postgres:
     image: postgres:latest

@@ -67,10 +67,10 @@ function UpdateDetailsModal() {
 
     return (
         <>
-            <button className="modal-update-details-button" onClick={() => setShowModal(true)}>Update Details</button>
+            <button className="modal-update-details-button" id={"profile-update-details-button"} onClick={() => setShowModal(true)}>Update Details</button>
             {showModal && (
                 <div className="modal-overlay" onClick={resetModal}>
-                    <div className="modal" onClick={e => e.stopPropagation()}>
+                    <div className="modal" onClick={e => e.stopPropagation()} id={"update-details-modal"}>
                         <div className={"modal-form-container"}>
                             <div className={"modal-description"}>
                                 <Trans i18nKey='main.updateDetailsModal.enterNewName'/><br/>
@@ -85,6 +85,7 @@ function UpdateDetailsModal() {
                                                placeholder={t('main.updateDetailsModal.enterFirstName')}
                                                value={firstName}
                                                onChange={(e) => setFirstName(e.target.value)}
+                                               id={"update-details-first-name"}
                                         />
                                     </label>
                                 </div>
@@ -95,6 +96,7 @@ function UpdateDetailsModal() {
                                                placeholder={t('main.updateDetailsModal.enterLastName')}
                                                value={lastName}
                                                onChange={(e) => setLastName(e.target.value)}
+                                                  id={"update-details-last-name"}
                                         />
                                     </label>
                                 </div>
@@ -104,6 +106,7 @@ function UpdateDetailsModal() {
                                     <button
                                         className="modal-form-submit-button"
                                         type="submit"
+                                        id={"update-details-submit"}
                                     >{t('main.updateDetailsModal.confirm')}
                                     </button>
                                     <button
