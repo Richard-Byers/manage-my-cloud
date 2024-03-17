@@ -6,6 +6,7 @@ import {AuthData} from "../../routing/AuthWrapper";
 import AddConnectionsModal from "../../modals/managingConnections/AddConnectionsModal"
 import {buildAxiosRequestWithHeaders} from "../../helpers/AxiosHelper";
 import Connection from "./Connection";
+import {TokenUpdater} from "../../helpers/TokenUpdater"
 import ToolTip from "../../ui_components/ToolTip";
 import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 
@@ -35,6 +36,20 @@ const ManageConnectionsPage = () => {
                 window.history.replaceState({}, document.title, newUrl);
             });
         }
+    }, []);
+
+    useEffect(() => {
+        const checkToken = async () => {
+            if (!document.hidden) {
+                await TokenUpdater.checkAndUpdateToken();
+            }
+        };
+        // Check the token when the page becomes visible
+        document.addEventListener('visibilitychange', checkToken);
+
+        return () => {
+            document.removeEventListener('visibilitychange', checkToken);
+        };
     }, []);
 
     return (

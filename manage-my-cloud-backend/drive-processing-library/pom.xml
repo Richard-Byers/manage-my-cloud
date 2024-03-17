@@ -27,6 +27,7 @@
         <google-http-client-jackson2.version>1.44.1</google-http-client-jackson2.version>
         <google-api-services-drive.version>v3-rev197-1.25.0</google-api-services-drive.version>
         <google-auth-library-oauth2-http.version>1.23.0</google-auth-library-oauth2-http.version>
+        <jackson.version>2.16.2</jackson.version>
     </properties>
 
     <dependencies>
@@ -79,6 +80,12 @@
         </dependency>
 
         <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>${junit.version}</version>
@@ -96,11 +103,6 @@
             <artifactId>mockito-inline</artifactId>
             <version>${mockito-inline.version}</version>
             <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>com.fasterxml.jackson.datatype</groupId>
-            <artifactId>jackson-datatype-jsr310</artifactId>
         </dependency>
 
         <dependency>

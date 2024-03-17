@@ -18,10 +18,19 @@ import com.microsoft.graph.requests.GraphServiceClient;
 import com.microsoft.graph.serializer.AdditionalDataManager;
 import okhttp3.Request;
 import org.mmc.pojo.CustomEmail;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
+import org.mmc.Constants;
 import org.mmc.pojo.UserPreferences;
 import org.mmc.response.CustomDriveItem;
 import org.mmc.response.DriveInformationReponse;
 import org.mmc.response.FilesDeletedResponse;
+import org.mmc.util.JsonUtils;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import java.io.IOException;
@@ -476,20 +485,108 @@ public class DriveInformationService implements IDriveInformationService {
             }
         });
 
-        filesInUserDrive.getEmails().parallelStream().forEach(item -> {
-            try {
-                gmailClient.users().messages().delete("me", item.getId()).execute();
-                emailsDeleted.getAndIncrement();
-                simpMessagingTemplate.convertAndSendToUser(email, "/queue/deletion-progress", emailsDeleted.get() * 100 / totalItemCount.get());
-            } catch (Exception e) {
-                throw new RuntimeException("Error deleting email item");
-            }
-        });
+        if (filesInUserDrive.getEmails() != null) {
+            filesInUserDrive.getEmails().parallelStream().forEach(item -> {
+                try {
+                    gmailClient.users().messages().delete("me", item.getId()).execute();
+                    emailsDeleted.getAndIncrement();
+                    simpMessagingTemplate.convertAndSendToUser(email, "/queue/deletion-progress", emailsDeleted.get() * 100 / totalItemCount.get());
+                } catch (Exception e) {
+                    throw new RuntimeException("Error deleting email item");
+                }
+            });
+        }
 
         FilesDeletedResponse filesDeletedResponse = new FilesDeletedResponse();
         filesDeletedResponse.setFilesDeleted(filesDeleted.get());
         filesDeletedResponse.setEmailsDeleted(emailsDeleted.get());
         return filesDeletedResponse;
+    }
+
+    public JsonNode getDuplicatesFoundByAI(String provider, JsonNode files) throws IOException, InterruptedException {
+
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode result = JsonUtils.removeEmailFields(files);
+        String prettyJson = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(result);
+        return mapper.readTree(chatDiscussionWithAI(prettyJson, provider, 0));
+    }
+
+    private static String chatDiscussionWithAI(String files, String provider, int timesTried) throws IOException {
+        // OpenAI API endpoint
+        String url = "https://api.openai.com/v1/chat/completions";
+        String openApiKey = System.getenv("OPENAI_API_KEY");
+
+        // Create HTTP client
+        try (CloseableHttpClient client = HttpClients.createDefault()) {
+            // Create POST request
+            HttpPost post = new HttpPost(url);
+
+            // Set headers
+            post.setHeader("Content-Type", "application/json");
+            post.setHeader("Authorization", "Bearer " + openApiKey);
+
+            // Create request body object
+            Map<String, Object> requestBody = new HashMap<>();
+            requestBody.put("model", "gpt-3.5-turbo");
+
+            // Create messages array
+            List<Map<String, Object>> messages = new ArrayList<>();
+            Map<String, Object> systemMessage = new HashMap<>();
+            systemMessage.put("role", "system");
+            systemMessage.put("content", "You are a helpful assistant analysing a JSON for duplicates by name key.");
+            messages.add(systemMessage);
+
+            Map<String, Object> userMessage = new HashMap<>();
+            userMessage.put("role", "user");
+            //If statement is needed here due to how drives rename duplicate files
+            if (provider.equals("GoogleDrive")) {
+                userMessage.put("content", Constants.GOOGLE_CHAT_GPT_PROMPT + files);
+            } else {
+                userMessage.put("content", Constants.MICROSOFT_CHAT_GPT_PROMPT + files);
+            }
+            messages.add(userMessage);
+
+            requestBody.put("messages", messages); // Add the messages parameter
+            requestBody.put("max_tokens", 4096);
+
+            // Convert request body object to JSON string
+            ObjectMapper mapper = new ObjectMapper();
+            String json = mapper.writeValueAsString(requestBody);
+
+            // Set request body
+            StringEntity entity = new StringEntity(json);
+            post.setEntity(entity);
+
+            // Execute request and get response
+            HttpResponse response = client.execute(post);
+
+            //Sometimes we get a 400 error due to some issue with the AI's response so we will use recursion to try another 2 times
+            if(response.getStatusLine().getStatusCode() != 200) {
+                timesTried++;
+                if(timesTried < 3) {
+                    return chatDiscussionWithAI(files, provider, timesTried); // Return the result of the recursive call
+                }
+                return null;
+            }
+
+            // Extract response body
+            HttpEntity responseEntity = response.getEntity();
+
+            // Convert response body to JSON
+            String responseBody = EntityUtils.toString(responseEntity);
+            JsonNode responseJson = mapper.readTree(responseBody);
+
+            // Extract 'content' field from the 'choices' array in the JSON response
+            String content = responseJson.get("choices").get(0).get("message").get("content").asText();
+
+            if (JsonUtils.validateContentFormat(content)) {
+                return JsonUtils.transformJson(mapper.readTree(content)).toString();
+            } else {
+                throw new IOException("Invalid response format");
+            }
+        } catch (IOException e) {
+            throw new IOException(e);
+        }
     }
 
     public DriveInformationReponse mapToDriveInformationResponse(String displayName, String email, Double total, Double used) {

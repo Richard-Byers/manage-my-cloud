@@ -1,7 +1,7 @@
 import CloseIcon from "@mui/icons-material/Close";
 import {Success} from "../../helpers/Success";
 import {Failure} from "../../helpers/Failure";
-import {NothingFound} from "../../helpers/NothingFound";
+import {NothingFoundRecommendations} from "../../helpers/NothingFound";
 import ArticleIcon from "@mui/icons-material/Article";
 import EmailIcon from "@mui/icons-material/Email";
 import React, {useEffect, useState} from "react";
@@ -218,7 +218,6 @@ const DeletionRecommendationsModal: React.FC<DeletionRecommendationModalProps> =
     const closeModal = () => {
         setShowModal(false);
         setShowDeletionModal(false);
-        setShowDeletionModal(false);
         setDeleteRecommendedClicked(false);
         setSelectAll(false);
         setFilesToBeDeleted({children: [], emails: []})
@@ -413,7 +412,7 @@ const DeletionRecommendationsModal: React.FC<DeletionRecommendationModalProps> =
                                             </>
                                             : showDriveData &&
                                             <>
-                                                <NothingFound caughtUpFor={"Drive Files"}/>
+                                                <NothingFoundRecommendations caughtUpFor={"Drive Files"}/>
                                                 <div className={"recommended-file-button-container"}>
                                                     <button className={"dashboard-button"} onClick={closeModal}>
                                                         {t('main.dashboard.deletionModals.deleteRecommended.closeRecommendation')}
@@ -467,7 +466,7 @@ const DeletionRecommendationsModal: React.FC<DeletionRecommendationModalProps> =
                                             </>
                                             : showEmails &&
                                             <>
-                                                <NothingFound caughtUpFor={"Emails"}/>
+                                                <NothingFoundRecommendations caughtUpFor={"Emails"}/>
                                                 <div className={"recommended-file-button-container"}>
                                                     <button className={"dashboard-button"} onClick={closeModal}>
                                                         {t('main.dashboard.deletionModals.deleteRecommended.closeRecommendation')}
@@ -478,7 +477,7 @@ const DeletionRecommendationsModal: React.FC<DeletionRecommendationModalProps> =
 
                                     </> :
                                     <>
-                                        <NothingFound caughtUpFor={"Everything"}/>
+                                        <NothingFoundRecommendations caughtUpFor={"Everything"}/>
                                         <div className={"recommended-file-button-container"}>
                                             <button className={"dashboard-button"} onClick={closeModal}
                                                     id={"recommendation-done-button"}>

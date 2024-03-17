@@ -158,4 +158,37 @@ public class UserDriveController {
 
         return ResponseEntity.badRequest().build();
     }
+
+
+    @PostMapping("/get-duplicates")
+    public ResponseEntity<JsonNode> getAIDuplicatesResponse(@RequestParam("email") String email,
+                                                            @RequestParam("provider") String connectionProvider,
+                                                            @RequestParam("driveEmail") String driveEmail,
+                                                            @RequestBody JsonNode files) {
+
+        UserEntity userEntity = userService.findUserByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
+        CloudPlatform cloudPlatform = cloudPlatformService.getUserCloudPlatform(userEntity.getEmail(), connectionProvider, driveEmail);
+
+        if (cloudPlatform == null) {
+            throw new RuntimeException(String.format("Cloud platform not found %s", connectionProvider));
+        }
+
+        if (connectionProvider.equals(ONEDRIVE)) {
+            try {
+                JsonNode jsonNode = driveInformationService.getDuplicatesFoundByAI( ONEDRIVE, files);
+                return ResponseEntity.ok(jsonNode);
+            } catch (Exception e) {
+                return ResponseEntity.badRequest().build();
+            }
+        } else if (connectionProvider.equals(GOOGLEDRIVE)) {
+            try {
+                JsonNode jsonNode = driveInformationService.getDuplicatesFoundByAI( GOOGLEDRIVE, files);
+                return ResponseEntity.ok(jsonNode);
+            } catch (Exception e) {
+                return ResponseEntity.badRequest().build();
+            }
+        } else {
+            return ResponseEntity.badRequest().build();
+        }
+    }
 }
