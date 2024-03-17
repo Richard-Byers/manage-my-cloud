@@ -45,13 +45,13 @@ export const SignUpModal: React.FC<SignUpProps> = ({
     const [emailConfirmation, setShowEmailConfirmation] = useState<ShowSuccessProps>({successMessage: null});
 
     const handleFirstNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const firstName = formatName(event.target.value);
+        const firstName = event.target.value;
         setSignupInput((prevState) => ({...prevState, firstName}));
         setShowError({errorMessage: null});
     };
 
     const handleLastNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const lastName = formatName(event.target.value);
+        const lastName = event.target.value;
         setSignupInput((prevState) => ({...prevState, lastName}));
         setShowError({errorMessage: null});
     };
@@ -79,9 +79,6 @@ export const SignUpModal: React.FC<SignUpProps> = ({
 
     const stopPropagation = (e: React.MouseEvent<HTMLDivElement>) => {
         e.stopPropagation();
-    };
-    const formatName = (name: string): string => {
-        return name.trim().charAt(0).toUpperCase() + name.trim().slice(1).toLowerCase();
     };
 
     const handleSignupSubmission = (e: React.FormEvent) => {
