@@ -111,10 +111,7 @@ function UpdateDetailsModal() {
                                     </button>
                                     <button
                                         className="modal-form-submit-button"
-                                        onClick={() => {
-                                            resetModal();
-                                            setShowModal(false);
-                                        }}>{t('main.updateDetailsModal.cancel')}</button>
+                                        onClick={() => setShowModal(false)}>{t('main.updateDetailsModal.cancel')}</button>
                                 </div>
                             </form>
                             <div className={"separator"}></div>

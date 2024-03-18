@@ -1,10 +1,7 @@
 package com.authorisation.services;
 
-import com.authorisation.entities.CloudPlatform;
 import com.authorisation.response.OneDriveTokenResponse;
 import org.mmc.drive.DriveInformationService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -21,7 +18,6 @@ import static com.authorisation.util.EncryptionUtil.encrypt;
 
 @Service
 public class OneDriveService implements IOneDriveService {
-    private static final Logger log = LoggerFactory.getLogger(OneDriveService.class);
 
     private final String clientId;
     private final String redirectUri;

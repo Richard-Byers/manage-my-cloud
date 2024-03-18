@@ -1,7 +1,6 @@
 package com.authorisation.controllers;
 
 import com.authorisation.response.OneDriveTokenResponse;
-import com.authorisation.services.CloudPlatformService;
 import com.authorisation.services.OneDriveService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -11,7 +10,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.util.Pair;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
@@ -19,17 +17,11 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import java.util.Arrays;
-import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import com.fasterxml.jackson.core.type.TypeReference;
 
 @WebMvcTest(OneDriveAuthController.class)
 @ExtendWith(MockitoExtension.class)
@@ -41,8 +33,6 @@ class OneDriveAuthControllerTest {
     private WebApplicationContext context;
     @MockBean
     private OneDriveService oneDriveService;
-    @MockBean
-    private CloudPlatformService cloudPlatformService;
 
     @BeforeEach
     public void setup() {

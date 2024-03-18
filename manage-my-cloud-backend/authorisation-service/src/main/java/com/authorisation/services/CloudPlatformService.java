@@ -11,6 +11,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -23,13 +24,14 @@ public class CloudPlatformService implements ICloudPlatformService {
 
     private final CloudPlatformRepository cloudPlatformRepository;
     private final UserEntityRepository userEntityRepository;
+
     public CloudPlatform addCloudPlatform(String userEmail, String platformName, String accessToken, String refreshToken, Date accessTokenExpiryDate, String driveEmail) {
         UserEntity userEntity = userEntityRepository.findByEmail(userEmail).orElseThrow(() -> new RuntimeException("User not found"));
         LinkedAccounts linkedAccounts = userEntity.getLinkedAccounts();
 
         if (ONEDRIVE.equals(platformName) || GOOGLEDRIVE.equals(platformName)) {
             if (linkedAccounts == null) {
-                linkedAccounts = new LinkedAccounts();
+                linkedAccounts = new LinkedAccounts(0, new ArrayList<>());
                 userEntity.setLinkedAccounts(linkedAccounts);
             }
             linkedAccounts.getLinkedDriveAccounts().add(new Account(driveEmail, platformName));
@@ -59,8 +61,7 @@ public class CloudPlatformService implements ICloudPlatformService {
         LinkedAccounts linkedAccounts = userEntity.getLinkedAccounts();
 
         if (linkedAccounts == null) {
-            linkedAccounts = new LinkedAccounts();
-            userEntity.setLinkedAccounts(linkedAccounts);
+            return;
         }
 
         if (ONEDRIVE.equals(platformName) || GOOGLEDRIVE.equals(platformName)) {
