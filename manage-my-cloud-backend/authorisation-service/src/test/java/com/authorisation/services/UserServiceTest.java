@@ -23,6 +23,7 @@ import com.authorisation.repositories.VerificationTokenRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mmc.pojo.UserPreferences;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -108,14 +109,19 @@ class UserServiceTest {
         UserEntity expectedUserEntity = generateGoogleUserEntity();
         RegistrationRequest registrationRequest = generateRegistrationRequest();
         String pictureUrl = "picture";
+        byte[] mockImageBytes = new byte[0];
+
+        UserService userServiceSpy = Mockito.spy(userService);
+        doReturn(mockImageBytes).when(userServiceSpy).loadGoogleProfileImage(pictureUrl);
 
         //when
         given(userEntityRepository.findByEmail(registrationRequest.email())).willReturn(Optional.empty());
         given(userEntityRepository.save(any(UserEntity.class))).willReturn(expectedUserEntity);
 
-        UserEntity actualResult = userService.registerGoogleUser(registrationRequest.email(), registrationRequest.firstName(), registrationRequest.lastName(), pictureUrl);
+        UserEntity actualResult = userServiceSpy.registerGoogleUser(registrationRequest.email(), registrationRequest.firstName(), registrationRequest.lastName(), pictureUrl);
         //then
         assertEquals(expectedUserEntity.getEmail(), actualResult.getEmail());
+        assertArrayEquals(mockImageBytes, actualResult.getProfileImage());
     }
 
     @Test

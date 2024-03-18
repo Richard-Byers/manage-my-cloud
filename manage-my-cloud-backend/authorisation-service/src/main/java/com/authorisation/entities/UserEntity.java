@@ -26,7 +26,6 @@ public class UserEntity {
     private String role;
     private boolean isEnabled = false;
     private String accountType;
-    private String googleProfileImageUrl;
     @Embedded
     private LinkedAccounts linkedAccounts;
     @Column(columnDefinition = "bytea")
