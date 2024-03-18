@@ -8,7 +8,7 @@ import StorageProgressBar from "../storage_bar/StorageProgressBar";
 import DashboardCardModal from "../../../modals/dashboard/DashboardCardModal";
 import {useTranslation} from "react-i18next";
 import ErrorModal from "../../../modals/dashboard/ErrorModal";
-
+import { useNavigate } from 'react-router-dom';
 interface DriveInformation {
     displayName: string,
     email: string,
@@ -30,13 +30,15 @@ const CardContainer: React.FC<ConnectedDrivesCardProps> = ({connectionProvider, 
     const [showErrorModal, setShowErrorModal] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
 
+    const navigate = useNavigate()
+
     const toggleModal = () => {
         setShowDashboardModal(!dashboardModal);
     }
 
     const handleCloseErrorModal = () => {
         setShowErrorModal(false);
-        window.location.href = 'http://localhost:3000/manage-connections';
+        navigate('/manage-connections');
     }
 
     React.useEffect(() => {
@@ -100,9 +102,9 @@ async function getUserDrives(user: any, connectionProvider: string, driveEmail: 
 
     if (response.status !== 200) {
         if (connectionProvider === 'GoogleDrive') {
-            throw new Error('Something went wrong when fetching information about your Google Drive belonging to the email: ' + driveEmail + '. Please check if Manage My Cloud has permission to access your Google Drive in your Google account settings.');
+            throw new Error('Something went wrong when fetching information about your Google Drive belonging to the email: ' + driveEmail + '. Please try re-linking your Google Drive in the Manage Connections page.');
         } else {
-            throw new Error('Something went wrong when fetching information about your OneDrive belonging to the email: ' + driveEmail + '. Please check if Manage My Cloud has permission to access your OneDrive in your Microsoft account settings.');
+            throw new Error('Something went wrong when fetching information about your OneDrive belonging to the email: ' + driveEmail + '. Please try re-linking your OneDrive in the Manage Connections page');
         }
     }
 

@@ -1,4 +1,4 @@
-.modal {
+.error-modal {
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -16,7 +16,7 @@
     transition: transform 0.2s ease-in-out;
 }
 
-.modal-content {
+.error-modal-content {
     position: relative;
     padding: 20px;
     width: 80%;
@@ -31,8 +31,8 @@
     font-weight: 700;
 }
 
-.modal-content button {
-    background-color: #4CAF50; /* green */
+.error-modal-content button {
+    background: rgb(100, 189, 120);
     color: white; /* white text */
     padding: 15px 32px; /* vertical padding of 15px, horizontal padding of 32px */
     text-align: center; /* center the text */
@@ -45,17 +45,30 @@
     border-radius: 12px; /* rounded corners */
     font-family: 'MontserratRegular', sans-serif;
     font-weight: 700;
+    box-shadow: 6px 9px 5px 0px rgba(0, 0, 0, 0.18);
+    -webkit-box-shadow: 6px 9px 5px 0px rgba(0, 0, 0, 0.18);
+    -moz-box-shadow: 6px 9px 5px 0px rgba(0, 0, 0, 0.18);
+}
+
+.error-modal-content button:hover {
+    background: #5ab06b;
+    transition: 0.2s ease-in-out;
+}
+
+.error-modal-content button:active {
+    background: #5ab06b;
+    transition: 0.2s ease-in-out;
 }
 
 @media only screen and (max-width: 940px) {
-    .modal {
+    .error-modal {
         width: 75%;
         height: auto;
     }
 }
 
 @media only screen and (max-width: 940px) {
-    .modal-content {
+    .error-modal-content {
         font-size: 0.7rem;
         font-family: 'MontserratRegular', sans-serif;
         font-weight: 700;
@@ -63,14 +76,14 @@
 }
 
 @media only screen and (max-width: 768px) {
-    .modal {
+    .error-modal {
         width: 75%;
         height: auto;
     }
 }
 
 @media only screen and (max-width: 768px) {
-    .modal-content {
+    .error-modal-content {
         font-size: 0.7rem;
         font-family: 'MontserratRegular', sans-serif;
         font-weight: 700;
@@ -78,7 +91,7 @@
 }
 
 @media only screen and (max-width: 500px) {
-    .modal-content {
+    .error-modal-content {
         font-size: 0.7rem;
     }
 }

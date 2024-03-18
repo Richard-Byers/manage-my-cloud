@@ -13,11 +13,11 @@ const ErrorModal: React.FC<ErrorModalProps> = ({ showModal, handleClose, errorMe
     }
 
     return (
-        <div className='modal'>
-            <div className='modal-content'>
-                <div className='modal-body'>
+        <div className='error-modal'>
+            <div className='error-modal-content'>
+                <div className='error-modal-body'>
                     <p>{errorMessage}</p>
-                    <button onClick={handleClose}>Close</button>
+                    <button onClick={handleClose}>Manage Connections</button>
                 </div>
             </div>
         </div>
