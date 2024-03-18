@@ -16,8 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.authorisation.givens.CloudPlatformGivens.generateCloudPlatform;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -57,6 +56,28 @@ class CloudPlatformServiceTest {
     }
 
     @Test
+    void addCloudPlatform_LinkedAccountsNull() {
+        String userEmail = "email@example.com";
+        String driveEmail = "email@example.com";
+        String platformName = "OneDrive";
+        String accessToken = "access_token";
+        String refreshToken = "refresh_token";
+
+        UserEntity userEntity = new UserEntity();
+        userEntity.setEmail(userEmail);
+
+        CloudPlatform expectedCloudPlatform = generateCloudPlatform();
+
+        when(userEntityRepository.findByEmail(userEmail)).thenReturn(java.util.Optional.of(userEntity));
+        when(cloudPlatformRepository.save(any(CloudPlatform.class))).thenReturn(expectedCloudPlatform);
+
+        CloudPlatform actualCloudPlatform = cloudPlatformService.addCloudPlatform(userEmail, platformName, accessToken, refreshToken, null, driveEmail);
+
+        assertEquals(expectedCloudPlatform, actualCloudPlatform);
+        verify(userEntityRepository, times(1)).save(userEntity);
+    }
+
+    @Test
     void deleteCloudPlatform_oneDrive() {
         String userEmail = "email@example.com";
         String platformName = "OneDrive";
@@ -73,6 +94,23 @@ class CloudPlatformServiceTest {
 
         verify(userEntityRepository, times(1)).save(userEntity);
         verify(cloudPlatformRepository, times(1)).deleteByUserEntityEmailAndPlatformNameAndDriveEmail(userEmail, platformName, driveEmail);
+    }
+
+    @Test
+    void deleteCloudPlatform_NullLinkedAccounts() {
+        String userEmail = "email@example.com";
+        String platformName = "OneDrive";
+        String driveEmail = "email2@example.com";
+
+        UserEntity userEntity = new UserEntity();
+        userEntity.setEmail(userEmail);
+
+        when(userEntityRepository.findByEmail(userEmail)).thenReturn(java.util.Optional.of(userEntity));
+
+        cloudPlatformService.deleteCloudPlatform(userEmail, platformName, driveEmail);
+
+        verify(userEntityRepository, times(0)).save(userEntity);
+        verify(cloudPlatformRepository, times(0)).deleteByUserEntityEmailAndPlatformNameAndDriveEmail(userEmail, platformName, driveEmail);
     }
 
     @Test
@@ -123,5 +161,31 @@ class CloudPlatformServiceTest {
         cloudPlatformService.getUserCloudPlatform(userEmail, platformName, driveEmail);
 
         verify(cloudPlatformRepository, times(1)).findByUserEntityEmailAndPlatformNameAndDriveEmail(userEmail, platformName, driveEmail);
+    }
+
+    @Test
+    void isDriveLinked_returnsTrue() {
+        String userEmail = "email@example.com";
+        String platformName = "provider";
+        String driveEmail = "email2@example.com";
+
+        CloudPlatform cloudPlatform = new CloudPlatform();
+
+        when(cloudPlatformRepository.findByUserEntityEmailAndDriveEmailAndPlatformName(userEmail, platformName, driveEmail)).thenReturn(cloudPlatform);
+        boolean driveLinked = cloudPlatformService.isDriveLinked(userEmail, platformName, driveEmail);
+
+        assertTrue(driveLinked);
+    }
+
+    @Test
+    void isDriveLinked_returnsFalse() {
+        String userEmail = "email@example.com";
+        String platformName = "provider";
+        String driveEmail = "email2@example.com";
+
+        when(cloudPlatformRepository.findByUserEntityEmailAndDriveEmailAndPlatformName(userEmail, platformName, driveEmail)).thenReturn(null);
+        boolean driveLinked = cloudPlatformService.isDriveLinked(userEmail, platformName, driveEmail);
+
+        assertFalse(driveLinked);
     }
 }

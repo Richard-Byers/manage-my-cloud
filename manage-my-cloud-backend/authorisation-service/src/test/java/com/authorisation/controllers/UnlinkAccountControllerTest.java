@@ -15,6 +15,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import static com.authorisation.TestConstants.GOOGLEDRIVE;
+import static com.authorisation.TestConstants.ONEDRIVE;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -47,7 +49,7 @@ class UnlinkAccountControllerTest {
 
     @Test
     @WithMockUser
-    void unlinkAccountTest() throws Exception {
+    void unlinkAccount_OneDrive_UnlinksAccount() throws Exception {
         String email = "email@example.com";
         String driveEmail = "email2@example.com";
 
@@ -55,9 +57,25 @@ class UnlinkAccountControllerTest {
 
         mockMvc.perform(delete("/unlink-drive")
                         .param("email", email)
-                        .param("provider", "OneDrive").param("driveEmail", driveEmail).with(csrf()))
+                        .param("provider", ONEDRIVE).param("driveEmail", driveEmail).with(csrf()))
                 .andExpect(status().isOk());
 
         verify(oneDriveService).unlinkOneDrive(email, driveEmail);
+    }
+
+    @Test
+    @WithMockUser
+    void unlinkAccount_GoogleDrive_UnlinksAccount() throws Exception {
+        String email = "email@example.com";
+        String driveEmail = "email2@example.com";
+
+        doNothing().when(googleAuthService).unlinkGoogleDrive(email, driveEmail);
+
+        mockMvc.perform(delete("/unlink-drive")
+                        .param("email", email)
+                        .param("provider", GOOGLEDRIVE).param("driveEmail", driveEmail).with(csrf()))
+                .andExpect(status().isOk());
+
+        verify(googleAuthService).unlinkGoogleDrive(email, driveEmail);
     }
 }
