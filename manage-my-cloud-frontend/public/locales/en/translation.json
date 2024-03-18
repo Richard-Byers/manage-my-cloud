@@ -58,7 +58,11 @@
           "deleteButton": "Delete",
           "closeRecommendation": "Done",
           "closeRecommendationTryAgain": "Try Again",
-          "selectAll": "Select All"
+          "selectAll": "Select All",
+          "successfullyDeleted": "Successfully deleted",
+          "files": "file(s) and",
+          "emails": "email(s) from your drive.",
+          "itemsNotDeleted": "Item(s) were not deleted"
         },
         "deleteDuplicates": {
           "title": "File(s) detected by AI that are duplicates (Disclaimer: Results may not be 100% accurate)",

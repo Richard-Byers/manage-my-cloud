@@ -305,12 +305,12 @@ const DeletionRecommendationsModal: React.FC<DeletionRecommendationModalProps> =
                 setLoading(false);
                 client.deactivate();
                 setHaveFilesBeenDeleted(true);
-                setSuccessfulDeletionMessage(`Successfully deleted ${response.data.filesDeleted} file(s) and ${response.data.emailsDeleted} email(s) from your drive.`);
+                setSuccessfulDeletionMessage(`${t('main.dashboard.deletionModals.deleteRecommended.successfullyDeleted')} ${response.data.filesDeleted} ${t('main.dashboard.deletionModals.deleteRecommended.files')} ${response.data.emailsDeleted} ${t('main.dashboard.deletionModals.deleteRecommended.emails')}`);
             })
             .catch((error) => {
                 setLoading(false);
                 client.deactivate();
-                setUnsuccessfulDeletionMessage("Item(s) were not deleted");
+                setUnsuccessfulDeletionMessage(t('main.dashboard.deletionModals.deleteRecommended.itemsNotDeleted'));
             });
         await client.deactivate();
         setLoading(false);
