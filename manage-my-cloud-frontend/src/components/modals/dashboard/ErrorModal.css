@@ -22,12 +22,12 @@
     width: 80%;
     max-width: 500px;
     box-sizing: border-box;
-    font-size: 1.05rem;
+    font-size: 1.3rem;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    font-family: 'MontserratRegular', sans-serif;
+    font-family: 'MontserratLight', sans-serif;
     font-weight: 700;
 }
 
@@ -70,7 +70,7 @@
 @media only screen and (max-width: 940px) {
     .error-modal-content {
         font-size: 0.7rem;
-        font-family: 'MontserratRegular', sans-serif;
+        font-family: 'MontserratLight', sans-serif;
         font-weight: 700;
     }
 }
@@ -85,7 +85,7 @@
 @media only screen and (max-width: 768px) {
     .error-modal-content {
         font-size: 0.7rem;
-        font-family: 'MontserratRegular', sans-serif;
+        font-family: 'MontserratLight', sans-serif;
         font-weight: 700;
     }
 }

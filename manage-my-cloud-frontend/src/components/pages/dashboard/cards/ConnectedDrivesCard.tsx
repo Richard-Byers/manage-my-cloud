@@ -102,9 +102,9 @@ async function getUserDrives(user: any, connectionProvider: string, driveEmail: 
 
     if (response.status !== 200) {
         if (connectionProvider === 'GoogleDrive') {
-            throw new Error('Something went wrong when fetching information about your Google Drive belonging to the email: ' + driveEmail + '. Please try re-linking your Google Drive in the Manage Connections page.');
+            throw new Error(`Unable to access Google Drive (${driveEmail}). Please re-link your account in Manage Connections.`);
         } else {
-            throw new Error('Something went wrong when fetching information about your OneDrive belonging to the email: ' + driveEmail + '. Please try re-linking your OneDrive in the Manage Connections page');
+            throw new Error(`Unable to access OneDrive (${driveEmail}). Please re-link your account in Manage Connections.`);
         }
     }
 
