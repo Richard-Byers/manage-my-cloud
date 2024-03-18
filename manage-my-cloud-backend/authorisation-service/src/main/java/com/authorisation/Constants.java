@@ -16,5 +16,11 @@ public class Constants {
     public static final String ONEDRIVE_REDIRECT_URI = "ONEDRIVE_REDIRECT_URI";
     public static final String ONEDRIVE_CLIENT_SECRET = "ONEDRIVE_CLIENT_SECRET";
     public static final String ONEDRIVE_GRANT_TYPE = "authorization_code";
+    public static final String ONEDRIVE_REFRESH_GRANT_TYPE = "refresh_token";
+
+    public  static final long EXPIRATION_THRESHOLD_MILLISECONDS = 1000 * 60 * 5;
+    public  static final long EXPIRATION_THRESHOLD_MINUTES = 5;
+
+
 
 }

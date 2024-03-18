@@ -6,14 +6,14 @@ import com.authorisation.entities.UserEntity;
 import com.authorisation.pojo.Account;
 import com.authorisation.repositories.CloudPlatformRepository;
 import com.authorisation.repositories.UserEntityRepository;
-import com.authorisation.response.OneDriveTokenResponse;
+
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
+
 
 import static com.authorisation.Constants.*;
 import static com.authorisation.util.EncryptionUtil.encrypt;

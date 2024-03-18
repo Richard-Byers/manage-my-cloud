@@ -1,5 +1,6 @@
 package com.authorisation.services;
 
+import com.authorisation.entities.CloudPlatform;
 import com.authorisation.response.OneDriveTokenResponse;
 import org.mmc.drive.DriveInformationService;
 import org.springframework.beans.factory.annotation.Autowired;
