@@ -14,9 +14,7 @@ const ProfilePage = () => {
 
     useEffect(() => {
         document.body.style.overflow = "hidden";
-    }, []);
-
-    useEffect(() => {
+    
         if (user && user.email) {
             refreshUser(user.email);
         }
