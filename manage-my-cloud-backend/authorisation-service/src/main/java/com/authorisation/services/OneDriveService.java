@@ -16,6 +16,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import java.util.Date;
 
 import static com.authorisation.Constants.*;
+import static com.authorisation.util.EncryptionUtil.decrypt;
 import static com.authorisation.util.EncryptionUtil.encrypt;
 
 @Service
@@ -28,7 +29,6 @@ public class OneDriveService implements IOneDriveService {
     private final CloudPlatformService cloudPlatformService;
     private final WebClient webClient;
     private final DriveInformationService driveInformationService;
-
     @Autowired
     public OneDriveService(@Value("${onedrive.clientId}") String clientId,
                            @Value("${onedrive.redirectUri}") String redirectUri,
@@ -109,6 +109,7 @@ public class OneDriveService implements IOneDriveService {
     public OneDriveTokenResponse refreshToken(String refreshToken, String driveEmail, String email) {
         try {
             String scope = "user.read files.readwrite.all offline_access";
+            String decryptedRefreshToken = decrypt(refreshToken);
 
             OneDriveTokenResponse oneDriveTokenResponse = webClient.post()
                     .uri(MS_AUTH_CODE_URL)
@@ -117,7 +118,7 @@ public class OneDriveService implements IOneDriveService {
                             .with("redirect_uri", redirectUri)
                             .with("scope", scope)
                             .with("client_secret", clientSecret)
-                            .with("refresh_token", refreshToken)
+                            .with("refresh_token", decryptedRefreshToken) // Use decrypted refresh token
                             .with("grant_type", ONEDRIVE_REFRESH_GRANT_TYPE))
                     .retrieve()
                     .bodyToMono(OneDriveTokenResponse.class)

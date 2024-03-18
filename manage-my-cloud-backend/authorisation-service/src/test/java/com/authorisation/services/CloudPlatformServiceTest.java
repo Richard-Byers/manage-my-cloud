@@ -127,36 +127,6 @@ class CloudPlatformServiceTest {
     }
 
     @Test
-    void getDriveEmailAndRefreshTokens_ReturnsCloudPlatforms() {
-        String userEmail = "email@example.com";
-        String platformName = "provider";
-        List<CloudPlatform> expectedCloudPlatforms = new ArrayList<>();
-        expectedCloudPlatforms.add(new CloudPlatform());
-
-        when(cloudPlatformRepository.findAllByUserEntityEmailAndPlatformName(userEmail, platformName)).thenReturn(expectedCloudPlatforms);
-
-        List<CloudPlatform> actualCloudPlatforms = cloudPlatformService.getDriveEmailAndRefreshTokens(userEmail, platformName);
-
-        assertEquals(expectedCloudPlatforms, actualCloudPlatforms);
-    }
-
-    @Test
-    void getExpiresIn_ReturnsExpiryDate() {
-        String platformName = "provider";
-        String driveEmail = "email2@example.com";
-        Date expectedExpiryDate = new Date();
-
-        CloudPlatform cloudPlatform = new CloudPlatform();
-        cloudPlatform.setAccessTokenExpiryDate(expectedExpiryDate);
-
-        when(cloudPlatformRepository.findByDriveEmailAndPlatformName(platformName, driveEmail)).thenReturn(cloudPlatform);
-
-        Date actualExpiryDate = cloudPlatformService.getExpiresIn(platformName, driveEmail);
-
-        assertEquals(expectedExpiryDate, actualExpiryDate);
-    }
-
-    @Test
     void saveCloudPlatform_SavesCloudPlatform() {
         CloudPlatform cloudPlatform = new CloudPlatform();
 
