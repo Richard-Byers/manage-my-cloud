@@ -379,7 +379,6 @@ public class DriveInformationService implements IDriveInformationService {
     }
 
     public FilesDeletedResponse deleteRecommendedGoogleDriveFiles(JsonNode filesToDelete, String refreshToken, String accessToken) throws JsonProcessingException {
-        System.out.println(filesToDelete.toString());
         AtomicInteger filesDeleted = new AtomicInteger();
         AtomicInteger emailsDeleted = new AtomicInteger();
         FilesDeletedResponse filesDeletedResponse = new FilesDeletedResponse();

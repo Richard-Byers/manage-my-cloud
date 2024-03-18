@@ -245,6 +245,8 @@
                                 <exclude>com/authorisation/entities/**</exclude>
                                 <exclude>com/authorisation/response/**</exclude>
                                 <exclude>com/authorisation/requests/**</exclude>
+                                <exclude>com/authorisation/pojo/**</exclude>
+                                <exclude>com/authorisation/Constants.java</exclude>
                             </excludes>
                         </configuration>
                     </execution>

@@ -7,6 +7,8 @@ import com.authorisation.mappers.UserMapperImpl;
 import org.junit.jupiter.api.Test;
 
 import static com.authorisation.givens.UserEntityGivens.generateUserEntity;
+import static com.authorisation.givens.UserEntityGivens.generateUserEntityWithProfilePicture;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class UserMapperTest {
@@ -17,7 +19,7 @@ class UserMapperTest {
     void toUserDto() {
 
         //given
-        UserEntity userEntity = generateUserEntity();
+        UserEntity userEntity = generateUserEntityWithProfilePicture();
 
         //when
         UserDto userDto = userMapper.toUserDto(userEntity);
@@ -27,6 +29,7 @@ class UserMapperTest {
         assertEquals(userEntity.getFirstName(), userDto.getFirstName());
         assertEquals(userEntity.getLastName(), userDto.getLastName());
         assertEquals(userEntity.getEmail(), userDto.getEmail());
+        assertArrayEquals(userEntity.getProfileImage(), userDto.getProfileImage());
     }
 
 }
