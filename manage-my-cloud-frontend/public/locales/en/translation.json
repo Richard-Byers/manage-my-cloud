@@ -2,7 +2,15 @@
   "main": {
     "header": "Manage My Cloud",
     "welcome": {
-      "welcomeTo": "Welcome to Manage My Cloud"
+      "welcomeTo": "Welcome to Manage My Cloud",
+      "toGetStarted1": "To get started, you'll need to navigate to the ",
+      "toGetStarted2": "Manage Connections Page",
+      "toGetStarted3": " by clicking the button located in the navigation bar.",
+      "keepAnEyeOut1": "Keep an eye out for this icon",
+      "keepAnEyeOut2": " which will provide tips and insights into our features.",
+      "whenFinished1": "When you're finished reading, click the",
+      "whenFinished2": " button to close this message.",
+      "gotIt": "Got It!"
     },
     "tooltip": {
       "profile": {

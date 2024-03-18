@@ -27,7 +27,6 @@
     align-items: center;
     justify-content: center;
     width: 60%;
-    gap: 2em;
 }
 
 .welcome-container-text-container{
@@ -59,7 +58,7 @@
     cursor: pointer;
     font-size: 16px;
     transition: 0.3s;
-    font-family: MontserratRegular, serif;
+    font-family: MontserratMedium, serif;
     box-shadow: 6px 9px 5px 0px rgba(0, 0, 0, 0.18);
     -webkit-box-shadow: 6px 9px 5px 0px rgba(0, 0, 0, 0.18);
     -moz-box-shadow: 6px 9px 5px 0px rgba(0, 0, 0, 0.18);
@@ -68,6 +67,19 @@
 .welcome-button:hover{
     scale: 1.1;
     background-color: #45a049;
+}
+
+@media only screen and (max-width: 1120px) {
+
+    .welcome-container-text-container{
+        padding: 1em;
+    }
+
+    .welcome-modal-art img{
+        width: 95%;
+        height: 95%;
+    }
+
 }
 
 @media only screen and (max-width: 768px) {
@@ -79,8 +91,28 @@
         width: 100vw;
         height: 100vh;
         border-radius: 0;
-        padding: 1em;
+        padding: 0;
         overflow-y: auto;
+        background: url("../images/landing/main-background.jpeg") 100% / cover;
+        backdrop-filter: blur(5px);
+    }
+
+    .welcome-container{
+        height: 100%;
+        width: 100%;
+        justify-content: center;
+        background: rgba(255, 255, 255, 0.02);
+        backdrop-filter: blur(5px);
+    }
+
+    .welcome-container-text-container{
+        width: 95%;
+        padding: 0;
+        color: white;
+    }
+
+    .welcome-modal-art {
+        display: none;
     }
 
 }

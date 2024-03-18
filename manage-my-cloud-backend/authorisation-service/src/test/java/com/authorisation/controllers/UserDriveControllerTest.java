@@ -275,7 +275,8 @@ class UserDriveControllerTest {
 
         when(userService.findUserByEmail(email)).thenReturn(Optional.of(userEntity));
         when(cloudPlatformService.getUserCloudPlatform(email, GOOGLEDRIVE, driveEmail)).thenReturn(cloudPlatform);
-        when(driveInformationService.fetchAllGoogleDriveFiles(refreshToken, accessToken)).thenReturn(expectedJsonNode);
+        when(driveInformationService.fetchAllGoogleDriveFiles(refreshToken, accessToken, simpMessagingTemplate,
+                email)).thenReturn(expectedJsonNode);
 
         //when
         MvcResult mvcResult = mockMvc.perform(get(DRIVE_ITEMS_URL)
@@ -532,7 +533,8 @@ class UserDriveControllerTest {
         when(userService.findUserByEmail(email)).thenReturn(Optional.of(userEntity));
         when(userService.getUserRecommendationSettings(email)).thenReturn(preferences);
         when(cloudPlatformService.getUserCloudPlatform(email, GOOGLEDRIVE, driveEmail)).thenReturn(cloudPlatform);
-        when(driveInformationService.deleteRecommendedGoogleDriveFiles(expectedJsonNode, refreshToken, accessToken)).thenThrow(new RuntimeException("Error"));
+        when(driveInformationService.deleteRecommendedGoogleDriveFiles(expectedJsonNode, refreshToken, accessToken, simpMessagingTemplate,
+                email)).thenThrow(new RuntimeException("Error"));
 
         //when
         mockMvc.perform(post(DELETE_RECOMMENDED_URL)

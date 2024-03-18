@@ -3,9 +3,11 @@ import './WelcomeModal.css';
 import logo from '../images/managemycloudlogo.svg';
 import {AuthData} from "../routing/AuthWrapper";
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
+import {useTranslation} from "react-i18next";
 
 const WelcomeModal = () => {
 
+    const {t} = useTranslation()
     const [showModal, setShowModal] = useState(true);
     const {refreshUser, user} = AuthData();
 
@@ -21,16 +23,16 @@ const WelcomeModal = () => {
                     <div className={"welcome-modal"}>
                         <div className={"welcome-container"} id={"welcome-container"}>
                         <span className={"welcome-container-text-container"} id={"welcome-container-text-container"}>
-                            <h2>Welcome to Manage My Cloud</h2>
+                            <h2>{t("main.welcome.welcomeTo")}</h2>
                             <br/>
-                            <p>To get started, you'll need to navigate to the <strong>Manage Connections Page</strong> by clicking the button located in the navigation bar.</p>
+                            <p>{t("main.welcome.toGetStarted1")} <strong>{t("main.welcome.toGetStarted2")}</strong> {t("main.welcome.toGetStarted3")}</p>
                             <br/>
-                            <p>Keep an eye out for this icon <HelpOutlineIcon/> located throughout our website, when hovering or clicking it we will provide you with insights into our features.</p>
+                            <p>{t("main.welcome.keepAnEyeOut1")} <HelpOutlineIcon/> {t("main.welcome.keepAnEyeOut2")}</p>
                             <br/>
-                            <p>When you're finished reading, click the <strong>Got it!</strong> button to close this message.</p>
+                            <p>{t("main.welcome.whenFinished1")} <strong>{t("main.welcome.gotIt")}</strong> {t("main.welcome.whenFinished2")}</p>
                         </span>
                             <button onClick={handleCloseModal} className={"welcome-button"} id={"welcome-button"}>
-                                Got it!
+                                {t("main.welcome.gotIt")}
                             </button>
                         </div>
                         <div className={"welcome-modal-art"} id={"welcome-modal-art"}>
