@@ -13,7 +13,7 @@ public class UserEntityGivens {
 
     public static UserEntity generateUserEntityWithProfilePicture() {
         byte[] picture = {1, 2, 3, 4, 5};
-        return new UserEntity(1L, "John", "Doe", "johndoe@gmail.com", "password", "USER", false, null, null, new LinkedAccounts(), picture);
+        return new UserEntity(1L, "John", "Doe", "johndoe@gmail.com", "password", "USER", false, null,  new LinkedAccounts(), picture);
     }
 
     public static UserEntity generateUserEntityEnabled() {
@@ -25,7 +25,7 @@ public class UserEntityGivens {
     }
 
     public static UserEntity generateUserEntityTesterEmail() {
-        return new UserEntity(1L, "John", "Doe", TESTER_EMAIL, "password", "USER", true, "GOOGLE", "picture", new LinkedAccounts(), null);
+        return new UserEntity(1L, "John", "Doe", TESTER_EMAIL, "password", "USER", true, "GOOGLE",  new LinkedAccounts(), null);
     }
 
     public static String generateUserData() {
