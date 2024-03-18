@@ -8,7 +8,7 @@ import static com.authorisation.TestConstants.TESTER_EMAIL;
 public class UserEntityGivens {
 
     public static UserEntity generateUserEntity() {
-        return new UserEntity(1L, "John", "Doe", "johndoe@gmail.com", "password", "USER", false, null, null, new LinkedAccounts(), null);
+        return new UserEntity(1L, "John", "Doe", "johndoe@gmail.com", "password", "USER", false, null, new LinkedAccounts(), null);
     }
 
     public static UserEntity generateUserEntityWithProfilePicture() {
@@ -17,11 +17,11 @@ public class UserEntityGivens {
     }
 
     public static UserEntity generateUserEntityEnabled() {
-        return new UserEntity(1L, "John", "Doe", "johndoe@gmail.com", "password", "USER", true, null, null, new LinkedAccounts(), null);
+        return new UserEntity(1L, "John", "Doe", "johndoe@gmail.com", "password", "USER", true, null, new LinkedAccounts(), null);
     }
 
     public static UserEntity generateGoogleUserEntity() {
-        return new UserEntity(1L, "John", "Doe", "johndoe@gmail.com", "password", "USER", true, "GOOGLE", "picture", new LinkedAccounts(), null);
+        return new UserEntity(1L, "John", "Doe", "johndoe@gmail.com", "password", "USER", true, "GOOGLE", new LinkedAccounts(), null);
     }
 
     public static UserEntity generateUserEntityTesterEmail() {
