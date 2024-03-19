@@ -6,6 +6,8 @@ import {AuthData} from "../../routing/AuthWrapper";
 import AddConnectionsModal from "../../modals/managingConnections/AddConnectionsModal"
 import {buildAxiosRequestWithHeaders} from "../../helpers/AxiosHelper";
 import Connection from "./Connection";
+import ToolTip from "../../ui_components/ToolTip";
+import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 
 const ManageConnectionsPage = () => {
     const {t} = useTranslation();
@@ -41,6 +43,9 @@ const ManageConnectionsPage = () => {
             <div className={"manage-connections-page-content-grid"}>
                 <div className="manage-connections-page-title-container">
                     {t('main.manageConnectionsPage.title')}
+                    <ToolTip
+                        message={t("main.tooltip.manageConnections.manageConnectionMain")}
+                        children={<HelpOutlineIcon/>}/>
                 </div>
 
                 {user?.linkedAccounts.linkedAccountsCount === 0 ?
@@ -55,13 +60,13 @@ const ManageConnectionsPage = () => {
                 }
 
                 {user?.linkedAccounts.linkedAccountsCount === 0 ? null :
-                <div className="overflow-container">
-                    {user?.linkedAccounts.linkedAccountsCount === 0 ? null
-                        :
-                        user?.linkedAccounts.linkedDriveAccounts.map(({accountEmail, accountType}) => (
-                            <Connection key={accountEmail} accountEmail={accountEmail} accountType={accountType}/>
-                        ))}
-                </div>
+                    <div className="overflow-container">
+                        {user?.linkedAccounts.linkedAccountsCount === 0 ? null
+                            :
+                            user?.linkedAccounts.linkedDriveAccounts.map(({accountEmail, accountType}) => (
+                                <Connection key={accountEmail} accountEmail={accountEmail} accountType={accountType}/>
+                            ))}
+                    </div>
                 }
 
                 {user?.linkedAccounts.linkedAccountsCount !== undefined && user?.linkedAccounts.linkedAccountsCount >= 1 ? (

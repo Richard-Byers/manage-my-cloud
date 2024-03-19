@@ -1,11 +1,11 @@
 .add-connections-modal {
     display: flex;
-    background: rgba(255, 255, 255, 0.4);
+    background: rgb(255, 255, 255);
     backdrop-filter: blur(5px);
     flex-direction: column;
-    color: #ffffff;
+    color: black;
     border-radius: 8px;
-    gap: 10px;
+    gap: 0.6em;
     padding: 1rem;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
     text-align: center;
@@ -46,6 +46,12 @@
     margin: 0;
     display: flex;
     flex-direction: column;
+}
+
+.link-with-supported-providers-text{
+    display: flex;
+    font-family: MontserratMedium, serif;
+    gap: 0.1em;
 }
 
 /*Animations*/

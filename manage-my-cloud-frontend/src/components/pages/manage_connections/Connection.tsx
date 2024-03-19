@@ -13,8 +13,8 @@ const Connection: React.FC<ConnectionProps> = ({accountType, accountEmail}) => {
     return (
         <div className={"connection-container"} id={`${accountType}-container`}>
             <img src={CONNECTION_LOGOS[accountType]} alt={`Logo for ${accountType}`}/>
-            <p id={"linked-drive-type"}>{CONNECTION_TITLE[accountType]}</p>
-            <p id={"linked-drive-email"}>{accountEmail}</p>
+            <p className={"linked-drive-information-text"} id={"linked-drive-type"}>{CONNECTION_TITLE[accountType]}</p>
+            <p className={"linked-drive-information-text"} id={"linked-drive-email"}>{accountEmail}</p>
             <RemoveConnectionModal connectionProvider={CONNECTION_TITLE[accountType]} driveEmail={accountEmail}/>
         </div>
     )

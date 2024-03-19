@@ -3,9 +3,19 @@ import "./AddConnectionsModal.css";
 import LinkOneDrive from "../../pages/manage_connections/LinkOneDrive";
 import LinkGoogleDrive from "../../pages/manage_connections/LinkGoogleDrive";
 import CloseIcon from "@mui/icons-material/Close";
+import ToolTip from "../../ui_components/ToolTip";
+import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
+import {useTranslation} from "react-i18next";
+import OneDriveLogo from "../../images/manage-connections/OneDriveLogo.png";
+import GoogleDriveLogo from "../../images/manage-connections/GoogleDriveLogo.png";
 
 const AddConnectionsModal = () => {
+    const {t} = useTranslation();
     const [showModal, setShowModal] = useState(false);
+
+    const stopPropagation = (e: React.MouseEvent<HTMLDivElement>) => {
+        e.stopPropagation();
+    };
 
     const toggleModal = () => {
         setShowModal(!showModal);
@@ -23,13 +33,18 @@ const AddConnectionsModal = () => {
 
             {showModal && (
                 <div className="modal-overlay" onClick={closeModal}>
-                    <div className="add-connections-modal">
+                    <div className="add-connections-modal" onClick={stopPropagation}>
 
                         <button className={"modal-close-button"} onClick={closeModal}>
                             <CloseIcon className="svg_icons"/>
                         </button>
 
-                        <p>Link with one of our available providers below</p>
+                        <p className={"link-with-supported-providers-text"} id={"link-with-supported-providers-text"}>
+                            {t("main.manageConnectionsPage.addConnectionModal.linkWithSupportedProviderText")}
+                            <ToolTip
+                                message={t("main.tooltip.manageConnections.addConnectionsModalText")}
+                                children={<HelpOutlineIcon/>}/>
+                        </p>
 
                         <LinkOneDrive/>
                         <LinkGoogleDrive/>

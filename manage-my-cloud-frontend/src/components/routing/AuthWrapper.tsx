@@ -23,6 +23,7 @@ interface User {
         linkedAccountsCount: number;
         linkedDriveAccounts: Account[];
     }
+    firstLogin: boolean;
 }
 
 interface AuthContextProps {
@@ -83,7 +84,7 @@ export const AuthWrapper = () => {
                 const data = response.data;
                 setUser(data);
                 cookies.set('user', JSON.stringify(data));
-                navigate("/profile")
+                navigate(ROUTES.DASHBOARD)
             } catch (error) {
                 // Handle the error
                 console.error('Error:', error);

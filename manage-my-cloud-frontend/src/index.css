@@ -26,6 +26,12 @@ code {
   url('../src/components/fonts/Montserrat-Regular.ttf') format('truetype');
 }
 
+@font-face {
+  font-family: 'MontserratMedium';
+  src: local('MontserratMedium'),
+  url('../src/components/fonts/Montserrat-Medium.ttf') format('truetype');
+}
+
 /* This is the scrollbar track */
 ::-webkit-scrollbar {
   width: 10px;
