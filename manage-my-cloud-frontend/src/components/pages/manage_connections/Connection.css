@@ -1,5 +1,5 @@
 
-.connection-container{
+.connection-container {
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -23,16 +23,16 @@
     object-fit: contain;
 }
 
-.connection-container p {
+.linked-drive-information-text {
     margin: 0.5em 0 0.5em 0;
     font-size: 1.2rem;
-    font-family: MontserratBold, serif;
+    font-family: MontserratRegular, serif;
     word-wrap: anywhere;
 }
 
 @media only screen and (max-width: 940px) {
 
-    .connection-container{
+    .connection-container {
         height: auto;
         width: 75%;
     }
@@ -43,21 +43,21 @@
         object-fit: contain;
     }
 
-    .connection-container p {
-        font-size: 1.2rem;
+    .linked-drive-information-text {
+        font-size: 1rem;
     }
 
 }
 
 /* For mobile screens */
 @media only screen and (max-width: 500px) {
-    .connection-container{
+    .connection-container {
         height: 22vh;
         width: 75%;
         grid-column: 1 / span 4;
     }
 
-    .connection-container p {
+    .linked-drive-information-text p {
         font-size: 0.8rem;
     }
 }

@@ -91,7 +91,21 @@
     gap: 1em;
 }
 
+.item-recommendation-count-container {
+    display: flex;
+    gap: 0.1em;
+    height: fit-content;
+}
+
+.item-recommendation-count-container h2{
+    margin: 0;
+}
+
 @media only screen and (max-width: 768px) {
+
+    .item-recommendation-count-container {
+        flex-direction: column;
+    }
 
     .deletion-recommendation-select-all-description{
         padding: 0;
