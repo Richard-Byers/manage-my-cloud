@@ -1,13 +1,13 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import {useTranslation} from "react-i18next";
 import LoadingSpinner from "../../helpers/LoadingSpinner";
-import CloseIcon from "@mui/icons-material/Close";
 import {getFileType} from "../../../constants/FileTypesConstants";
 import {buildAxiosRequestWithHeaders} from "../../helpers/AxiosHelper";
 import {AuthData} from "../../routing/AuthWrapper";
 import {Success} from "../../helpers/Success";
 import {Failure} from "../../helpers/Failure";
-import {NothingFoundRecommendations, NothingFoundDuplicates} from "../../helpers/NothingFound";
+import {NothingFoundDuplicates} from "../../helpers/NothingFound";
+import CloseIcon from "@mui/icons-material/Close";
 
 interface DeleteDuplicatesProps {
     data: FileNode;
@@ -16,8 +16,8 @@ interface DeleteDuplicatesProps {
     driveEmail: string;
     setHaveFilesBeenDeleted: (arg0: boolean) => void;
     setShowDeletionModal: (arg0: boolean) => void;
-    deleteDuplicatesClicked: boolean; 
-    setDeleteDuplicatesClicked: (arg0: boolean) => void; 
+    deleteDuplicatesClicked: boolean;
+    setDeleteDuplicatesClicked: (arg0: boolean) => void;
 }
 
 interface FilesToBeDeleted {
@@ -89,15 +89,15 @@ const FileTree: React.FC<FileTreeProps> = ({data, setFilesToBeDeleted, filesToBe
 };
 
 const DeleteDuplicatesModal: React.FC<DeleteDuplicatesProps> = ({
-    data,
-    connectionProvider,
-    setShowModal,
-    driveEmail,
-    setHaveFilesBeenDeleted,
-    setShowDeletionModal, 
-    deleteDuplicatesClicked, 
-    setDeleteDuplicatesClicked 
-                                                                                  }) => {
+                                                                    data,
+                                                                    connectionProvider,
+                                                                    setShowModal,
+                                                                    driveEmail,
+                                                                    setHaveFilesBeenDeleted,
+                                                                    setShowDeletionModal,
+                                                                    deleteDuplicatesClicked,
+                                                                    setDeleteDuplicatesClicked
+                                                                }) => {
 
     const {user} = AuthData();
     const {t} = useTranslation();
@@ -112,8 +112,11 @@ const DeleteDuplicatesModal: React.FC<DeleteDuplicatesProps> = ({
     const [error, setError] = useState<string | null>(null);
     const [showErrorModal, setShowErrorModal] = useState(false);
 
+    const shouldRun = useRef(true);
     useEffect(() => {
         if (deleteDuplicatesClicked) {
+            if (!shouldRun.current) return;
+            shouldRun.current = false;
             const fetchDriveData = async () => {
                 const info = await getDuplicates(user, connectionProvider);
                 setDriveData(info);
@@ -122,7 +125,7 @@ const DeleteDuplicatesModal: React.FC<DeleteDuplicatesProps> = ({
             fetchDriveData();
         }
     }, [deleteDuplicatesClicked]);
-    
+
 
     const handleSelectAll = (event: React.ChangeEvent<HTMLInputElement>) => {
         setSelectAll(event.target.checked);
@@ -183,11 +186,11 @@ const DeleteDuplicatesModal: React.FC<DeleteDuplicatesProps> = ({
         try {
             setLoading(true);
             const response = await buildAxiosRequestWithHeaders('POST', `/get-duplicates?email=${user.email}&provider=${connectionProvider}&driveEmail=${driveEmail}`, headers, data);
-    
+
             if (response.status !== 200) {
                 throw new Error(`Request failed with status code ${response.status}`);
             }
-    
+
             return response.data;
         } catch (error) {
             setLoading(false);
@@ -199,17 +202,21 @@ const DeleteDuplicatesModal: React.FC<DeleteDuplicatesProps> = ({
     }
 
     return (
-            <div className={"modal-overlay"} onClick={closeDuplicateModal}>
-                {loading ? <LoadingSpinner/> :
-                    <div className={"modal"} onClick={stopPropagation}>
+        <div className={"modal-overlay"} onClick={closeDuplicateModal}>
+            {loading ? <LoadingSpinner/> :
+                <div className={"modal"} onClick={stopPropagation}>
 
-                        
-                        {/*If items we're deleted then render successfulDeletionMessage*/}
+                    <button className={"modal-close-button"} onClick={closeModal}>
+                        <CloseIcon className="svg_icons"/>
+                    </button>
+
+                    {/*If items we're deleted then render successfulDeletionMessage*/}
                     {successfulDeletionMessage !== "" &&
-                        <div className={"recommended-file-button-container"}>
+                        <div className={"success-button-container"}>
                             <p id={"deletion-success-message"}>{successfulDeletionMessage}</p>
                             <Success/>
-                            <button className={"dashboard-button"} onClick={closeModal} id={"success-deletion-close-button"}>
+                            <button className={"dashboard-button"} onClick={closeModal}
+                                    id={"success-deletion-close-button"}>
                                 {t('main.dashboard.deletionModals.deleteRecommended.closeRecommendation')}
                             </button>
                         </div>
@@ -226,7 +233,7 @@ const DeleteDuplicatesModal: React.FC<DeleteDuplicatesProps> = ({
                             </button>
                         </div>
                     }
-                        {successfulDeletionMessage === "" && unsuccessfulDeletionMessage === "" &&
+                    {successfulDeletionMessage === "" && unsuccessfulDeletionMessage === "" &&
                         <div className={"dashboard-page-buttons-modal-grid"}>
                             <div className={"deletion-duplicates-container"}>
                                 {driveData && driveData?.children.length > 0 ?
@@ -269,13 +276,13 @@ const DeleteDuplicatesModal: React.FC<DeleteDuplicatesProps> = ({
                                         {t('main.dashboard.deletionModals.deleteRecommended.deleteButton')}
                                     </button>
                                 </div>}
-    
+
                         </div>
-                        }
-                    </div>
-                }
-            </div>
+                    }
+                </div>
+            }
+        </div>
     )
-        };
-    
-    export default DeleteDuplicatesModal;
+};
+
+export default DeleteDuplicatesModal;

@@ -116,7 +116,7 @@
       "title": "Profile",
       "profileButton": "Profile",
       "preferencesButton": "Preferences",
-      "profileActionsButton": "Advanced"
+      "profileActionsButton": "Actions"
     },
     "userProfileCard": {
       "firstName": "First Name",

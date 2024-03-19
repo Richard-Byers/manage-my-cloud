@@ -1,10 +1,10 @@
-import React, {useState} from "react";
+import React, {useRef, useState} from "react";
 import "../Modal.css";
 import "./DashboardCardModal.css";
 import {CONNECTION_LOGOS, CONNECTION_TITLE,} from "../../../constants/ConnectionConstants";
 import {getFileType} from "../../../constants/FileTypesConstants";
 import DashboardPageButtons from "../../pages/dashboard/DashboardPageButtons";
-import {buildAxiosRequestWithHeaders} from "../../helpers/AxiosHelper";
+import {buildAxiosRequestWithHeaders, DEFAULT_PROGRESS_ENDPOINT} from "../../helpers/AxiosHelper";
 import {AuthData} from "../../routing/AuthWrapper";
 import {useTranslation} from "react-i18next";
 import {Cell, Pie, PieChart, Tooltip, TooltipProps} from "recharts";
@@ -101,8 +101,10 @@ const DashboardCardModal: React.FC<DashboardCardModalProps> = ({
         return null;
     };
 
+    const shouldRun = useRef(true);
     React.useEffect(() => {
-
+        if (!shouldRun.current) return;
+        shouldRun.current = false;
         const fetchDriveData = async () => {
             const info = await getDriveItems(user, connectionProvider);
             setDriveData(info);
@@ -216,7 +218,7 @@ const DashboardCardModal: React.FC<DashboardCardModalProps> = ({
         const connectionProviderTitle = CONNECTION_TITLE[connectionProvider];
 
         const client = new Client({
-            webSocketFactory: () => new SockJS('http://localhost:8080/progress'),
+            webSocketFactory: () => new SockJS(DEFAULT_PROGRESS_ENDPOINT),
             onConnect: () => {
                 client.subscribe(`/user/${user?.email}/queue/progress`, (message) => {
                     const progress = JSON.parse(message.body);

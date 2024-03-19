@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useRef, useState} from 'react';
 import './ConnectedDrivesCard.css';
 import {AuthData} from "../../../routing/AuthWrapper";
 import {buildAxiosRequestWithHeaders} from "../../../helpers/AxiosHelper";
@@ -31,7 +31,10 @@ const CardContainer: React.FC<ConnectedDrivesCardProps> = ({connectionProvider, 
         setShowDashboardModal(!dashboardModal);
     }
 
+    const shouldRun = useRef(true);
     React.useEffect(() => {
+        if (!shouldRun.current) return;
+        shouldRun.current = false;
         const fetchDriveInformation = async () => {
             const info = await getUserDrives(user, connectionProvider, driveEmail);
             setDriveInformation(info);

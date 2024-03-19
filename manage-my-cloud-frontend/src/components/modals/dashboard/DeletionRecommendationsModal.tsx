@@ -4,10 +4,14 @@ import {Failure} from "../../helpers/Failure";
 import {NothingFoundRecommendations} from "../../helpers/NothingFound";
 import ArticleIcon from "@mui/icons-material/Article";
 import EmailIcon from "@mui/icons-material/Email";
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import {AuthData} from "../../routing/AuthWrapper";
 import {useTranslation} from "react-i18next";
-import {buildAxiosRequestWithHeaders} from "../../helpers/AxiosHelper";
+import {
+    buildAxiosRequestWithHeaders,
+    DEFAULT_DELETION_PROGRESS_ENDPOINT,
+    DEFAULT_RECOMMENDATION_PROGRESS_ENDPOINT
+} from "../../helpers/AxiosHelper";
 import {getFileType} from "../../../constants/FileTypesConstants";
 import ToolTip from "../../ui_components/ToolTip";
 import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
@@ -183,8 +187,11 @@ const DeletionRecommendationsModal: React.FC<DeletionRecommendationModalProps> =
     const [showDriveData, setShowDriveData] = React.useState(true);
     const [progress, setProgress] = useState<number>(0);
 
+    const shouldRun = useRef(true);
     useEffect(() => {
         if (deleteRecommendedClicked) {
+            if (!shouldRun.current) return;
+            shouldRun.current = false;
             const fetchDriveData = async () => {
                 const info = await getRecommendedDeletions(user, connectionProvider);
                 setDriveData(info);
@@ -257,7 +264,7 @@ const DeletionRecommendationsModal: React.FC<DeletionRecommendationModalProps> =
         }
 
         const client = new Client({
-            webSocketFactory: () => new SockJS('http://localhost:8080/recommendation-progress'),
+            webSocketFactory: () => new SockJS(DEFAULT_RECOMMENDATION_PROGRESS_ENDPOINT),
             onConnect: () => {
                 client.subscribe(`/user/${user?.email}/queue/recommendation-progress`, (message) => {
                     const progress = JSON.parse(message.body);
@@ -288,7 +295,7 @@ const DeletionRecommendationsModal: React.FC<DeletionRecommendationModalProps> =
         }
 
         const client = new Client({
-            webSocketFactory: () => new SockJS('http://localhost:8080/deletion-progress'),
+            webSocketFactory: () => new SockJS(DEFAULT_DELETION_PROGRESS_ENDPOINT),
             onConnect: () => {
                 client.subscribe(`/user/${user?.email}/queue/deletion-progress`, (message) => {
                     const progress = JSON.parse(message.body);
@@ -327,7 +334,7 @@ const DeletionRecommendationsModal: React.FC<DeletionRecommendationModalProps> =
 
                     {/*If items we're deleted then render successfulDeletionMessage*/}
                     {successfulDeletionMessage !== "" &&
-                        <div className={"recommended-file-button-container"}>
+                        <div className={"success-button-container"}>
                             <p id={"deletion-success-message"}>{successfulDeletionMessage}</p>
                             <Success/>
                             <button className={"dashboard-button"} onClick={closeModal}

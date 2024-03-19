@@ -29,7 +29,7 @@ of ```manage-my-cloud-backend```
   - GOOGLE_CREDENTIALS_JSON=
   - "SPRING_PROFILES_ACTIVE=docker"
 
-then build the docker container using ```docker-build -t manage-my-cloud .``` and then run the following command:
+then build the docker container using ```docker build -t manage-my-cloud .``` and then run the following command:
 
 ### ```docker-compose up -d```
 

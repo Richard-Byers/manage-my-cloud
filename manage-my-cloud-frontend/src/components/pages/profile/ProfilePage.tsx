@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import './ProfilePage.css';
 import Navbar from '../../nav/Navbar';
 import ProfileActionsCard from './cards/ProfileActionsCard';
@@ -12,7 +12,10 @@ const ProfilePage = () => {
     const [activeCard, setActiveCard] = useState('userProfile');
     const {user, refreshUser} = AuthData();
 
+    const shouldRun = useRef(true);
     useEffect(() => {
+        if (!shouldRun.current) return;
+        shouldRun.current = false;
         document.body.style.overflow = "hidden";
     
         if (user && user.email) {

@@ -99,6 +99,7 @@
         display: flex;
         align-items: center;
         align-content: center;
+        justify-content: flex-start;
         flex-direction: column;
         grid-row: span 1;
         grid-column: 1;

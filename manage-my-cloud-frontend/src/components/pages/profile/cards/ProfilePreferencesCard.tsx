@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import './ProfilePreferencesCard.css';
 import {useTranslation} from 'react-i18next';
 import ToggleSwitch from "../../../ui_components/ToggleSwitch";
@@ -37,7 +37,11 @@ function ProfilePreferencesCard() {
         {value: '6', label: '\u00A0\u00A01 Year\u00A0\u00A0\u00A0'},
 
     ];
+
+    const shouldRun = useRef(true);
     useEffect(() => {
+        if (!shouldRun.current) return;
+        shouldRun.current = false;
         buildAxiosRequestWithHeaders('GET', `/get-preferences/${user?.email}`, headers, {})
             .then((response: { data: any; }) => {
                 const settings = response.data;
