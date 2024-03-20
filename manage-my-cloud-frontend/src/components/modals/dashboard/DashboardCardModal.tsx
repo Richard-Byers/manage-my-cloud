@@ -254,8 +254,6 @@ const DashboardCardModal: React.FC<DashboardCardModalProps> = ({
         setLoading(true);
         const response = await buildAxiosRequestWithHeaders('GET', `/drive-items?email=${user.email}&provider=${connectionProviderTitle}&driveEmail=${driveEmail}`, headers, {});
 
-        console.log(response);
-
         if (!response.data) {
             setLoading(false);
             await client.deactivate();
