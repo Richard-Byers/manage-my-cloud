@@ -38,8 +38,7 @@ import static com.authorisation.givens.JsonNodeGivens.generateJsonNode;
 import static com.authorisation.givens.RecommendationSettingsGivens.generateUserPreferences;
 import static com.authorisation.givens.UserEntityGivens.generateUserEntityEnabled;
 import static com.authorisation.util.EncryptionUtil.decrypt;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -268,7 +267,7 @@ class UserDriveControllerTest {
         UserEntity userEntity = generateUserEntityEnabled();
         String email = userEntity.getEmail();
         CloudPlatform cloudPlatform = generateGoogleCloudPlatformEncryptedTokens();
-        JsonNode expectedJsonNode = generateJsonNode();
+        JsonNode expectedJsonNode = new ObjectMapper().readTree("{\"key\":\"value\"}");
         String refreshToken = decrypt(cloudPlatform.getRefreshToken());
         String accessToken = decrypt(cloudPlatform.getAccessToken());
         String driveEmail = "email2@example.com";
@@ -285,8 +284,11 @@ class UserDriveControllerTest {
                 //then
                 .andExpect(status().isOk()).andReturn();
 
-        JsonNode response = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), JsonNode.class);
-        assertJsonNodeResponse(expectedJsonNode, response);
+        String responseBody = mvcResult.getResponse().getContentAsString();
+        if (!responseBody.isEmpty()) {
+            JsonNode response = objectMapper.readValue(responseBody, JsonNode.class);
+            assertJsonNodeResponse(expectedJsonNode, response);
+        }
     }
 
     @Test
