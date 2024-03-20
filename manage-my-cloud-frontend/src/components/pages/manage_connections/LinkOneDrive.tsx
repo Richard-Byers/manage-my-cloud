@@ -1,8 +1,11 @@
 import React from "react";
 import "./LinkOneDrive.css";
 import OneDriveLogo from "../../images/manage-connections/OneDriveLogo.png";
+import {useTranslation} from "react-i18next";
 
 const LinkOneDrive = () => {
+
+    const {t} = useTranslation()
 
     const handleOneDriveLink = async () => {
 
@@ -26,7 +29,7 @@ const LinkOneDrive = () => {
         <div>
             <button className={"link-onedrive-button"} onClick={handleOneDriveLink}>
                 <img src={OneDriveLogo} alt={"OneDrive Logo"}/>
-                <p>Link with OneDrive</p>
+                <p>{t("main.manageConnectionsPage.addConnectionModal.linkWithOneDrive")}</p>
             </button>
         </div>
     )

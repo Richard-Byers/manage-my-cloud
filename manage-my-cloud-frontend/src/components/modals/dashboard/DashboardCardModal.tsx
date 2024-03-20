@@ -1,19 +1,21 @@
-import React from "react";
+import React, {useState} from "react";
 import "../Modal.css";
 import "./DashboardCardModal.css";
 import {CONNECTION_LOGOS, CONNECTION_TITLE,} from "../../../constants/ConnectionConstants";
-import { getFileType } from "../../../constants/FileTypesConstants";
+import {getFileType} from "../../../constants/FileTypesConstants";
 import DashboardPageButtons from "../../pages/dashboard/DashboardPageButtons";
-import { buildAxiosRequestWithHeaders } from "../../helpers/AxiosHelper";
-import { AuthData } from "../../routing/AuthWrapper";
-import LoadingSpinner from "../../helpers/LoadingSpinner";
-import { useTranslation } from "react-i18next";
-import { PieChart, Pie, Cell, Tooltip, TooltipProps } from "recharts";
+import {buildAxiosRequestWithHeaders} from "../../helpers/AxiosHelper";
+import {AuthData} from "../../routing/AuthWrapper";
+import {useTranslation} from "react-i18next";
+import {Cell, Pie, PieChart, Tooltip, TooltipProps} from "recharts";
 import CloseIcon from "@mui/icons-material/Close";
 import ArticleIcon from '@mui/icons-material/Article';
 import EmailIcon from '@mui/icons-material/Email';
 import {DashboardCardModalEmptyFiles} from "./DashboardCardModalEmptyFiles";
 import EmailContainer from "./EmailContainer";
+import {Client} from "@stomp/stompjs";
+import SockJS from "sockjs-client";
+import LoadingProgress from "../../ui_components/LoadingProgress";
 import { useGoogleLogin } from '@react-oauth/google';
 
 interface DashboardCardModalProps {
@@ -69,6 +71,7 @@ const DashboardCardModal: React.FC<DashboardCardModalProps> = ({
     const [showEmails, setShowEmails] = React.useState(false);
     const [showDriveData, setShowDriveData] = React.useState(true);
     const [haveFilesBeenDeleted, setHaveFilesBeenDeleted] = React.useState(false);
+    const [progress, setProgress] = useState<number>(0);
     const COLOURS = ["blue", "brown", "red", "orange", "purple", "green"];
 
     let categories = {
@@ -79,7 +82,7 @@ const DashboardCardModal: React.FC<DashboardCardModalProps> = ({
         Others: 0
     };
 
-    const CustomTooltip = ({ active, payload }: TooltipProps<any, any>) => {
+    const CustomTooltip = ({active, payload}: TooltipProps<any, any>) => {
         if (active && payload && payload.length) {
             return (
                 <div
@@ -91,7 +94,7 @@ const DashboardCardModal: React.FC<DashboardCardModalProps> = ({
                     }}
                 >
                     <p
-                        style={{ fontSize: "12px" }}
+                        style={{fontSize: "12px"}}
                     >{`${payload[0].name}: ${payload[0].value}%`}</p>
                 </div>
             );
@@ -152,7 +155,7 @@ const DashboardCardModal: React.FC<DashboardCardModalProps> = ({
                         categories.Video += 1;
                     } else if (node.type.startsWith('text') || node.type.includes('document') || node.type.includes('presentation') || node.type.includes('spreadsheet') || node.type.includes('pdf')) {
                         categories.Documents += 1;
-                    } else if (!node.type.startsWith('Folder')){
+                    } else if (!node.type.startsWith('Folder')) {
                         categories.Others += 1;
                     }
 
@@ -235,13 +238,31 @@ const DashboardCardModal: React.FC<DashboardCardModalProps> = ({
         }
 
         const connectionProviderTitle = CONNECTION_TITLE[connectionProvider];
+
+        const client = new Client({
+            webSocketFactory: () => new SockJS('http://localhost:8080/progress'),
+            onConnect: () => {
+                client.subscribe(`/user/${user?.email}/queue/progress`, (message) => {
+                    const progress = JSON.parse(message.body);
+                    setProgress(progress);
+                });
+            }
+        });
+
+        await client.activate();
+
         setLoading(true);
-        const response = await buildAxiosRequestWithHeaders('GET', `/drive-items?email=${user.email}&provider=${connectionProviderTitle}&driveEmail=${driveEmail}`, headers, {})
+        const response = await buildAxiosRequestWithHeaders('GET', `/drive-items?email=${user.email}&provider=${connectionProviderTitle}&driveEmail=${driveEmail}`, headers, {});
+
+        console.log(response);
 
         if (!response.data) {
             setLoading(false);
+            await client.deactivate();
             throw new Error('Invalid response data');
         }
+
+        await client.deactivate();
         setLoading(false);
         return response.data;
     }
@@ -252,7 +273,9 @@ const DashboardCardModal: React.FC<DashboardCardModalProps> = ({
 
     return (
         <div className={"modal-overlay"} onClick={closeModal}>
-            {loading ? <LoadingSpinner/> :
+            {loading ? (<>
+                    <LoadingProgress filled={progress}/>
+                </>) :
                 <div className={"modal"} onClick={stopPropagation} id={"connected-drive-modal"}>
 
                     <button className={"modal-close-button"} onClick={closeModal}>
@@ -260,6 +283,8 @@ const DashboardCardModal: React.FC<DashboardCardModalProps> = ({
                     </button>
 
                     <div className={"dashboard-card-modal-grid"}>
+
+                        {/* This div displays the general information about the user's drive */}
                         <div className={"dashboard-card-modal-drive-information"}>
                             <img src={CONNECTION_LOGOS[connectionProvider]}
                                  alt={`Logo for ${connectionProvider}`}/>
@@ -267,31 +292,36 @@ const DashboardCardModal: React.FC<DashboardCardModalProps> = ({
                             <span>{driveEmail}</span>
                             <span>{t('main.dashboard.dashboardCardModal.driveInformation.usedStorage')} {usedStorage > 0.0 ? usedStorage : "< 0"}/GB</span>
                             <span>{t('main.dashboard.dashboardCardModal.driveInformation.totalStorage')} {totalStorage}/GB</span>
-                            {!showEmails && driveData && !areAllChildrenFolders(driveData) ?  (
-                            <PieChart className="dashboard-card-modal-pie-chart" width={200} height={200}>
-                                <Pie
-                                    data={pieChartData}
-                                    cx="50%"
-                                    cy="50%"
-                                    labelLine={false}
-                                    outerRadius={80}
-                                    fill="#8884d8"
-                                    dataKey="value"
-                                    isAnimationActive={false}
-                                >
-                                    {pieChartData.map((entry, index) => (
-                                        <Cell key={`cell-${index}`} fill={COLOURS[index % COLOURS.length]} />
-                                    ))}
-                                </Pie>
-                                <Tooltip content={<CustomTooltip />} />
-                            </PieChart>
-                            ): null}
+                            {!showEmails && driveData && !areAllChildrenFolders(driveData) ? (
+                                <PieChart className="dashboard-card-modal-pie-chart" width={200} height={200}>
+                                    <Pie
+                                        data={pieChartData}
+                                        cx="50%"
+                                        cy="50%"
+                                        labelLine={false}
+                                        outerRadius={80}
+                                        fill="#8884d8"
+                                        dataKey="value"
+                                        isAnimationActive={false}
+                                    >
+                                        {pieChartData.map((entry, index) => (
+                                            <Cell key={`cell-${index}`} fill={COLOURS[index % COLOURS.length]}/>
+                                        ))}
+                                    </Pie>
+                                    <Tooltip content={<CustomTooltip/>}/>
+                                </PieChart>
+                            ) : null}
                         </div>
+
+                        {/* This div displays all the files inside the user drive */}
                         <div className={"dashboard-card-modal-drive-files-container"}>
 
+                            {/* If google provider then display options to view emails and files */}
                             {connectionProvider === "GoogleDrive" ?
                                 <div className={"google-drive-item-type-navigation-container"}>
-                                    <button onClick={handleShowDriveData}><ArticleIcon/>{t('main.dashboard.dashboardCardModal.driveInformation.driveFiles')}</button>
+                                    <button onClick={handleShowDriveData}>
+                                        <ArticleIcon/>{t('main.dashboard.dashboardCardModal.driveInformation.driveFiles')}
+                                    </button>
                                     <button onClick={handleShowEmails}><EmailIcon/> Gmail</button>
                                 </div>
                                 : null

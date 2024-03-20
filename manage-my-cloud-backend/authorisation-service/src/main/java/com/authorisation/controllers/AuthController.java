@@ -23,6 +23,7 @@ public class AuthController {
     public ResponseEntity<UserDto> login(@RequestBody @Valid CredentialsDto credentialsDto) {
         UserDto userDto = userService.login(credentialsDto);
         userDto.setToken(userAuthenticationProvider.createToken(userDto.getEmail()));
+        userService.updateFirstLogin(userDto.getEmail());
         return ResponseEntity.ok(userDto);
     }
 

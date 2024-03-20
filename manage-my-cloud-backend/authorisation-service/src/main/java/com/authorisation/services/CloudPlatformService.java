@@ -105,11 +105,6 @@ public class CloudPlatformService implements ICloudPlatformService {
         return cloudPlatform != null;
     }
 
-    boolean isGmailLinked(String userEmail, String driveEmail, String platformName) {
-        CloudPlatform cloudPlatform = cloudPlatformRepository.findByUserEntityEmailAndDriveEmailAndPlatformName(userEmail, driveEmail, platformName);
-        return cloudPlatform != null;
-    }
-
     public CloudPlatform getUserCloudPlatform(String userEmail, String platformName, String driveEmail) {
         return cloudPlatformRepository.findByUserEntityEmailAndPlatformNameAndDriveEmail(userEmail, platformName, driveEmail);
     }

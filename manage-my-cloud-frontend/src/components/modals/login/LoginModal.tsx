@@ -11,6 +11,7 @@ import {SignUpModal} from "../signUp/SignUpModal";
 import {ResetPasswordModal} from "../resetPassword/ResetPasswordModal";
 import {AuthData} from "../../routing/AuthWrapper";
 import {useTranslation} from "react-i18next";
+import {ROUTES} from "../../../constants/RouteConstants";
 
 interface LoginProps {
     email: string;
@@ -76,7 +77,7 @@ const LoginModal: React.FC = () => {
         login(loginInput.email, loginInput.password)
             .then(() => {
 
-                navigate('/profile');
+                navigate(ROUTES.DASHBOARD);
             })
             .catch((error) => {
                 setShowError(true);

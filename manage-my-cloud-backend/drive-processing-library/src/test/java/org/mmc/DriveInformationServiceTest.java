@@ -8,6 +8,7 @@ import com.microsoft.graph.models.Drive;
 import com.microsoft.graph.requests.*;
 import okhttp3.Request;
 import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
 import org.mmc.auth.DriveAuthManager;
 import org.mmc.drive.DriveInformationService;
 import org.mmc.pojo.UserPreferences;
@@ -15,10 +16,11 @@ import org.mmc.response.DriveInformationReponse;
 import org.mmc.response.FilesDeletedResponse;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import java.io.IOException;
 import java.util.Date;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -28,11 +30,20 @@ import static org.mmc.givens.DriveInformationResponseGivens.*;
 import static org.mmc.givens.UserPreferencesGivens.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class DriveInformationServiceTest {
 
     private final DriveInformationService driveInformationService = new DriveInformationService();
+    private final SimpMessagingTemplate simpMessagingTemplate = mock(SimpMessagingTemplate.class);
+
+    private final String EMAIL = "johndoe@gmail.com";
+
+    @BeforeEach
+    public void setUp() {
+        Mockito.doNothing().when(simpMessagingTemplate).convertAndSend(any(), any(), any(), any());
+    }
 
     @Test
     public void getOneDriveInformation_ReturnsDriveInformation() {
@@ -173,7 +184,7 @@ public class DriveInformationServiceTest {
             when(driveRequestBuilder.items(anyString())).thenReturn(driveItemRequestBuilder);
             when(mockRequest.get()).thenReturn(mockDrive);
 
-            JsonNode driveInformationReponse = driveInformationService.listAllItemsInOneDrive(accessToken, expiryDate);
+            JsonNode driveInformationReponse = driveInformationService.listAllItemsInOneDrive(accessToken, expiryDate, simpMessagingTemplate, EMAIL);
 
             //then
             assertEquals(1, driveInformationReponse.get("children").size());
@@ -196,7 +207,7 @@ public class DriveInformationServiceTest {
         String accessToken = "testAccessToken";
         GraphServiceClient<Request> mockGraphClient = mock(GraphServiceClient.class);
 
-        AtomicBoolean firstCall = new AtomicBoolean(true);
+        AtomicInteger callCount = new AtomicInteger(0);
 
         try (MockedStatic<DriveAuthManager> driveAuthManagerMockedStatic = Mockito.mockStatic(DriveAuthManager.class)) {
             //when
@@ -208,15 +219,15 @@ public class DriveInformationServiceTest {
             when(driveItemRequestBuilder.children()).thenReturn(driveItemCollectionRequestBuilder);
             when(driveItemCollectionRequestBuilder.buildRequest()).thenReturn(mockRequest);
             when(mockRequest.get()).thenAnswer(invocation -> {
-                if (firstCall.get()) {
-                    firstCall.set(false);
+                int count = callCount.getAndIncrement();
+                if (count == 1) {
                     return mockDrive;
                 } else {
                     return mockSubDrive;
                 }
             });
 
-            JsonNode driveInformationReponse = driveInformationService.listAllItemsInOneDrive(accessToken, expiryDate);
+            JsonNode driveInformationReponse = driveInformationService.listAllItemsInOneDrive(accessToken, expiryDate, simpMessagingTemplate, EMAIL);
 
             //then
             assertEquals(2, driveInformationReponse.get("children").size());
@@ -231,7 +242,7 @@ public class DriveInformationServiceTest {
         JsonNode itemsInDrive = generateItemsToDelete();
 
         //when
-        JsonNode recommendedItems = driveInformationService.returnItemsToDelete(itemsInDrive, userPreferences);
+        JsonNode recommendedItems = driveInformationService.returnItemsToDelete(itemsInDrive, userPreferences, simpMessagingTemplate, EMAIL);
         //then
         assertEquals(3, recommendedItems.get("children").size());
     }
@@ -243,7 +254,7 @@ public class DriveInformationServiceTest {
         JsonNode itemsInDrive = generateItemsToDelete();
 
         //when
-        JsonNode recommendedItems = driveInformationService.returnItemsToDelete(itemsInDrive, userPreferences);
+        JsonNode recommendedItems = driveInformationService.returnItemsToDelete(itemsInDrive, userPreferences, simpMessagingTemplate, EMAIL);
         //then
         assertEquals(1, recommendedItems.get("children").size());
         assertEquals("name1.png", recommendedItems.get("children").get(0).get("name").asText());
@@ -256,7 +267,7 @@ public class DriveInformationServiceTest {
         JsonNode itemsInDrive = generateItemsToDelete();
 
         //when
-        JsonNode recommendedItems = driveInformationService.returnItemsToDelete(itemsInDrive, userPreferences);
+        JsonNode recommendedItems = driveInformationService.returnItemsToDelete(itemsInDrive, userPreferences, simpMessagingTemplate, EMAIL);
         //then
         assertEquals(1, recommendedItems.get("children").size());
         assertEquals("name1.csv", recommendedItems.get("children").get(0).get("name").asText());
@@ -269,7 +280,7 @@ public class DriveInformationServiceTest {
         JsonNode itemsInDrive = generateItemsToDelete();
 
         //when
-        JsonNode recommendedItems = driveInformationService.returnItemsToDelete(itemsInDrive, userPreferences);
+        JsonNode recommendedItems = driveInformationService.returnItemsToDelete(itemsInDrive, userPreferences, simpMessagingTemplate, EMAIL);
         //then
         assertEquals(1, recommendedItems.get("children").size());
         assertEquals("name1.mp4", recommendedItems.get("children").get(0).get("name").asText());
@@ -282,7 +293,7 @@ public class DriveInformationServiceTest {
         JsonNode itemsInDrive = generateItemsToDeleteWithUnsupportedFileTypes();
 
         //when
-        JsonNode recommendedItems = driveInformationService.returnItemsToDelete(itemsInDrive, userPreferences);
+        JsonNode recommendedItems = driveInformationService.returnItemsToDelete(itemsInDrive, userPreferences, simpMessagingTemplate, EMAIL);
         //then
         assertEquals(1, recommendedItems.get("children").size());
         assertEquals("name1.log", recommendedItems.get("children").get(0).get("name").asText());
@@ -295,7 +306,7 @@ public class DriveInformationServiceTest {
         JsonNode itemsInDrive = generateItemsToDeleteWithUnsupportedFileTypes();
 
         //when
-        JsonNode recommendedItems = driveInformationService.returnItemsToDelete(itemsInDrive, userPreferences);
+        JsonNode recommendedItems = driveInformationService.returnItemsToDelete(itemsInDrive, userPreferences, simpMessagingTemplate, EMAIL);
         //then
         assertEquals(0, recommendedItems.get("children").size());
     }
@@ -322,7 +333,7 @@ public class DriveInformationServiceTest {
             when(driveItemRequestBuilder.buildRequest()).thenReturn(driveItemRequest);
             when(driveItemRequest.delete()).thenReturn(null);
 
-            FilesDeletedResponse filesDeletedResponse = driveInformationService.deleteRecommendedOneDriveFiles(itemsToDelete, accessToken, expiryDate);
+            FilesDeletedResponse filesDeletedResponse = driveInformationService.deleteRecommendedOneDriveFiles(itemsToDelete, accessToken, expiryDate, simpMessagingTemplate, EMAIL);
 
             //then
             assertEquals(3, filesDeletedResponse.getFilesDeleted());
@@ -352,7 +363,7 @@ public class DriveInformationServiceTest {
             when(driveItemRequestBuilder.buildRequest()).thenThrow(new RuntimeException(expectedExceptionMessage));
             when(driveItemRequest.delete()).thenReturn(null);
 
-            Exception exception = assertThrows(RuntimeException.class, () -> driveInformationService.deleteRecommendedOneDriveFiles(itemsToDelete, accessToken, expiryDate));
+            Exception exception = assertThrows(RuntimeException.class, () -> driveInformationService.deleteRecommendedOneDriveFiles(itemsToDelete, accessToken, expiryDate, simpMessagingTemplate, EMAIL));
             String actualExceptionMessage = exception.getMessage();
             //then
             assertTrue(actualExceptionMessage.contains(expectedExceptionMessage));
@@ -409,7 +420,7 @@ public class DriveInformationServiceTest {
             when(messages.get(anyString(), anyString())).thenReturn(getMessages);
             when(getMessages.execute()).thenReturn(message);
 
-            JsonNode driveFiles = driveInformationService.fetchAllGoogleDriveFiles(refreshToken, accessToken, true);
+            JsonNode driveFiles = driveInformationService.fetchAllGoogleDriveFiles(refreshToken, accessToken, simpMessagingTemplate, EMAIL, true);
 
             //then
             assertEquals(1, driveFiles.get("children").size());
@@ -445,7 +456,7 @@ public class DriveInformationServiceTest {
             when(users.messages()).thenReturn(messages);
             when(messages.delete(anyString(), anyString())).thenReturn(deleteMessage);
 
-            FilesDeletedResponse filesDeletedResponse = driveInformationService.deleteRecommendedGoogleDriveFiles(itemsToDelete, refreshToken, accessToken);
+            FilesDeletedResponse filesDeletedResponse = driveInformationService.deleteRecommendedGoogleDriveFiles(itemsToDelete, refreshToken, accessToken, simpMessagingTemplate, EMAIL);
 
             //then
             assertEquals(3, filesDeletedResponse.getFilesDeleted());

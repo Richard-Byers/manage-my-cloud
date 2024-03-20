@@ -32,10 +32,10 @@
     flex-direction: column;
     align-items: center;
     grid-column: 1/ span;
-    width: 30vw;
+    width: 22vw;
     height: 100%;
-    border-right: 2px solid black;
-    padding-right: 2em;
+    border-right: 1px solid black;
+    padding-right: 1em;
 }
 
 .dashboard-card-modal-drive-information img {
@@ -156,7 +156,7 @@
 }
 
 .dashboard-page-buttons-container {
-    grid-row: 2 / span 1;
+    grid-row: 3 / span 1;
     grid-column: 1 / span 2;
 }
 

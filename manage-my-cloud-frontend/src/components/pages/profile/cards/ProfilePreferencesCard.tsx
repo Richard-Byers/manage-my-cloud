@@ -5,6 +5,8 @@ import ToggleSwitch from "../../../ui_components/ToggleSwitch";
 import Select from 'react-select';
 import {buildAxiosRequestWithHeaders} from "../../../helpers/AxiosHelper";
 import {AuthData} from "../../../routing/AuthWrapper";
+import ToolTip from "../../../ui_components/ToolTip";
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 
 function ProfilePreferencesCard() {
     const {t} = useTranslation();
@@ -132,6 +134,9 @@ function ProfilePreferencesCard() {
 
             <span className={"preference-section-span"}>
                 {t('main.profilePreferencesCard.drivePreferences')}
+                <ToolTip
+                message={t("main.tooltip.profile.drivePreferences")}
+                children={<HelpOutlineIcon/>}/>
             </span>
 
             <div className="toggle-container" id={"delete-videos-toggle"}>
@@ -184,6 +189,9 @@ function ProfilePreferencesCard() {
 
             <span className={"preference-section-span"}>
                 {t('main.profilePreferencesCard.emailPreferences')}
+                <ToolTip
+                    message={t("main.tooltip.profile.emailPreferences")}
+                    children={<HelpOutlineIcon/>}/>
             </span>
 
             <div className="toggle-container" id={"delete-emails-toggle"}>
@@ -210,7 +218,8 @@ function ProfilePreferencesCard() {
             </div>
 
             <div className="button-container">
-                <button onClick={updatePreferences} id={"update-profile-preferences-button"}>{t('main.profilePreferencesCard.updatePreferences')}</button>
+                <button onClick={updatePreferences}
+                        id={"update-profile-preferences-button"}>{t('main.profilePreferencesCard.updatePreferences')}</button>
             </div>
         </div>
     );

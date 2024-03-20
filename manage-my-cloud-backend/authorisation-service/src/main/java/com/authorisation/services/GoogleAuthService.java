@@ -75,6 +75,8 @@ public class GoogleAuthService {
             UserDto userDto = userService.googleLogin(email);
             userDto.setToken(userAuthenticationProvider.createToken(userDto.getEmail()));
 
+            userService.updateFirstLogin(email);
+
             return ResponseEntity.ok(userDto);
         } catch (Exception e) {
             // Log the exception

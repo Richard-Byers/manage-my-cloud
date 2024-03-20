@@ -1,9 +1,9 @@
-import React, { useState } from "react";
+import React, {useState} from "react";
 import "./DashboardPageButtons.css";
-import { useTranslation } from "react-i18next";
+import {useTranslation} from "react-i18next";
 import DeletionRecommendationsModal from "../../modals/dashboard/DeletionRecommendationsModal";
 import DeleteDuplicatesModal from "../../modals/dashboard/DeleteDuplicatesModal";
-import { CONNECTION_TITLE } from "../../../constants/ConnectionConstants";
+import {CONNECTION_TITLE} from "../../../constants/ConnectionConstants";
 
 interface DashboardPageButtonsProps {
     data: FileNode;
@@ -37,7 +37,7 @@ const DashboardPageButtons: React.FC<DashboardPageButtonsProps> = ({
                                                                        driveEmail,
                                                                        setHaveFilesBeenDeleted,
                                                                    }) => {
-    const { t } = useTranslation();
+    const {t} = useTranslation();
 
     const [showDeletionModal, setShowDeletionModal] = useState(false);
     const [showDuplicateDeletionModal, setShowDuplicateDeletionModal] = useState(false);
@@ -82,7 +82,7 @@ const DashboardPageButtons: React.FC<DashboardPageButtonsProps> = ({
                     setDeleteDuplicatesClicked={setDeleteDuplicatesClicked}
                 />
             )}
-            <button className={"dashboard-button"}  id={"delete-recommended-button"} onClick={handleDeleteRecommended}>
+            <button className={"dashboard-button"} id={"delete-recommended-button"} onClick={handleDeleteRecommended}>
                 {t("main.dashboard.dashboardPageButtons.deleteRecommended")}
             </button>
             {showDeletionModal && (
