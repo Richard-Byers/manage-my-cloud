@@ -150,7 +150,7 @@ class RegistrationControllerTest {
                         )
                         // then
                         .andExpect(status().isFound())
-                        .andExpect(result -> assertTrue(result.getResponse().getRedirectedUrl().contains("/register/resendVerificationEmail?token=token&message=resend_verification")));
+                        .andExpect(result -> assertTrue(result.getResponse().getRedirectedUrl().contains("/message?message=The link is invalid or broken, <a href=\"http://localhost:80/register/resendVerificationEmail?token=token\">Click Here</a> to resend verification email")));
 
     }
 

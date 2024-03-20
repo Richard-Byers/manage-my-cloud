@@ -75,7 +75,7 @@ public class RegistrationController {
                 redirectUrl = "http://localhost:3000/login?message=verification_success";
             } else {
                 String resendUrl = applicationUrl(request) + "/register/resendVerificationEmail?token=" + token;
-                redirectUrl = resendUrl + "&message=resend_verification";
+                redirectUrl = "http://localhost:3000/message?message=The link is invalid or broken, <a href=\"" + resendUrl + "\">Click Here</a> to resend verification email";
             }
         }
 

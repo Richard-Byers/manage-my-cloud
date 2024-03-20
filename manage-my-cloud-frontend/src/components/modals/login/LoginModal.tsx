@@ -28,7 +28,15 @@ const LoginModal: React.FC = () => {
     const location = useLocation();
 
     const [searchParams] = useSearchParams();
-    const token = searchParams.get('token');
+    const message = searchParams.get('message');
+
+
+    let verificationMessage;
+    if (message === 'verification_success') {
+        verificationMessage = 'Account verified successfully';
+    } else if (message === 'already_verified') {
+        verificationMessage = 'Account already verified';
+    }
 
     useEffect(() => {
         setShowModal(location.pathname === '/login');
@@ -163,6 +171,12 @@ const LoginModal: React.FC = () => {
                                         {t('main.landingPage.loginModal.invalidUserOrEmailError')}
                                     </div>
                                 )}
+                                {verificationMessage && (
+                                    <div className={"modal-form-success"}>
+                                        {verificationMessage}
+                                    </div>
+                                )}
+
                                 <button className={"modal-form-submit-button"} type="submit">
                                     {t('main.landingPage.loginModal.loginButton')}
                                 </button>
