@@ -15,6 +15,7 @@ build:
 
 gcp:
   stage: gcp
+  tags: gcp
   image: google/cloud-sdk:alpine
   script:
     - echo $GCP_CLOUD_BUILD_SERVICE_KEY > /tmp/gcloud-service-key.json
