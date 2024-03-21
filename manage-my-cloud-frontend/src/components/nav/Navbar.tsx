@@ -86,7 +86,7 @@ const Navbar: React.FC = () => {
 
             <ul className="navbar-nav">
                 <li className="logo">
-                    <Link to={ROUTES.LANDING} className={"logo-container"}>
+                    <Link to={ROUTES.DASHBOARD} className={"logo-container"}>
                         <img src={logo} alt="manage my cloud logo" height="100" width="100"/>
                     </Link>
                 </li>

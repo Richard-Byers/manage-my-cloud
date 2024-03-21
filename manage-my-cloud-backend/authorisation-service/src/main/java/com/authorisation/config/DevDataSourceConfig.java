@@ -12,6 +12,7 @@ import javax.sql.DataSource;
 @Profile("dev")
 public class DevDataSourceConfig {
 
+    // Create connection to local postgres docker database if running the auth service using dev profile
     @Bean
     public DataSource createDevConnectionPool() {
         HikariConfig config = new HikariConfig();

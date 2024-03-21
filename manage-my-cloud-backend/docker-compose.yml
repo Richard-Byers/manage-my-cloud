@@ -22,8 +22,6 @@ services:
   manage-my-cloud-frontend:
     image: manage-my-cloud-frontend:latest
     container_name: manage-my-cloud-frontend
-    environment:
-      - REACT_APP_ENV=development
     ports:
       - "3000:3000"
   postgres:

@@ -13,6 +13,7 @@ public class EncryptionUtil {
     private static final int IV_SIZE = 12;
     private static final int TAG_SIZE = 128;
 
+    // Used to encrypt access and refresh token for cloud providers
     public static String encrypt(String strToEncrypt) {
         try {
             Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
@@ -35,6 +36,7 @@ public class EncryptionUtil {
         }
     }
 
+    // Used to encrypt access and refresh token for cloud providers
     public static String decrypt(String strToDecrypt) {
         try {
             Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");

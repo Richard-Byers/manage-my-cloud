@@ -1,6 +1,6 @@
 .nav {
     display: flex;
-    margin: 0.5% 2% 2% 2%;
+    margin: 2% 2% 2% 2%;
     justify-content: space-between;
     font-size: 1.2rem;
 }
@@ -108,9 +108,9 @@
     padding: 0;
     position: fixed;
     top: 0;
-    right: 0;
+    left: 0;
     height: 100%;
-    width: 300px;
+    width: 350px;
     z-index: 999;
     background-color: rgba(255, 255, 255, 0.3);
     backdrop-filter: blur(10px);
@@ -124,9 +124,12 @@
 .sidebar li {
     display: none;
     list-style: none;
-    padding: 1em;
     width: 100%;
     border-bottom: 2px solid #000000;
+}
+
+.sidebar li img{
+    padding: 1em;
 }
 
 .sidebar button {
@@ -134,6 +137,7 @@
     border: none;
     font-family: MontserratBold, serif;
     font-size: 1.2rem;
+    padding: 1em;
 }
 
 .sidebar li:last-child {
@@ -148,7 +152,8 @@
     color: black;
     text-decoration: none;
     width: 100%;
-    font-family: MontserratBold, serif;
+    padding: 1em;
+    font-family: MontserratMedium, serif;
 }
 
 .sidebar li button {
@@ -157,7 +162,7 @@
     color: black;
     text-decoration: none;
     width: 100%;
-    font-family: MontserratBold, serif;
+    font-family: MontserratRegular, serif;
 }
 
 .sidebar-button-open {
@@ -172,6 +177,10 @@
     background: none;
     border: none;
     color: #000000;
+}
+
+.sidebar-button-close svg{
+    margin-left: auto;
 }
 
 .hide-on-mobile {
@@ -191,6 +200,10 @@
 }
 
 @media only screen and (max-width: 940px) {
+
+    .nav-item{
+        width: 100%;
+    }
 
     .navbar-nav {
         margin: 0;
@@ -214,9 +227,8 @@
         display: none;
     }
 
-    .logo img {
-        height: 80px;
-        object-fit: contain;
+    .logo{
+        display: none;
     }
 }
 
