@@ -12,6 +12,7 @@ build:
   script:
     - cd manage-my-cloud-backend
     - mvn clean install
+
 gcp:
   stage: gcp
   image: google/cloud-sdk:alpine
@@ -25,8 +26,7 @@ gcp:
     - docker image remove -f manage-my-cloud-backend
   only:
     - master
-  when:
-    - manual
+  when: manual
 
 after_script:
   - rm /tmp/gcloud-service-key.json
