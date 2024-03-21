@@ -22,10 +22,10 @@ gcp:
     - echo $GCP_CLOUD_BUILD_SERVICE_KEY > /tmp/gcloud-service-key.json
     - gcloud auth activate-service-account --key-file /tmp/gcloud-service-key.json
     - cd manage-my-cloud-backend
-    - docker build -t manage-my-cloud-backend .
-    - docker tag manage-my-cloud-backend gcr.io/finalyearproject-406016/manage-my-cloud-backend:latest
-    - docker push gcr.io/finalyearproject-406016/manage-my-cloud-frontend:latest
-    - docker image remove -f manage-my-cloud-backend
+    - sudo docker build -t manage-my-cloud-backend .
+    - sudo docker tag manage-my-cloud-backend gcr.io/finalyearproject-406016/manage-my-cloud-backend:latest
+    - sudo docker push gcr.io/finalyearproject-406016/manage-my-cloud-frontend:latest
+    - sudo docker image remove -f manage-my-cloud-backend
   when: manual
   after_script: 
     - rm /tmp/gcloud-service-key.json
