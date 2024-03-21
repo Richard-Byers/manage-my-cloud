@@ -24,8 +24,6 @@ gcp:
     - docker tag manage-my-cloud-backend gcr.io/finalyearproject-406016/manage-my-cloud-backend:latest
     - docker push gcr.io/finalyearproject-406016/manage-my-cloud-frontend:latest
     - docker image remove -f manage-my-cloud-backend
-  only:
-    - master
   when: manual
 
 after_script:
