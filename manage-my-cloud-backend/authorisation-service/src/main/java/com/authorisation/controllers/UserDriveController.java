@@ -41,7 +41,7 @@ public class UserDriveController {
             throw new RuntimeException("Cloud platform not found");
         }
 
-        if (cloudPlatformService.isTokenRefreshNeeded(email, connectionProvider, driveEmail)) {
+        if (connectionProvider.equals(ONEDRIVE) && cloudPlatformService.isTokenRefreshNeeded(email, connectionProvider, driveEmail)) {
             oneDriveService.refreshToken(cloudPlatform.getRefreshToken(), driveEmail, email);
         }
 
@@ -85,6 +85,10 @@ public class UserDriveController {
 
         if (cloudPlatform == null) {
             throw new RuntimeException(String.format("Cloud platform not found %s", connectionProvider));
+        }
+
+        if (connectionProvider.equals(ONEDRIVE) && cloudPlatformService.isTokenRefreshNeeded(email, connectionProvider, driveEmail)) {
+            oneDriveService.refreshToken(cloudPlatform.getRefreshToken(), driveEmail, email);
         }
 
         if (connectionProvider.equals(ONEDRIVE)) {
@@ -139,6 +143,10 @@ public class UserDriveController {
             throw new RuntimeException(String.format("Cloud platform not found %s", connectionProvider));
         }
 
+        if (connectionProvider.equals(ONEDRIVE) && cloudPlatformService.isTokenRefreshNeeded(email, connectionProvider, driveEmail)) {
+            oneDriveService.refreshToken(cloudPlatform.getRefreshToken(), driveEmail, email);
+        }
+
         if (connectionProvider.equals(ONEDRIVE)) {
             String accessToken = decrypt(cloudPlatform.getAccessToken());
             Date accessTokenExpiryDate = cloudPlatform.getAccessTokenExpiryDate();
@@ -182,6 +190,9 @@ public class UserDriveController {
 
         if (cloudPlatform == null) {
             throw new RuntimeException(String.format("Cloud platform not found %s", connectionProvider));
+        }
+        if (connectionProvider.equals(ONEDRIVE) && cloudPlatformService.isTokenRefreshNeeded(email, connectionProvider, driveEmail)) {
+            oneDriveService.refreshToken(cloudPlatform.getRefreshToken(), driveEmail, email);
         }
 
         if (connectionProvider.equals(ONEDRIVE)) {

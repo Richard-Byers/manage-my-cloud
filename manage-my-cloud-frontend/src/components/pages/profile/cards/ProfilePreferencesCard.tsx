@@ -7,6 +7,7 @@ import {buildAxiosRequestWithHeaders} from "../../../helpers/AxiosHelper";
 import {AuthData} from "../../../routing/AuthWrapper";
 import ToolTip from "../../../ui_components/ToolTip";
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
+import SuccessModal  from "../../../modals/profile/SuccessModal";
 
 function ProfilePreferencesCard() {
     const {t} = useTranslation();
@@ -21,6 +22,7 @@ function ProfilePreferencesCard() {
     const [deleteDocuments, setDeleteDocuments] = useState(true);
     const [deleteEmails, setDeleteEmails] = useState(true);
 
+    const [showSuccessModal, setShowSuccessModal] = useState(false);
 
     const headers = {
         'Authorization': `Bearer ${user?.token}`
@@ -105,6 +107,9 @@ function ProfilePreferencesCard() {
 
         // Update the RecommendationSettings in the database
         buildAxiosRequestWithHeaders('POST', `/preference-update?email=${user?.email}`, headers, data)
+            .then(response => {
+                setShowSuccessModal(true);
+            })
             .catch(error => {
                 console.error('There has been a problem with your fetch operation:', error);
             });
@@ -221,6 +226,7 @@ function ProfilePreferencesCard() {
                 <button onClick={updatePreferences}
                         id={"update-profile-preferences-button"}>{t('main.profilePreferencesCard.updatePreferences')}</button>
             </div>
+            <SuccessModal show={showSuccessModal} onClose={() => setShowSuccessModal(false)} />
         </div>
     );
 }

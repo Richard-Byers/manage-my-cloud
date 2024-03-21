@@ -42,15 +42,14 @@ function TermsOfServiceModal({ show: showModal, handleClose: closeHandle }: Term
             {show && (
                 <div className="modal-overlay terms-of-service-modal" onClick={handleClose}>
                     <div className="modal modal-dialog" onClick={stopPropagation}>
+                        <button className="modal-close-button" onClick={handleClose}>x</button>
                         <div className="modal-header">
                             <h5 className="modal-title">{t('main.termsOfServiceModal.termsOfServiceTitle')}</h5>
-
                         </div>
                         <div className="modal-body">
                             <ReactMarkdown>{termsOfServiceText}</ReactMarkdown>
                         </div>
                         <div className="modal-footer">
-
                         </div>
                     </div>
                 </div>

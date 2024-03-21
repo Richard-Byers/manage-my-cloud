@@ -17,8 +17,10 @@
     line-height: 1.5;
     color: #212529;
     word-wrap: break-word;
-    overflow-y: auto; /* Add this line */
-    max-height: 400px; /* You can adjust this value as needed */
+    overflow-y: auto; /* Allow vertical scrolling */
+    display: flex;
+    flex-direction: column;
+    max-height: 50vh; /* Set max-height relative to the viewport height */
 }
 
 .terms-of-service-modal .modal-footer {
@@ -30,4 +32,28 @@
     color: #fff;
     background-color: #007bff;
     border-color: #007bff;
+}
+.modal-close-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    font-size: 1.5em;
+    cursor: pointer;
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .modal {
+        position: relative;
+        height: 100vh; /* Add this line */
+    }
+    .terms-of-service-modal .modal-body {
+        max-height: 100vh;
+    }
+
+    .modal-close-button {
+        display: block;
+    }
 }
