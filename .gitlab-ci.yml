@@ -20,8 +20,8 @@ gcp:
   image: google/cloud-sdk:alpine
   script:
     - echo $GCP_CLOUD_BUILD_SERVICE_KEY > /tmp/gcloud-service-key.json
-    - export GOOGLE_APPLICATION_CREDENTIALS=/tmp/gcloud-service-key.json
-    - gcloud auth activate-service-account container-iam@finalyearproject-406016.iam.gserviceaccount.com --key-file /tmp/gcloud-service-key.json --project=finalyearproject-406016
+    - sudo gcloud auth activate-service-account container-iam@finalyearproject-406016.iam.gserviceaccount.com --key-file /tmp/gcloud-service-key.json
+    - sudo gcloud config set project finalyearproject-406016
     - cd manage-my-cloud-backend
     - sudo docker build -t manage-my-cloud-backend .
     - sudo docker tag manage-my-cloud-backend gcr.io/finalyearproject-406016/manage-my-cloud-backend:latest
