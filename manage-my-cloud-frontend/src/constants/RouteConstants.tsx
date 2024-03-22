@@ -4,4 +4,5 @@ export const ROUTES = {
     MANAGE_CONNECTIONS: '/manage-connections',
     PREFERENCES: '/preferences',
     PROFILE: '/profile',
+    LOGIN: '/login',
 };
