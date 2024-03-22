@@ -58,13 +58,19 @@ const CardContainer: React.FC<ConnectedDrivesCardProps> = ({connectionProvider, 
 
     if (showErrorModal) {
         return (
-            <ErrorModal showModal={showErrorModal} handleClose={handleCloseErrorModal} errorMessage={errorMessage}/>
+            <ErrorModal showModal={showErrorModal} handleClose={handleCloseErrorModal} errorMessage={errorMessage} buttonName={t(
+                "main.dashboard.manageConnectionsLink"
+              )}/>
         );
     }
 
     if (!driveInformation) {
         return <LoadingSpinner/>
     }
+
+    const convertGBtoTB = (value: number) => {
+        return value >= 1024 ? `${value / 1024}TB` : `${value}GB`;
+    };
 
     return (
         <>
@@ -84,7 +90,7 @@ const CardContainer: React.FC<ConnectedDrivesCardProps> = ({connectionProvider, 
                 </div>
                 <div className='item-storage-used' id={"drive-used-storage"}>
                     <h2>{t('main.dashboard.connectedDrivesCard.storageUsed')}:</h2>
-                    <h2>{driveInformation.used > 0.0 ? driveInformation.used : "< 0"}GB/{driveInformation.total}GB</h2>
+                    <h2>{driveInformation.used > 0.0 ? driveInformation.used : "< 0"}GB/{convertGBtoTB(driveInformation.total)}</h2>
                 </div>
                 <StorageProgressBar used={driveInformation.used} total={driveInformation.total}/>
             </div>

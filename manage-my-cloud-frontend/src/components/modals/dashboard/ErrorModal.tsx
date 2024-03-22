@@ -5,9 +5,10 @@ interface ErrorModalProps {
     showModal: boolean;
     handleClose: () => void;
     errorMessage: string;
+    buttonName: string;
 }
 
-const ErrorModal: React.FC<ErrorModalProps> = ({ showModal, handleClose, errorMessage }) => {
+const ErrorModal: React.FC<ErrorModalProps> = ({ showModal, handleClose, errorMessage, buttonName }) => {
     if (!showModal) {
         return null;
     }
@@ -17,7 +18,7 @@ const ErrorModal: React.FC<ErrorModalProps> = ({ showModal, handleClose, errorMe
             <div className='error-modal-content'>
                 <div className='error-modal-body'>
                     <p>{errorMessage}</p>
-                    <button onClick={handleClose}>Manage Connections</button>
+                    <button onClick={handleClose}>{buttonName}</button>
                 </div>
             </div>
         </div>

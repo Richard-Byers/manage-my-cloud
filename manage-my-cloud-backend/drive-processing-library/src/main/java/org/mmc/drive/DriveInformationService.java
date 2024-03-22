@@ -421,8 +421,10 @@ public class DriveInformationService implements IDriveInformationService {
                         customItem.setReceivedDate(OffsetDateTime.ofInstant(Instant.ofEpochMilli(message.getInternalDate()), ZoneId.systemDefault()));
                         synchronized (emails) {
                             emails.add(customItem);
+                            itemsProcessed.getAndIncrement();
                         }
                     }
+                    simpMessagingTemplate.convertAndSendToUser(email, "/queue/progress", itemsProcessed.get() * 100 / totalItemCount.get());
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }

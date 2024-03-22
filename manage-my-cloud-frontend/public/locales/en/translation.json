@@ -38,7 +38,8 @@
           "totalStorage": "Total Storage",
           "driveFiles": "Drive Files",
           "noEmailsFoundMessage": "No emails found",
-          "noFilesFoundMessage": "No files found"
+          "noFilesFoundMessage": "No files found",
+          "gmailNotLinkedMessage": "It seems you have not gave us permission to link your Gmail, please link by pressing the button below."
         }
       },
       "connectedDrivesCard": {
