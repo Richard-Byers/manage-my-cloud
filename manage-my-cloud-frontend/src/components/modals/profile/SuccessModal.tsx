@@ -1,7 +1,7 @@
 import React, { MouseEvent } from 'react';
 import '../Modal.css';
-import './SuccessModal.css';
 import { useTranslation } from 'react-i18next';
+import CloseIcon from '@mui/icons-material/Close';
 
 interface SuccessModalProps {
     show: boolean;
@@ -21,7 +21,9 @@ function SuccessModal({ show, onClose }: SuccessModalProps) {
     return (
         <div className="modal-overlay" onClick={onClose}>
             <div className="modal" onClick={stopPropagation}>
-                <button className="modal-close-button" onClick={onClose}>x</button>
+                <button className="modal-close-button" onClick={onClose}>
+                    <CloseIcon />
+                </button>
                 <h2 style={{color: 'green'}}>{t('main.successModal.title')}</h2>
             </div>
         </div>
