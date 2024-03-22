@@ -33,9 +33,9 @@ const LoginModal: React.FC = () => {
 
     let verificationMessage;
     if (message === 'verification_success') {
-        verificationMessage = 'Account verified successfully';
+        verificationMessage = t('verificationMessages.verificationSuccess');
     } else if (message === 'already_verified') {
-        verificationMessage = 'Account already verified';
+        verificationMessage = t('verificationMessages.alreadyVerified');
     }
 
     useEffect(() => {
