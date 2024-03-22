@@ -210,6 +210,11 @@
     "emailContainer": {
       "noSubject": "No Subject"
     }
+  },
+  "verificationMessages": {
+    "verificationSuccess": "Account verified successfully",
+    "alreadyVerified": "Account already verified"
   }
 }
+
 
