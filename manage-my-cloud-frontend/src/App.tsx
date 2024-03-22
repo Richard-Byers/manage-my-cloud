@@ -3,6 +3,7 @@ import './App.css';
 import {BrowserRouter} from 'react-router-dom';
 import {AuthWrapper} from "./components/routing/AuthWrapper";
 import {GoogleOAuthProvider} from '@react-oauth/google';
+import LoginModal from './components/modals/login/LoginModal';
 
 function App() {
     return (

@@ -19,10 +19,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.view.RedirectView;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Optional;
 import java.util.UUID;
+
+import static com.authorisation.config.WebConfig.ENVIRONMENT;
 
 @Slf4j
 @RestController
@@ -60,21 +63,31 @@ public class RegistrationController {
     }
 
     @GetMapping("verifyEmail")
-    public String verifyEmail(@RequestParam("token") String token) {
+    public RedirectView verifyEmail(@RequestParam("token") String token) {
         VerificationToken verificationToken = verificationTokenRepository.findByToken(token);
+        String redirectUrl;
+        String baseUrl;
 
-        if (verificationToken.getUserEntity().isEnabled()) {
-            return "this account has already been verified, please login";
-        }
-
-        String verificationResult = userService.validateToken(token);
-
-        if (verificationResult.equals("valid")) {
-            return "Email has been verified successfully. You can now login";
+        if (ENVIRONMENT != null && ENVIRONMENT.equals("production")) {
+            baseUrl = System.getenv("FRONTEND_URL");
         } else {
-            String resendUrl = applicationUrl(request) + "/register/resendVerificationEmail?token=" + token;
-            return "The link is invalid or broken, <a href=\"" + resendUrl + "\">Click Here</a> to resend verification email";
+            baseUrl = "http://localhost:3000";
         }
+
+        if (verificationToken == null || verificationToken.getUserEntity().isEnabled()) {
+            redirectUrl = String.format("%s/login?message=already_verified", baseUrl);
+        } else {
+            String verificationResult = userService.validateToken(token);
+
+            if ("valid".equals(verificationResult)) {
+                redirectUrl = String.format("%s/login?message=verification_success", baseUrl);
+            } else {
+                String resendUrl = applicationUrl(request) + "/register/resendVerificationEmail?token=" + token;
+                redirectUrl = String.format("%s/login?message=link_broken&resendLink=%s", baseUrl, resendUrl);
+            }
+        }
+
+        return new RedirectView(redirectUrl);
     }
 
     @GetMapping("/resendVerificationEmail")
@@ -139,7 +152,16 @@ public class RegistrationController {
     }
 
     public String applicationUrl(HttpServletRequest request) {
-        return "http://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath();
+
+        String prefix;
+
+        if (ENVIRONMENT != null && ENVIRONMENT.equals("production")) {
+            prefix = "https://";
+        } else {
+            prefix = "http://";
+        }
+
+        return prefix + request.getServerName() + ":" + request.getServerPort() + request.getContextPath();
     }
 
     private void sendPasswordResetEmailLink(UserEntity userEntity, String applicationUrl, String passwordResetToken) {

@@ -3,10 +3,12 @@ import {Navigate, Route, Routes, useLocation} from "react-router-dom";
 import {AuthData} from "./AuthWrapper";
 import {nav} from "./Navigation";
 import {ROUTES} from "../../constants/RouteConstants";
+import LoginModal from '../modals/login/LoginModal';
+
 
 const AppRouting = () => {
     const { user, loading } = AuthData();
-    const location = useLocation(); // Get the current location
+    const location = useLocation();
 
     if (loading) {
         return <div>Loading...</div>;
@@ -27,6 +29,7 @@ const AppRouting = () => {
                     }
                 />
             ))}
+            <Route path="/login" element={<LoginModal />} />
         </Routes>
     );
 };

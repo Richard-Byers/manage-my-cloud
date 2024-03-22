@@ -195,8 +195,8 @@ const DeletionRecommendationsModal: React.FC<DeletionRecommendationModalProps> =
             const fetchDriveData = async () => {
                 const info = await getRecommendedDeletions(user, connectionProvider);
                 setDriveData(info);
+                setLoading(false);
             };
-
             fetchDriveData();
         }
     }, [deleteRecommendedClicked]);
@@ -283,7 +283,6 @@ const DeletionRecommendationsModal: React.FC<DeletionRecommendationModalProps> =
             await client.deactivate();
             throw new Error('Invalid response data');
         }
-        setLoading(false);
         await client.deactivate();
         return response.data;
     }
