@@ -511,7 +511,7 @@ public class DriveInformationService implements IDriveInformationService {
         return mapper.readTree(chatDiscussionWithAI(prettyJson, provider, 0));
     }
 
-    private static String chatDiscussionWithAI(String files, String provider, int timesTried) throws IOException {
+    public static String chatDiscussionWithAI(String files, String provider, int timesTried) throws IOException {
         // OpenAI API endpoint
         String url = "https://api.openai.com/v1/chat/completions";
         String openApiKey = System.getenv("OPENAI_API_KEY");
