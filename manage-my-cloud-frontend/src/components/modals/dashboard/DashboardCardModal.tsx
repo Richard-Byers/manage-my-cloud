@@ -43,7 +43,7 @@ interface FileNode {
   children: FileNode[];
   emails: Email[];
   googlePhotos: FileNode[];
-  gmail: boolean;
+  gaveGmailPermissions: boolean;
 }
 
 interface FileNodeProps {
@@ -130,6 +130,8 @@ const DashboardCardModal: React.FC<DashboardCardModalProps> = ({
     const fetchDriveData = async () => {
       const info = await getDriveItems(user, connectionProvider);
       setDriveData(info);
+
+      console.log(info.gaveGmailPermissions);
 
       if (connectionProvider === "GoogleDrive") {
         info.children.forEach((item: FileNode) => {
@@ -334,7 +336,7 @@ const DashboardCardModal: React.FC<DashboardCardModalProps> = ({
 
               {showEmails && (
                 <div className={"dashboard-card-modal-drive-files-grid"}>
-                  {driveData && driveData.gmail === false ? (
+                  {driveData && driveData.gaveGmailPermissions === false ? (
                     <div>
                       <DashboardCardModalEmptyFiles message={t(
                         "main.dashboard.dashboardCardModal.driveInformation.gmailNotLinkedMessage"

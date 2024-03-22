@@ -329,7 +329,7 @@ public class DriveInformationService implements IDriveInformationService {
 
     //Helper Methods
 
-    public JsonNode fetchAllGoogleDriveFiles(String refreshToken, String accessToken, SimpMessagingTemplate simpMessagingTemplate, String email, boolean isGmail) throws IOException {
+    public JsonNode fetchAllGoogleDriveFiles(String refreshToken, String accessToken, SimpMessagingTemplate simpMessagingTemplate, String email, boolean gaveGmailPermissions) throws IOException {
         com.google.api.services.drive.Drive service = getGoogleClient(refreshToken, accessToken);
         Gmail gmailClient = getGmailClient(refreshToken, accessToken);
         AtomicInteger totalItemCount = new AtomicInteger();
@@ -338,19 +338,19 @@ public class DriveInformationService implements IDriveInformationService {
             throw new RuntimeException("Drive not found");
         }
 
-        getTotalItemCount(service, gmailClient, totalItemCount, isGmail);
+        getTotalItemCount(service, gmailClient, totalItemCount, gaveGmailPermissions);
 
         CustomDriveItem root = new CustomDriveItem();
         root.setName("root");
         root.setType("Folder");
         root.setChildren(performFetchAllGoogleDriveFiles(service, totalItemCount, simpMessagingTemplate, email));
 
-        if (isGmail) {
-            root.setGmail(true);
+        if (gaveGmailPermissions) {
+            root.setGaveGmailPermissions(true);
             root.setEmails(performFetchAllGoogleEmails(gmailClient, totalItemCount, simpMessagingTemplate, email));
 
         } else {
-            root.setGmail(false);
+            root.setGaveGmailPermissions(false);
         }
 
         return mapper.valueToTree(root);
@@ -442,12 +442,12 @@ public class DriveInformationService implements IDriveInformationService {
         return emails;
     }
 
-    private void getTotalItemCount(com.google.api.services.drive.Drive service, Gmail gmailClient, AtomicInteger totalItemCount, boolean isGmail) {
+    private void getTotalItemCount(com.google.api.services.drive.Drive service, Gmail gmailClient, AtomicInteger totalItemCount, boolean gaveGmailPermissions) {
         try {
             int emailPagesRetrieved = 0;
             FileList fileList = service.files().list().setQ("mimeType != 'application/vnd.google-apps.folder' and 'me' in owners").execute();
             totalItemCount.getAndAdd(fileList.getFiles().size());
-            if (isGmail) {
+            if (gaveGmailPermissions) {
                 ListMessagesResponse response = gmailClient.users().messages().list("me").setQ("in:inbox AND is:read OR in:spam").execute();
                 while (response.getMessages() != null) {
                     totalItemCount.getAndAdd(response.getMessages().size());

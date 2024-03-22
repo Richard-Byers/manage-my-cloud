@@ -19,7 +19,7 @@ public interface IDriveInformationService {
 
     JsonNode listAllItemsInOneDrive(String userAccessToken, Date expiryDate, SimpMessagingTemplate simpMessagingTemplate, String email) throws JsonProcessingException;
 
-    JsonNode fetchAllGoogleDriveFiles(String refreshToken, String accessToken, SimpMessagingTemplate simpMessagingTemplate, String email, boolean isGmail) throws IOException;
+    JsonNode fetchAllGoogleDriveFiles(String refreshToken, String accessToken, SimpMessagingTemplate simpMessagingTemplate, String email, boolean gaveGmailPermissions) throws IOException;
 
     DriveInformationReponse mapToDriveInformationResponse(String displayName, String email, Double total, Double used);
 

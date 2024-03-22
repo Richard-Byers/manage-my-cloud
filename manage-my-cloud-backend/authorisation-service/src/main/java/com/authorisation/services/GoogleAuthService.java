@@ -94,10 +94,10 @@ public class GoogleAuthService {
             GoogleTokenResponse tokenResponse = getGoogleTokenResponse(authCodeOutput, googleCredentialsJson);
             String scope = getAccessTokenScope(tokenResponse.getAccessToken());
             String driveEmail = driveInformationService.getGoogleDriveEmail(tokenResponse.getRefreshToken(), tokenResponse.getAccessToken());
-            boolean isGmail = false;
+            boolean gaveGmailPermissions = false;
 
             if (scope.contains("https://mail.google.com/") || scope.contains("https://www.googleapis.com/auth/gmail.modify")) {
-                isGmail = true;
+                gaveGmailPermissions = true;
             }
 
             boolean isDriveLinked = cloudPlatformService.isDriveLinked(email, driveEmail, GOOGLEDRIVE);
@@ -107,7 +107,7 @@ public class GoogleAuthService {
                 return googleDriveLinkResponse;
             }
 
-            storeUserPlatformLink(tokenResponse, email, driveEmail, isGmail);
+            storeUserPlatformLink(tokenResponse, email, driveEmail, gaveGmailPermissions);
 
             return googleDriveLinkResponse;
         } catch (Exception e) {
@@ -127,13 +127,13 @@ public class GoogleAuthService {
             GoogleTokenResponse tokenResponse = getGoogleTokenResponse(authCodeOutput, googleCredentialsJson);
             String scope = getAccessTokenScope(tokenResponse.getAccessToken());
             String driveEmail = driveInformationService.getGoogleDriveEmail(tokenResponse.getRefreshToken(), tokenResponse.getAccessToken());
-            boolean isGmail = false;
+            boolean gaveGmailPermissions = false;
 
             if (scope.contains("https://mail.google.com/") || scope.contains("https://www.googleapis.com/auth/gmail.modify")) {
-                isGmail = true;
+                gaveGmailPermissions = true;
             }
 
-            UpdateUserPlatformLink(tokenResponse, email, driveEmail, isGmail);
+            UpdateUserPlatformLink(tokenResponse, email, driveEmail, gaveGmailPermissions);
 
             return googleDriveLinkResponse;
         } catch (Exception e) {
@@ -168,20 +168,20 @@ public class GoogleAuthService {
         }
     }
 
-    public void storeUserPlatformLink(GoogleTokenResponse tokenResponse, String email, String driveEmail, Boolean isGmail) {
+    public void storeUserPlatformLink(GoogleTokenResponse tokenResponse, String email, String driveEmail, Boolean gaveGmailPermissions) {
         cloudPlatformService.addCloudPlatform(
                 email,
                 GOOGLEDRIVE,
                 tokenResponse.getAccessToken(),
-                tokenResponse.getRefreshToken(), null, driveEmail, isGmail);
+                tokenResponse.getRefreshToken(), null, driveEmail, gaveGmailPermissions);
     }
 
-    public void UpdateUserPlatformLink(GoogleTokenResponse tokenResponse, String email, String driveEmail, Boolean isGmail) {
+    public void UpdateUserPlatformLink(GoogleTokenResponse tokenResponse, String email, String driveEmail, Boolean gaveGmailPermissions) {
         cloudPlatformService.updateCloudPlatform(
                 email,
                 GOOGLEDRIVE,
                 tokenResponse.getAccessToken(),
-                tokenResponse.getRefreshToken(), null, driveEmail, isGmail);
+                tokenResponse.getRefreshToken(), null, driveEmail, gaveGmailPermissions);
     }
 
     public void unlinkGoogleDrive(String email, String driveEmail) {

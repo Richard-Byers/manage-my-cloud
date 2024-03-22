@@ -63,7 +63,7 @@ class CloudPlatformServiceTest {
         String platformName = "OneDrive";
         String accessToken = "new_access_token";
         String refreshToken = "new_refresh_token";
-        boolean isGmail = true;
+        boolean gaveGmailPermissions = true;
 
         UserEntity userEntity = new UserEntity();
         userEntity.setEmail(userEmail);
@@ -76,11 +76,11 @@ class CloudPlatformServiceTest {
         when(cloudPlatformRepository.findByUserEntityEmailAndPlatformNameAndDriveEmail(userEmail, platformName, driveEmail)).thenReturn(existingCloudPlatform);
         when(cloudPlatformRepository.save(any(CloudPlatform.class))).thenAnswer(i -> i.getArguments()[0]);
 
-        CloudPlatform updatedCloudPlatform = cloudPlatformService.updateCloudPlatform(userEmail, platformName, accessToken, refreshToken, null, driveEmail, isGmail);
+        CloudPlatform updatedCloudPlatform = cloudPlatformService.updateCloudPlatform(userEmail, platformName, accessToken, refreshToken, null, driveEmail, gaveGmailPermissions);
 
         assertEquals(accessToken, decrypt(updatedCloudPlatform.getAccessToken()));
         assertEquals(refreshToken, decrypt(updatedCloudPlatform.getRefreshToken()));
-        assertEquals(isGmail, updatedCloudPlatform.isGmail());
+        assertEquals(gaveGmailPermissions, updatedCloudPlatform.isGaveGmailPermissions());
     }
 
     @Test

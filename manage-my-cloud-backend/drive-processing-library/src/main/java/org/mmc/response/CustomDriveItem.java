@@ -20,5 +20,5 @@ public class CustomDriveItem {
     private String webUrl;
     private List<CustomDriveItem> children;
     private List<CustomEmail> emails;
-    private boolean isGmail;
+    private boolean gaveGmailPermissions;
 }

@@ -24,7 +24,7 @@ public class CloudPlatformService implements ICloudPlatformService {
     private final CloudPlatformRepository cloudPlatformRepository;
     private final UserEntityRepository userEntityRepository;
 
-    public CloudPlatform addCloudPlatform(String userEmail, String platformName, String accessToken, String refreshToken, Date accessTokenExpiryDate, String driveEmail, boolean isGmail) {
+    public CloudPlatform addCloudPlatform(String userEmail, String platformName, String accessToken, String refreshToken, Date accessTokenExpiryDate, String driveEmail, boolean gaveGmailPermissions) {
         UserEntity userEntity = userEntityRepository.findByEmail(userEmail).orElseThrow(() -> new RuntimeException("User not found"));
         LinkedAccounts linkedAccounts = userEntity.getLinkedAccounts();
 
@@ -51,12 +51,12 @@ public class CloudPlatformService implements ICloudPlatformService {
         cloudPlatform.setRefreshToken(encryptedRefreshToken);
         cloudPlatform.setAccessTokenExpiryDate(accessTokenExpiryDate);
         cloudPlatform.setDriveEmail(driveEmail);
-        cloudPlatform.setGmail(isGmail);
+        cloudPlatform.setGaveGmailPermissions(gaveGmailPermissions);
 
         return cloudPlatformRepository.save(cloudPlatform);
     }
 
-    public CloudPlatform updateCloudPlatform(String userEmail, String platformName, String accessToken, String refreshToken, Date accessTokenExpiryDate, String driveEmail, boolean isGmail) {
+    public CloudPlatform updateCloudPlatform(String userEmail, String platformName, String accessToken, String refreshToken, Date accessTokenExpiryDate, String driveEmail, boolean gaveGmailPermissions) {
         CloudPlatform cloudPlatform = cloudPlatformRepository.findByUserEntityEmailAndPlatformNameAndDriveEmail(userEmail, platformName, driveEmail);
         if (cloudPlatform == null) {
             throw new RuntimeException("CloudPlatform not found");
@@ -68,7 +68,7 @@ public class CloudPlatformService implements ICloudPlatformService {
         cloudPlatform.setAccessToken(encryptedAccessToken);
         cloudPlatform.setRefreshToken(encryptedRefreshToken);
         cloudPlatform.setAccessTokenExpiryDate(accessTokenExpiryDate);
-        cloudPlatform.setGmail(isGmail);
+        cloudPlatform.setGaveGmailPermissions(gaveGmailPermissions);
 
         return cloudPlatformRepository.save(cloudPlatform);
     }
