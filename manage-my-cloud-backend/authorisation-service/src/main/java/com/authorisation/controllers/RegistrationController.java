@@ -19,6 +19,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.view.RedirectView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Optional;
@@ -60,21 +62,24 @@ public class RegistrationController {
     }
 
     @GetMapping("verifyEmail")
-    public String verifyEmail(@RequestParam("token") String token) {
+    public RedirectView verifyEmail(@RequestParam("token") String token) {
         VerificationToken verificationToken = verificationTokenRepository.findByToken(token);
+        String redirectUrl;
 
-        if (verificationToken.getUserEntity().isEnabled()) {
-            return "this account has already been verified, please login";
-        }
-
-        String verificationResult = userService.validateToken(token);
-
-        if (verificationResult.equals("valid")) {
-            return "Email has been verified successfully. You can now login";
+        if (verificationToken == null || verificationToken.getUserEntity().isEnabled()) {
+            redirectUrl = "http://localhost:3000/login?message=already_verified";
         } else {
-            String resendUrl = applicationUrl(request) + "/register/resendVerificationEmail?token=" + token;
-            return "The link is invalid or broken, <a href=\"" + resendUrl + "\">Click Here</a> to resend verification email";
+            String verificationResult = userService.validateToken(token);
+
+            if ("valid".equals(verificationResult)) {
+                redirectUrl = "http://localhost:3000/login?message=verification_success";
+            } else {
+                String resendUrl = applicationUrl(request) + "/register/resendVerificationEmail?token=" + token;
+                redirectUrl = "http://localhost:3000/message?message=The link is invalid or broken, <a href=\"" + resendUrl + "\">Click Here</a> to resend verification email";
+            }
         }
+
+        return new RedirectView(redirectUrl);
     }
 
     @GetMapping("/resendVerificationEmail")

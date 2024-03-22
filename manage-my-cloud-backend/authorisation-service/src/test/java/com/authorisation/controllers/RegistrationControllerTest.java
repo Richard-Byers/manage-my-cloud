@@ -31,6 +31,7 @@ import static com.authorisation.givens.RegistrationRequestGivens.generateRegistr
 import static com.authorisation.givens.UserEntityGivens.generateUserEntity;
 import static com.authorisation.givens.VerificationTokenGivens.generateDisabledEntityToken;
 import static com.authorisation.givens.VerificationTokenGivens.generateEnabledEntityToken;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -117,7 +118,6 @@ class RegistrationControllerTest {
         // given
         String tokenRequest = "token";
         VerificationToken expectedVerificationToken = generateEnabledEntityToken();
-        String expectedMessage = "this account has already been verified, please login";
 
         // when
         given(verificationTokenRepository.findByToken(tokenRequest)).willReturn(expectedVerificationToken);
@@ -125,14 +125,12 @@ class RegistrationControllerTest {
                 mockMvc
                         .perform(
                                 get(VERIFY_EMAIL)
-                                        .contentType("application/json").queryParam("token", tokenRequest))
+                                        .param("token", tokenRequest)
+                        )
                         // then
-                        .andExpect(status().isOk())
+                        .andExpect(status().isFound())
+                        .andExpect(result -> assertTrue(result.getResponse().getRedirectedUrl().contains("/login?message=already_verified")))
                         .andReturn();
-        String actualMessage = mvcResult.getResponse().getContentAsString();
-
-        //then
-        assertEquals(expectedMessage, actualMessage);
     }
 
     @Test
@@ -140,23 +138,20 @@ class RegistrationControllerTest {
         // given
         String tokenRequest = "token";
         VerificationToken expectedVerificationToken = generateDisabledEntityToken();
-        String expectedMessage = "The link is invalid or broken, <a href=\"http://localhost:80/register/resendVerificationEmail?token=token\">Click Here</a> to resend verification email";
 
         // when
         given(verificationTokenRepository.findByToken(tokenRequest)).willReturn(expectedVerificationToken);
         given(userService.validateToken(tokenRequest)).willReturn("Invalid verification token");
-        MvcResult mvcResult =
+
                 mockMvc
                         .perform(
                                 get(VERIFY_EMAIL)
-                                        .contentType("application/json").queryParam("token", tokenRequest))
+                                        .param("token", tokenRequest)
+                        )
                         // then
-                        .andExpect(status().isOk())
-                        .andReturn();
-        String actualMessage = mvcResult.getResponse().getContentAsString();
+                        .andExpect(status().isFound())
+                        .andExpect(result -> assertTrue(result.getResponse().getRedirectedUrl().contains("/message?message=The link is invalid or broken, <a href=\"http://localhost:80/register/resendVerificationEmail?token=token\">Click Here</a> to resend verification email")));
 
-        //then
-        assertEquals(expectedMessage, actualMessage);
     }
 
     @Test
@@ -164,23 +159,20 @@ class RegistrationControllerTest {
         // given
         String tokenRequest = "token";
         VerificationToken expectedVerificationToken = generateDisabledEntityToken();
-        String expectedMessage = "Email has been verified successfully. You can now login";
 
         // when
         given(verificationTokenRepository.findByToken(tokenRequest)).willReturn(expectedVerificationToken);
         given(userService.validateToken(tokenRequest)).willReturn("valid");
-        MvcResult mvcResult =
+
                 mockMvc
                         .perform(
                                 get(VERIFY_EMAIL)
-                                        .contentType("application/json").queryParam("token", tokenRequest))
+                                        .param("token", tokenRequest)
+                        )
                         // then
-                        .andExpect(status().isOk())
-                        .andReturn();
-        String actualMessage = mvcResult.getResponse().getContentAsString();
+                        .andExpect(status().isFound())
+                        .andExpect(result -> assertTrue(result.getResponse().getRedirectedUrl().contains("/login?message=verification_success")));
 
-        //then
-        assertEquals(expectedMessage, actualMessage);
     }
 
     @Test

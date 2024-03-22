@@ -1,5 +1,5 @@
-import React, {useState} from "react";
-import {useNavigate} from "react-router-dom";
+import React, {useState, useEffect} from "react";
+import {useNavigate, useLocation, useSearchParams} from "react-router-dom";
 import "./LoginModal.css";
 import "../Modal.css";
 import logo from "../../images/managemycloudlogo.png";
@@ -26,11 +26,31 @@ const LoginModal: React.FC = () => {
     const [showSignUpModal, setShowSignUpModal] = useState(false);
     const [showForgotPasswordModal, setShowForgotPasswordModal] = useState(false);
     const [showError, setShowError] = useState(false);
+    const location = useLocation();
+
+    const [searchParams] = useSearchParams();
+    const message = searchParams.get('message');
+
+
+    let verificationMessage;
+    if (message === 'verification_success') {
+        verificationMessage = t('verificationMessages.verificationSuccess');
+    } else if (message === 'already_verified') {
+        verificationMessage = t('verificationMessages.alreadyVerified');
+    }
+
+    useEffect(() => {
+        setShowModal(location.pathname === '/login');
+    }, [location]);
 
     const [loginInput, setLoginInput] = useState<LoginProps>({
         email: "",
         password: "",
-    });
+    })
+
+    if (!showModal) {
+        return null;
+    }
 
     const modalFormInputLabel = showError ? "modal-form-label-error" : "modal-form-label"
 
@@ -51,12 +71,15 @@ const LoginModal: React.FC = () => {
     };
 
     const toggleSignUpModal = () => {
-        closeModal();
         setShowSignUpModal(!showSignUpModal);
     };
 
+
+    const openSignUpModal = () => {
+        setShowSignUpModal(true);
+    };
+
     const toggleForgotPasswordModal = () => {
-        closeModal();
         setShowForgotPasswordModal(!showForgotPasswordModal);
     };
 
@@ -64,6 +87,7 @@ const LoginModal: React.FC = () => {
         setShowError(false);
         setShowSignUpModal(false);
         setShowModal(false);
+        navigate("/");
     };
 
     const stopPropagation = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -90,9 +114,11 @@ const LoginModal: React.FC = () => {
 
     return (
         <>
+        {location.pathname !== '/login' && (
             <button className={"modal-login-button"} id={"modal-login-button"} onClick={toggleModal}>
                 {t('main.landingPage.loginModal.getStartedButton')}
             </button>
+        )}
 
             {showModal && (
                 <div className="modal-overlay" onClick={closeModal}>
@@ -146,6 +172,12 @@ const LoginModal: React.FC = () => {
                                         {t('main.landingPage.loginModal.invalidUserOrEmailError')}
                                     </div>
                                 )}
+                                {verificationMessage && (
+                                    <div className={"modal-form-success"}>
+                                        {verificationMessage}
+                                    </div>
+                                )}
+
                                 <button className={"modal-form-submit-button"} type="submit">
                                     {t('main.landingPage.loginModal.loginButton')}
                                 </button>
@@ -154,27 +186,29 @@ const LoginModal: React.FC = () => {
                             <div className={"separator"}></div>
 
                             <div className={"sign-up-login-container"}>
-                                <button className={"modal-login-reset-signup"} id={"reset-password-button"} onClick={toggleForgotPasswordModal}>
+                                <button className={"modal-login-reset-signup"} id={"reset-password-button"}
+                                        onClick={toggleForgotPasswordModal}>
                                     {t('main.landingPage.loginModal.resetPasswordText')}
                                 </button>
-                                <button className={"modal-login-reset-signup"} id={"signup-button"} onClick={toggleSignUpModal}>
+                                <button className={"modal-login-reset-signup"} id={"signup-button"}
+                                        onClick={toggleSignUpModal}>
                                     {t('main.landingPage.loginModal.signUpText')}
                                 </button>
                             </div>
                         </div>
                     </div>
                 </div>
+
             )}
             {showSignUpModal && (<SignUpModal
                     setShowSignUpModal={setShowSignUpModal}/>
             )}
-
             {showForgotPasswordModal && (
                 <ResetPasswordModal
                     setForgotPasswordModal={setShowForgotPasswordModal}/>
             )}
         </>
     );
-};
 
+}
 export default LoginModal;
