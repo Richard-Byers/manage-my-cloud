@@ -66,7 +66,7 @@ public class RegistrationController {
         VerificationToken verificationToken = verificationTokenRepository.findByToken(token);
         String redirectUrl;
 
-        if (verificationToken.getUserEntity().isEnabled()) {
+        if (verificationToken == null || verificationToken.getUserEntity().isEnabled()) {
             redirectUrl = "http://localhost:3000/login?message=already_verified";
         } else {
             String verificationResult = userService.validateToken(token);
