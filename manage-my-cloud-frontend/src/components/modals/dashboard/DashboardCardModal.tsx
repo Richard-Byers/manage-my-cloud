@@ -267,6 +267,15 @@ const DashboardCardModal: React.FC<DashboardCardModalProps> = ({
     return response.data;
   }
 
+  const convertGBtoTB= (sizeInGB: number) => {
+    if (sizeInGB >= 1024) {
+        // Convert to TB and format to 2 decimal places
+        return `${(sizeInGB / 1024).toFixed(2)}TB`;
+    } else {
+        return `${sizeInGB}GB`;
+    }
+};
+
   function areAllChildrenFolders(driveData: FileNode): boolean {
     return driveData.children.every(child => child.type === 'Folder');
   }
@@ -289,9 +298,9 @@ const DashboardCardModal: React.FC<DashboardCardModalProps> = ({
               <img src={CONNECTION_LOGOS[connectionProvider]} alt={`Logo for ${connectionProvider}`} />
               <p> {t("main.dashboard.dashboardCardModal.driveInformation.accountDetails")} </p>
               <span>{driveEmail}</span>
-              <span> {t("main.dashboard.dashboardCardModal.driveInformation.usedStorage")}{usedStorage > 0.0 ? usedStorage : "< 0"}/GB</span>
+              <span> {t("main.dashboard.dashboardCardModal.driveInformation.usedStorage")}{usedStorage > 0.0 ? convertGBtoTB(usedStorage) : "< 0GB"}</span>
               <span>{t("main.dashboard.dashboardCardModal.driveInformation.totalStorage")}
-                {totalStorage}/GB</span>
+                {convertGBtoTB(totalStorage)}</span>
               {!showEmails && driveData && !areAllChildrenFolders(driveData) ? (
                 <PieChart className="dashboard-card-modal-pie-chart" width={200} height={200}>
                   <Pie

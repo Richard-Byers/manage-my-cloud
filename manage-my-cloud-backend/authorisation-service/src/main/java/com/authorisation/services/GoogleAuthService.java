@@ -5,13 +5,9 @@ import com.authorisation.dto.UserDto;
 import com.authorisation.response.GoogleDriveLinkResponse;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeTokenRequest;
-import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleTokenResponse;
-import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
-import com.google.api.client.json.jackson2.JacksonFactory;
 import lombok.RequiredArgsConstructor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -62,7 +58,7 @@ public class GoogleAuthService {
             GoogleTokenResponse tokenResponse = getGoogleTokenResponse(authCodeOutput, googleCredentialsJson);
 
             String idTokenStr = tokenResponse.getIdToken();
-            GoogleIdToken idToken = GoogleIdToken.parse(JacksonFactory.getDefaultInstance(), idTokenStr);
+            GoogleIdToken idToken = GoogleIdToken.parse(GsonFactory.getDefaultInstance(), idTokenStr);
             GoogleIdToken.Payload payload = idToken.getPayload();
 
             String email = payload.getEmail();

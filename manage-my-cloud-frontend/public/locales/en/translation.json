@@ -34,8 +34,8 @@
       "dashboardCardModal": {
         "driveInformation": {
           "accountDetails": "Account Details",
-          "usedStorage": "Used Storage",
-          "totalStorage": "Total Storage",
+          "usedStorage": "Used Storage: ",
+          "totalStorage": "Total Storage: ",
           "driveFiles": "Drive Files",
           "noEmailsFoundMessage": "No emails found",
           "noFilesFoundMessage": "No files found",
