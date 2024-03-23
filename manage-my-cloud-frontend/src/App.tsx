@@ -7,7 +7,7 @@ import LoginModal from './components/modals/login/LoginModal';
 
 function App() {
     return (
-        <GoogleOAuthProvider clientId="897733650985-l3188hg9ni6cfd61kf9jpkcce5b83omt.apps.googleusercontent.com">
+        <GoogleOAuthProvider clientId="897733650985-7eav0a3orjebhs71q9l6mtrnbukolhfo.apps.googleusercontent.com">
             <BrowserRouter>
                 <Suspense fallback="...loading">
                     <AuthWrapper/>

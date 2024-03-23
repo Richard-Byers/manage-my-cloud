@@ -6,13 +6,15 @@ import reportWebVitals from './reportWebVitals';
 import './i18n';
 
 const root = ReactDOM.createRoot(
-  document.getElementById('root') as HTMLElement
+    document.getElementById('root') as HTMLElement
 );
 root.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
+    <React.StrictMode>
+        <App/>
+    </React.StrictMode>
 );
+
+console.log(`Manage My Cloud frontend running in ${process.env.REACT_APP_ENV}`);
 
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))

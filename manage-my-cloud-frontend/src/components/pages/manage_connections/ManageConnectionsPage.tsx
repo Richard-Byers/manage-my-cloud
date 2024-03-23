@@ -1,5 +1,5 @@
 import Navbar from "../../nav/Navbar";
-import React, {useEffect} from "react";
+import React, {useEffect, useRef} from "react";
 import './ManageConnectionsPage.css';
 import {useTranslation} from 'react-i18next';
 import {AuthData} from "../../routing/AuthWrapper";
@@ -17,7 +17,10 @@ const ManageConnectionsPage = () => {
         "manage-connections-page-link-accounts-container-center" :
         "manage-connections-page-link-accounts-container";
 
+    const shouldRun = useRef(true);
     useEffect(() => {
+        if (!shouldRun.current) return;
+        shouldRun.current = false;
         const urlSearchParams = new URLSearchParams(window.location.search);
         const code = urlSearchParams.get('code');
         refreshUser(user?.email);

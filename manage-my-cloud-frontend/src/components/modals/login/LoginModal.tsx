@@ -1,5 +1,5 @@
-import React, {useState, useEffect} from "react";
-import {useNavigate, useLocation, useSearchParams} from "react-router-dom";
+import React, {useEffect, useState} from "react";
+import {useLocation, useNavigate, useSearchParams} from "react-router-dom";
 import "./LoginModal.css";
 import "../Modal.css";
 import logo from "../../images/managemycloudlogo.png";
@@ -37,6 +37,12 @@ const LoginModal: React.FC = () => {
         verificationMessage = t('verificationMessages.verificationSuccess');
     } else if (message === 'already_verified') {
         verificationMessage = t('verificationMessages.alreadyVerified');
+    } else if (message === 'link_broken') {
+        let resendLink = searchParams.get('resendLink');
+        if (resendLink) {
+            verificationMessage = <>{t('verificationMessages.linkBroken')} <a
+                href={resendLink}>{t('verificationMessages.clickHere')}</a> {t('verificationMessages.toResend')}</>;
+        }
     }
 
     useEffect(() => {
@@ -114,11 +120,11 @@ const LoginModal: React.FC = () => {
 
     return (
         <>
-        {location.pathname !== '/login' && (
-            <button className={"modal-login-button"} id={"modal-login-button"} onClick={toggleModal}>
-                {t('main.landingPage.loginModal.getStartedButton')}
-            </button>
-        )}
+            {location.pathname !== '/login' && (
+                <button className={"modal-login-button"} id={"modal-login-button"} onClick={toggleModal}>
+                    {t('main.landingPage.loginModal.getStartedButton')}
+                </button>
+            )}
 
             {showModal && (
                 <div className="modal-overlay" onClick={closeModal}>
@@ -172,11 +178,15 @@ const LoginModal: React.FC = () => {
                                         {t('main.landingPage.loginModal.invalidUserOrEmailError')}
                                     </div>
                                 )}
-                                {verificationMessage && (
+                                {verificationMessage && message !== "verification_success" ? (
+                                        <div className={"modal-form-error"}>
+                                            {verificationMessage}
+                                        </div>
+                                    ) :
                                     <div className={"modal-form-success"}>
                                         {verificationMessage}
                                     </div>
-                                )}
+                                }
 
                                 <button className={"modal-form-submit-button"} type="submit">
                                     {t('main.landingPage.loginModal.loginButton')}

@@ -31,8 +31,8 @@ import static com.authorisation.givens.RegistrationRequestGivens.generateRegistr
 import static com.authorisation.givens.UserEntityGivens.generateUserEntity;
 import static com.authorisation.givens.VerificationTokenGivens.generateDisabledEntityToken;
 import static com.authorisation.givens.VerificationTokenGivens.generateEnabledEntityToken;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
@@ -143,14 +143,14 @@ class RegistrationControllerTest {
         given(verificationTokenRepository.findByToken(tokenRequest)).willReturn(expectedVerificationToken);
         given(userService.validateToken(tokenRequest)).willReturn("Invalid verification token");
 
-                mockMvc
-                        .perform(
-                                get(VERIFY_EMAIL)
-                                        .param("token", tokenRequest)
-                        )
-                        // then
-                        .andExpect(status().isFound())
-                        .andExpect(result -> assertTrue(result.getResponse().getRedirectedUrl().contains("/message?message=The link is invalid or broken, <a href=\"http://localhost:80/register/resendVerificationEmail?token=token\">Click Here</a> to resend verification email")));
+        mockMvc
+                .perform(
+                        get(VERIFY_EMAIL)
+                                .param("token", tokenRequest)
+                )
+                // then
+                .andExpect(status().isFound())
+                .andExpect(result -> assertTrue(result.getResponse().getRedirectedUrl().contains("http://localhost:3000/login?message=link_broken&resendLink=http://localhost:80/register/resendVerificationEmail?token=token")));
 
     }
 
@@ -164,14 +164,14 @@ class RegistrationControllerTest {
         given(verificationTokenRepository.findByToken(tokenRequest)).willReturn(expectedVerificationToken);
         given(userService.validateToken(tokenRequest)).willReturn("valid");
 
-                mockMvc
-                        .perform(
-                                get(VERIFY_EMAIL)
-                                        .param("token", tokenRequest)
-                        )
-                        // then
-                        .andExpect(status().isFound())
-                        .andExpect(result -> assertTrue(result.getResponse().getRedirectedUrl().contains("/login?message=verification_success")));
+        mockMvc
+                .perform(
+                        get(VERIFY_EMAIL)
+                                .param("token", tokenRequest)
+                )
+                // then
+                .andExpect(status().isFound())
+                .andExpect(result -> assertTrue(result.getResponse().getRedirectedUrl().contains("/login?message=verification_success")));
 
     }
 
