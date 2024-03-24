@@ -124,6 +124,7 @@ public class UserService implements IUserService {
         UserEntity user = userEntityRepository.findByEmail(credentialsDto.getEmail())
                 .orElseThrow(() -> new UserNotFoundException("Unknown user", HttpStatus.NOT_FOUND));
 
+
         return userMapper.toUserDto(user);
     }
 

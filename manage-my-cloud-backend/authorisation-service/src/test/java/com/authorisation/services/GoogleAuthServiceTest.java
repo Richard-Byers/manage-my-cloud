@@ -2,6 +2,7 @@ package com.authorisation.services;
 
 import com.authorisation.config.UserAuthenticationProvider;
 import com.authorisation.dto.UserDto;
+import com.authorisation.entities.RefreshToken;
 import com.authorisation.entities.UserEntity;
 import com.authorisation.mappers.UserMapper;
 import com.authorisation.mappers.UserMapperImpl;
@@ -38,6 +39,8 @@ class GoogleAuthServiceTest {
     private UserAuthenticationProvider userAuthenticationProvider;
     @Mock
     private DriveInformationService driveInformationService;
+    @Mock
+    private RefreshTokenService refreshTokenService;
     @InjectMocks
     private GoogleAuthService googleAuthService;
     UserMapper userMapper = new UserMapperImpl();
@@ -52,6 +55,7 @@ class GoogleAuthServiceTest {
         String idTokenString = "idToken";
         GoogleTokenResponse mockResponse = mock(GoogleTokenResponse.class);
         GoogleIdToken mockIdToken = mock(GoogleIdToken.class);
+        RefreshToken refreshToken = new RefreshToken();
 
         MockedStatic<GoogleTokenService> googleTokenServiceMockedStatic = Mockito.mockStatic(GoogleTokenService.class);
         MockedStatic<GoogleIdToken> googleIdTokenMockedStatic = Mockito.mockStatic(GoogleIdToken.class);
@@ -76,6 +80,7 @@ class GoogleAuthServiceTest {
 
             when(userService.registerGoogleUser(email, firstName, lastName, pictureUrl)).thenReturn(userEntity);
             when(userService.googleLogin(email)).thenReturn(userDto);
+            when(refreshTokenService.createRefreshtoken(email)).thenReturn(refreshToken);
             ResponseEntity<UserDto> userDtoResponseEntity = googleAuthService.storeAuthCode(authCode);
 
             //then

@@ -1,10 +1,12 @@
-import {createContext, useContext, useEffect, useState} from "react"
+import {createContext, useContext, useEffect, useRef, useState} from "react"
 import AppRouting from "./AppRouting";
 import {buildAxiosRequest, buildAxiosRequestWithHeaders} from "../helpers/AxiosHelper";
 import {useNavigate} from "react-router-dom";
 import {ROUTES} from "../../constants/RouteConstants";
 import {useGoogleLogin} from '@react-oauth/google';
 import Cookies from 'universal-cookie'
+import {jwtDecode} from 'jwt-decode';
+
 
 interface Account {
     accountEmail: string;
@@ -17,6 +19,7 @@ interface User {
     lastName: string;
     email: string;
     token: string;
+    refreshToken: string;
     accountType: string | null;
     profileImage: Uint8Array | null;
     linkedAccounts: {
@@ -94,10 +97,77 @@ export const AuthWrapper = () => {
         scope: 'https://www.googleapis.com/auth/drive',
     });
 
+    const shouldRun = useRef(true);
+    useEffect(() => {
+        if (!shouldRun.current) return;
+        shouldRun.current = false;
+        let timeoutId: NodeJS.Timeout;
+
+        const refreshToken = async () => {
+            // Get the user data from the cookie
+            let storedUser = cookies.get('user');
+
+            if (storedUser && storedUser.refreshToken) {
+                try {
+                    const response = await buildAxiosRequest("POST", "/refresh-token", { token: storedUser.refreshToken });
+                    const newToken = response.data.accessToken;
+                    const newRefreshToken = response.data.refreshToken;
+
+                    setUser((prevUser) => {
+                        if (prevUser) {
+                            return {
+                                ...prevUser,
+                                token: newToken,
+                                refreshToken: newRefreshToken
+                            };
+                        } else {
+                            // Don't update the user state if there's no user
+                            return prevUser;
+                        }
+                    });
+
+                    if (storedUser) {
+                        // Parse the user data from JSON to an object
+                        storedUser = JSON.parse(JSON.stringify(storedUser));
+
+                        // Update the token and refreshToken
+                        storedUser.token = newToken;
+                        storedUser.refreshToken = newRefreshToken;
+
+                        // Store the updated user data back in the cookie
+                        cookies.set('user', JSON.stringify(storedUser));
+                    }
+
+                    // Calculate the expiry time of the token
+                    const decodedToken = jwtDecode(newToken as string);
+                    if (decodedToken && decodedToken.exp) {
+                        const expiryTime = decodedToken.exp * 1000; // Convert to milliseconds
+                        const timeoutDelay = expiryTime - Date.now() - 5000; // Subtract 5 seconds to refresh the token before it expires
+
+                        // Set a timeout to refresh the token just before it expires
+                        timeoutId = setTimeout(refreshToken, timeoutDelay);
+                    } else {
+                        console.error('Token does not contain an expiration time');
+                    }
+                } catch (error) {
+                    console.error(error);
+                    // Handle the error (e.g., log the user out, retry the request, show an error message, etc.)
+                }
+            }
+        };
+
+        // Call the function once on component mount
+        refreshToken();
+
+        // Clear the timeout when the component is unmounted
+        return () => clearTimeout(timeoutId);
+    }, []);
+
     const refreshUser = async (email: string | undefined): Promise<void> => {
         try {
+            let token = user?.token;
             const headers = {
-                Authorization: `Bearer ${user?.token}`
+                Authorization: `Bearer ${token}`
             }
             const response = await buildAxiosRequestWithHeaders("POST", "/refresh-user", headers, {email});
             const userData = response.data;
