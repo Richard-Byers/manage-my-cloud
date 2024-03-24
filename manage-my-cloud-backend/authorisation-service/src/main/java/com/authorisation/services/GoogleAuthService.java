@@ -2,6 +2,7 @@ package com.authorisation.services;
 
 import com.authorisation.config.UserAuthenticationProvider;
 import com.authorisation.dto.UserDto;
+import com.authorisation.entities.RefreshToken;
 import com.authorisation.response.GoogleDriveLinkResponse;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeTokenRequest;
 import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
@@ -32,18 +33,20 @@ public class GoogleAuthService {
     private UserAuthenticationProvider userAuthenticationProvider;
     private String googleCredentialsJson;
     private DriveInformationService driveInformationService;
+    private RefreshTokenService refreshTokenService;
 
     @Autowired
     public GoogleAuthService(@Value("${google.credentials}") String googleCredentialsJson,
                              CloudPlatformService cloudPlatformService,
                              UserService userService,
                              UserAuthenticationProvider userAuthenticationProvider,
-                             DriveInformationService driveInformationService) {
+                             DriveInformationService driveInformationService, RefreshTokenService refreshTokenService) {
         this.googleCredentialsJson = googleCredentialsJson;
         this.cloudPlatformService = cloudPlatformService;
         this.userService = userService;
         this.userAuthenticationProvider = userAuthenticationProvider;
         this.driveInformationService = driveInformationService;
+        this.refreshTokenService = refreshTokenService;
     }
 
     public ResponseEntity<UserDto> storeAuthCode(String authCode) {
@@ -67,6 +70,9 @@ public class GoogleAuthService {
 
             UserDto userDto = userService.googleLogin(email);
             userDto.setToken(userAuthenticationProvider.createToken(userDto.getEmail()));
+
+            RefreshToken refreshTokenObject = refreshTokenService.createRefreshtoken(userDto.getEmail());
+            userDto.setRefreshToken(refreshTokenObject.getToken());
 
             userService.updateFirstLogin(email);
 

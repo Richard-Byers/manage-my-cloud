@@ -18,6 +18,7 @@ public class UserDto {
     private boolean firstLogin;
     private String email;
     private String token;
+    private String refreshToken;
     private String accountType;
     private LinkedAccounts linkedAccounts;
     private byte[] profileImage;

@@ -8,7 +8,9 @@ public class UserDtoGivens {
         return UserDto.builder().id(1L).firstName("firstName")
                 .lastName("lastName")
                 .email("email")
-                .token("token").build();
+                .token("token")
+                .refreshToken("refreshToken")
+                .build();
     }
 
 }
