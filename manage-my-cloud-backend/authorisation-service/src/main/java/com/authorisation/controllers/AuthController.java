@@ -11,7 +11,6 @@ import com.authorisation.services.RefreshTokenService;
 import com.authorisation.services.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -23,9 +22,7 @@ public class AuthController {
 
     private final UserService userService;
     private final UserAuthenticationProvider userAuthenticationProvider;
-
-    @Autowired
-    private RefreshTokenService refreshTokenService;
+    private final RefreshTokenService refreshTokenService;
 
     @PostMapping("/login")
     public ResponseEntity<UserDto> login(@RequestBody @Valid CredentialsDto credentialsDto) {
@@ -41,8 +38,8 @@ public class AuthController {
     public ResponseEntity<UserDto> refreshUser(@RequestBody @Valid EmailDto emailDto) {
         UserDto userDto = userService.refreshUser(emailDto);
         userDto.setToken(userAuthenticationProvider.createToken(userDto.getEmail()));
-        RefreshToken refreshTokenObject = refreshTokenService.createRefreshtoken(userDto.getEmail());
-        userDto.setRefreshToken(refreshTokenObject.getToken());
+        RefreshToken refreshToken = refreshTokenService.findByUserEntityEmail(userDto.getEmail());
+        userDto.setRefreshToken(refreshToken.getToken());
         return ResponseEntity.ok(userDto);
     }
 

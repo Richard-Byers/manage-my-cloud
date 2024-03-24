@@ -141,7 +141,7 @@ class AuthControllerTest {
         // when
         given(userService.refreshUser(emailDtoRequest)).willReturn(expected);
         given(userAuthenticationProvider.createToken(expected.getEmail())).willReturn(expected.getToken());
-        given(refreshTokenService.createRefreshtoken(anyString())).willReturn(mockRefreshToken);
+        given(refreshTokenService.findByUserEntityEmail(expected.getEmail())).willReturn(mockRefreshToken);
 
         MvcResult mvcResult =
                 mockMvc
@@ -197,7 +197,7 @@ class AuthControllerTest {
 
         //then
         assertEquals(newAccessToken, result.getAccessToken());
-        assertEquals(newRefreshToken, result.getToken());
+        assertEquals(newRefreshToken, result.getRefreshToken());
     }
 
     @Test

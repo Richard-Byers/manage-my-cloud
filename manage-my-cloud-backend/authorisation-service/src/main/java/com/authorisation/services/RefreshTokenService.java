@@ -42,8 +42,16 @@ public class RefreshTokenService {
         return refreshTokenRepository.findByToken(token);
     }
 
+    public RefreshToken findByUserEntityEmail(String email) {
+        Optional<RefreshToken> refreshToken = refreshTokenRepository.findByUserEntityEmail(email);
+        if (refreshToken.isEmpty()) {
+            throw new RuntimeException("Refresh token not found for user with email: " + email);
+        }
+        return refreshToken.get();
+    }
+
     public RefreshToken verifyExpiration(RefreshToken token) {
-        if(token.getExpiryDate().compareTo(Instant.now()) < 0) {
+        if (token.getExpiryDate().compareTo(Instant.now()) < 0) {
             refreshTokenRepository.delete(token);
             throw new RuntimeException(token.getToken() + " Refresh token has expired, please make a new sign in request.");
 

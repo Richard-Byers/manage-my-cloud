@@ -1,4 +1,4 @@
-import {createContext, useContext, useEffect, useState} from "react"
+import {createContext, useContext, useEffect, useRef, useState} from "react"
 import AppRouting from "./AppRouting";
 import {buildAxiosRequest, buildAxiosRequestWithHeaders} from "../helpers/AxiosHelper";
 import {useNavigate} from "react-router-dom";
@@ -97,13 +97,17 @@ export const AuthWrapper = () => {
         scope: 'https://www.googleapis.com/auth/drive',
     });
 
+    const shouldRun = useRef(true);
     useEffect(() => {
+        if (!shouldRun.current) return;
+        shouldRun.current = false;
+        let timeoutId: NodeJS.Timeout;
+
         const refreshToken = async () => {
             // Get the user data from the cookie
             let storedUser = cookies.get('user');
 
             if (storedUser && storedUser.refreshToken) {
-                console.log("Refreshing token");
                 try {
                     const response = await buildAxiosRequest("POST", "/refresh-token", { token: storedUser.refreshToken });
                     const newToken = response.data.accessToken;
@@ -125,16 +129,29 @@ export const AuthWrapper = () => {
                     if (storedUser) {
                         // Parse the user data from JSON to an object
                         storedUser = JSON.parse(JSON.stringify(storedUser));
-                    
+
                         // Update the token and refreshToken
                         storedUser.token = newToken;
                         storedUser.refreshToken = newRefreshToken;
-                    
+
                         // Store the updated user data back in the cookie
                         cookies.set('user', JSON.stringify(storedUser));
                     }
+
+                    // Calculate the expiry time of the token
+                    const decodedToken = jwtDecode(newToken as string);
+                    if (decodedToken && decodedToken.exp) {
+                        const expiryTime = decodedToken.exp * 1000; // Convert to milliseconds
+                        const timeoutDelay = expiryTime - Date.now() - 5000; // Subtract 5 seconds to refresh the token before it expires
+
+                        // Set a timeout to refresh the token just before it expires
+                        timeoutId = setTimeout(refreshToken, timeoutDelay);
+                    } else {
+                        console.error('Token does not contain an expiration time');
+                    }
                 } catch (error) {
                     console.error(error);
+                    // Handle the error (e.g., log the user out, retry the request, show an error message, etc.)
                 }
             }
         };
@@ -142,68 +159,13 @@ export const AuthWrapper = () => {
         // Call the function once on component mount
         refreshToken();
 
-        // Then call it every 10 minutes
-        const intervalId = setInterval(refreshToken, 10 * 60 * 1000); // 10 minutes in milliseconds
-
-        // Clear the interval when the component is unmounted
-        return () => clearInterval(intervalId);
-    }, []); 
-
-    const isTokenExpired = (token: String) => {
-        try {
-            const decodedToken = jwtDecode(token as string);
-    
-            if (!decodedToken || !decodedToken.exp) {
-                return true;
-            }
-    
-            const dateNow = new Date();
-            const tokenExpirationDate = decodedToken.exp * 1000; // Convert to milliseconds
-    
-            return tokenExpirationDate < dateNow.getTime();
-        } catch (error) {
-            console.error(error);
-            return true;
-        }
-    };
+        // Clear the timeout when the component is unmounted
+        return () => clearTimeout(timeoutId);
+    }, []);
 
     const refreshUser = async (email: string | undefined): Promise<void> => {
         try {
             let token = user?.token;
-    
-            if (isTokenExpired(token as string) || !token) {
-                const response = await buildAxiosRequest("POST", "/refresh-token", { token: user?.refreshToken });
-                const newToken = response.data.accessToken;
-                const newRefreshToken = response.data.refreshToken;
-    
-                setUser((prevUser) => {
-                    if (prevUser) {
-                        return {
-                            ...prevUser,
-                            token: newToken,
-                            refreshToken: newRefreshToken
-                        };
-                    } else {
-                        // Don't update the user state if there's no user
-                        return prevUser;
-                    }
-                });
-    
-                let storedUser = cookies.get('user');
-                if (storedUser) {
-                    // Parse the user data from JSON to an object
-                    storedUser = JSON.parse(JSON.stringify(storedUser));
-                
-                    // Update the token and refreshToken
-                    storedUser.token = newToken;
-                    storedUser.refreshToken = newRefreshToken;
-                    token = newToken;
-                
-                    // Store the updated user data back in the cookie
-                    cookies.set('user', JSON.stringify(storedUser));
-                }
-            }
-    
             const headers = {
                 Authorization: `Bearer ${token}`
             }

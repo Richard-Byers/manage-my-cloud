@@ -1,5 +1,5 @@
 import Navbar from "../../nav/Navbar";
-import React from "react";
+import React, {useEffect, useRef} from "react";
 import ConnectedDrivesCard from "./cards/ConnectedDrivesCard";
 import './DashboardPage.css';
 import {useNavigate} from "react-router-dom";
@@ -14,11 +14,18 @@ const DashboardPage = () => {
 
     const navigate = useNavigate();
     const {t} = useTranslation();
-    const {user} = AuthData();
+    const {user, refreshUser} = AuthData();
 
     function navigateToManageConnections() {
         navigate(ROUTES.MANAGE_CONNECTIONS);
     }
+
+    const shouldRun = useRef(true);
+    useEffect(() => {
+        if (!shouldRun.current) return;
+        shouldRun.current = false;
+        refreshUser(user?.email);
+    }, []);
 
     return (
         <>
