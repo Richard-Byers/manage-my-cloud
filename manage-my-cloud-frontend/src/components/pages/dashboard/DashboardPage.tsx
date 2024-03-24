@@ -63,7 +63,6 @@ const DashboardPage = () => {
                 </div>
             </div>
         </>
-
     )
 };
 

@@ -3,6 +3,7 @@ package com.authorisation.controllers;
 import com.authorisation.entities.CloudPlatform;
 import com.authorisation.entities.UserEntity;
 import com.authorisation.services.CloudPlatformService;
+import com.authorisation.services.OneDriveService;
 import com.authorisation.services.UserService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -64,6 +65,8 @@ class UserDriveControllerTest {
     @MockBean
     private DriveInformationService driveInformationService;
     @MockBean
+    private OneDriveService oneDriveService;
+    @MockBean
     private SimpMessagingTemplate simpMessagingTemplate;
     ObjectMapper objectMapper = new ObjectMapper();
     private static final String DRIVE_INFORMATION_URL = "/drive-information";
@@ -91,15 +94,19 @@ class UserDriveControllerTest {
 
         when(userService.findUserByEmail(email)).thenReturn(Optional.of(userEntity));
         when(cloudPlatformService.getUserCloudPlatform(email, ONEDRIVE, driveEmail)).thenReturn(cloudPlatform);
+        when(cloudPlatformService.isTokenRefreshNeeded(email, ONEDRIVE, driveEmail)).thenReturn(false);
         when(driveInformationService.getOneDriveInformation(decrypt(cloudPlatform.getAccessToken()), cloudPlatform.getAccessTokenExpiryDate())).thenReturn(expectedDriveInformationReponse);
 
         //when
         MvcResult mvcResult = mockMvc.perform(get(DRIVE_INFORMATION_URL)
                         .param("email", email)
-                        .param("provider", ONEDRIVE).param("driveEmail", driveEmail).with(csrf()))
-                //then
-                .andExpect(status().isOk()).andReturn();
+                        .param("provider", ONEDRIVE)
+                        .param("driveEmail", driveEmail)
+                        .with(csrf()))
+                .andExpect(status().isOk())
+                .andReturn();
 
+        //then
         DriveInformationReponse response = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), DriveInformationReponse.class);
         assertDriveInformationResponse(expectedDriveInformationReponse, response);
     }
@@ -145,26 +152,38 @@ class UserDriveControllerTest {
         //when
         ServletException exception = assertThrows(ServletException.class, () -> mockMvc.perform(get(DRIVE_INFORMATION_URL)
                 .param("email", email)
-                .param("provider", ONEDRIVE).param("driveEmail", driveEmail).with(csrf())).andReturn());
+                .param("provider", ONEDRIVE)
+                .param("driveEmail", driveEmail)
+                .with(csrf()))
+        );
+
         //then
-        assertEquals("Cloud platform not found OneDrive", exception.getRootCause().getMessage());
+        assertEquals("Cloud platform not found", exception.getRootCause().getMessage());
     }
 
     @Test
     @WithMockUser
-    void getUserDriveInformation_CloudPlatformNull_ThrowsException() {
+    void getUserDriveInformation_CloudPlatformNull_ThrowsException() throws Exception {
         //given
         UserEntity userEntity = generateUserEntityEnabled();
         String email = userEntity.getEmail();
+        String driveEmail = "email2@example.com";
 
-        when(userService.findUserByEmail(email)).thenThrow(new RuntimeException("User not found"));
+        when(userService.findUserByEmail(email)).thenReturn(Optional.of(userEntity));
+        when(cloudPlatformService.getUserCloudPlatform(email, ONEDRIVE, driveEmail)).thenReturn(null);
+        when(cloudPlatformService.isTokenRefreshNeeded(email, ONEDRIVE, driveEmail)).thenReturn(false);
 
         //when
-        ServletException exception = assertThrows(ServletException.class, () -> mockMvc.perform(get(DRIVE_INFORMATION_URL)
-                .param("email", email)
-                .param("provider", ONEDRIVE).param("driveEmail", email).with(csrf())).andReturn());
+        ServletException exception = assertThrows(ServletException.class, () ->
+                mockMvc.perform(get(DRIVE_INFORMATION_URL)
+                        .param("email", email)
+                        .param("provider", ONEDRIVE)
+                        .param("driveEmail", driveEmail)
+                        .with(csrf()))
+        );
 
-        assertEquals("User not found", exception.getRootCause().getMessage());
+        //then
+        assertEquals("Cloud platform not found", exception.getRootCause().getMessage());
     }
 
     @Test
