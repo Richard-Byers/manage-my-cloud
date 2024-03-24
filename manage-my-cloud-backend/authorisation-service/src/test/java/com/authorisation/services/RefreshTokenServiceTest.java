@@ -19,7 +19,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class RefreshTokenServiceTest {
+class RefreshTokenServiceTest {
 
     @Mock
     private RefreshTokenRepository refreshTokenRepository;
@@ -32,7 +32,7 @@ public class RefreshTokenServiceTest {
 
     @Test
     void createRefreshtoken_existingToken_updatesToken() {
-        // Arrange
+        // Given
         String email = "test@example.com";
         RefreshToken existingToken = new RefreshToken();
         existingToken.setToken(UUID.randomUUID().toString());
@@ -40,10 +40,10 @@ public class RefreshTokenServiceTest {
         when(refreshTokenRepository.findByUserEntityEmail(email)).thenReturn(Optional.of(existingToken));
         when(refreshTokenRepository.save(any(RefreshToken.class))).thenReturn(existingToken);
 
-        // Act
+        // When
         RefreshToken result = refreshTokenService.createRefreshtoken(email);
 
-        // Assert
+        // Then
         assertNotNull(result.getToken());
         assertTrue(result.getExpiryDate().isAfter(Instant.now()));
         verify(refreshTokenRepository).save(any(RefreshToken.class));
@@ -51,7 +51,7 @@ public class RefreshTokenServiceTest {
 
     @Test
     void createRefreshtoken_noExistingToken_createsNewToken() {
-        // Arrange
+        // Given
         String email = "test@example.com";
         UserEntity userEntity = new UserEntity();
         userEntity.setEmail(email);
@@ -60,49 +60,49 @@ public class RefreshTokenServiceTest {
         RefreshToken expectedRefreshToken = new RefreshToken();
         when(refreshTokenRepository.save(any(RefreshToken.class))).thenReturn(expectedRefreshToken);
 
-        // Act
+        // When
         RefreshToken result = refreshTokenService.createRefreshtoken(email);
 
-        // Assert
+        // Then
         assertNotNull(result);
         assertEquals(expectedRefreshToken, result);
     }
 
     @Test
     void findByToken_existingToken_returnsToken() {
-        // Arrange
+        // Given
         String token = UUID.randomUUID().toString();
         RefreshToken existingToken = new RefreshToken();
         when(refreshTokenRepository.findByToken(token)).thenReturn(Optional.of(existingToken));
 
-        // Act
+        // When
         Optional<RefreshToken> result = refreshTokenService.findByToken(token);
 
-        // Assert
+        // Then
         assertTrue(result.isPresent());
         assertEquals(existingToken, result.get());
     }
 
     @Test
     void verifyExpiration_tokenNotExpired_returnsToken() {
-        // Arrange
+        // Given
         RefreshToken token = new RefreshToken();
         token.setExpiryDate(Instant.now().plusMillis(3600000)); // 1 hour in the future
 
-        // Act
+        // When
         RefreshToken result = refreshTokenService.verifyExpiration(token);
 
-        // Assert
+        // Then
         assertEquals(token, result);
     }
 
     @Test
     void verifyExpiration_tokenExpired_throwsException() {
-        // Arrange
+        // Given
         RefreshToken token = new RefreshToken();
         token.setExpiryDate(Instant.now().minusMillis(3600000)); // 1 hour in the past
 
-        // Act and Assert
+        // When and Then
         assertThrows(RuntimeException.class, () -> refreshTokenService.verifyExpiration(token));
     }
 }

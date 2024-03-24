@@ -64,8 +64,6 @@ class AuthControllerTest {
         // when
         given(userService.login(credentialsDtoRequest)).willReturn(expected);
         given(userAuthenticationProvider.createToken(expected.getEmail())).willReturn(expected.getToken());
-        //This is a pain as it saves it in the DB, so I can't make it a String
-        // as I need it to save in the DB in the correct columns so may come back and try do this properly
         given(refreshTokenService.createRefreshtoken(anyString())).willReturn(mockRefreshToken);
 
         MvcResult mvcResult =
