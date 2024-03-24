@@ -75,4 +75,16 @@ public class JsonUtils {
         }
         return node;
     }
+
+    public static JsonNode extractChildren(JsonNode files) {
+        ObjectMapper mapper = new ObjectMapper();
+        ArrayNode childrenArray = (ArrayNode) files.get("children");
+        ObjectNode childrenObject = mapper.createObjectNode();
+
+        for (int i = 0; i < childrenArray.size(); i++) {
+            JsonNode child = childrenArray.get(i);
+            childrenObject.set(child.get("id").asText(), child);
+        }
+        return childrenObject;
+    }
 }
