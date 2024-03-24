@@ -28,6 +28,10 @@ public class UserEntityGivens {
         return new UserEntity(1L, "John", "Doe", false, TESTER_EMAIL, "password", "USER", true, "GOOGLE", new LinkedAccounts(), null);
     }
 
+    public static UserEntity generateUserEntityFirstLogin() {
+        return new UserEntity(1L, "John", "Doe", true,"johndoe@gmail.com", "password", "USER", true, null, new LinkedAccounts(), null);
+    }
+
     public static String generateUserData() {
         return "Email: managemycloudtester@gmail.com\n" +
                 "First Name: test\n" +

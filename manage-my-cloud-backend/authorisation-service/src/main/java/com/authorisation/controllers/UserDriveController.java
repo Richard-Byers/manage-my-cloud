@@ -38,7 +38,7 @@ public class UserDriveController {
 
         CloudPlatform cloudPlatform = cloudPlatformService.getUserCloudPlatform(email, connectionProvider, driveEmail);
         if (cloudPlatform == null) {
-            throw new RuntimeException("Cloud platform not found");
+            throw new RuntimeException(String.format("Cloud platform not found %s", connectionProvider));
         }
 
         if (connectionProvider.equals(ONEDRIVE) && cloudPlatformService.isTokenRefreshNeeded(email, connectionProvider, driveEmail)) {
@@ -47,10 +47,6 @@ public class UserDriveController {
 
         UserEntity userEntity = userService.findUserByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
         cloudPlatform = cloudPlatformService.getUserCloudPlatform(userEntity.getEmail(), connectionProvider, driveEmail);
-
-        if (cloudPlatform == null) {
-            throw new RuntimeException(String.format("Cloud platform not found %s", connectionProvider));
-        }
 
         if (connectionProvider.equals(ONEDRIVE)) {
             String accessToken = decrypt(cloudPlatform.getAccessToken());
@@ -197,14 +193,14 @@ public class UserDriveController {
 
         if (connectionProvider.equals(ONEDRIVE)) {
             try {
-                JsonNode jsonNode = driveInformationService.getDuplicatesFoundByAI( ONEDRIVE, files);
+                JsonNode jsonNode = driveInformationService.getDuplicatesFoundByAI(ONEDRIVE, files);
                 return ResponseEntity.ok(jsonNode);
             } catch (Exception e) {
                 return ResponseEntity.badRequest().build();
             }
         } else if (connectionProvider.equals(GOOGLEDRIVE)) {
             try {
-                JsonNode jsonNode = driveInformationService.getDuplicatesFoundByAI( GOOGLEDRIVE, files);
+                JsonNode jsonNode = driveInformationService.getDuplicatesFoundByAI(GOOGLEDRIVE, files);
                 return ResponseEntity.ok(jsonNode);
             } catch (Exception e) {
                 return ResponseEntity.badRequest().build();

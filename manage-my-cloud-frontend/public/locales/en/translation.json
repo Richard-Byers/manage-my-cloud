@@ -203,7 +203,7 @@
       "termsOfServiceTitle": "Terms of Service"
     },
     "successModal": {
-      "title": "Success",
+      "title": "Successfully updated preferences",
       "closeButton": "Close"
     }
   },

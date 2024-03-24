@@ -1,15 +1,17 @@
-import React, { MouseEvent } from 'react';
+import React, {MouseEvent} from 'react';
 import '../Modal.css';
-import { useTranslation } from 'react-i18next';
+import {useTranslation} from 'react-i18next';
 import CloseIcon from '@mui/icons-material/Close';
+import {Success} from "../../helpers/Success";
+import './SuccessModal.css';
 
 interface SuccessModalProps {
     show: boolean;
     onClose: () => void;
 }
 
-function SuccessModal({ show, onClose }: SuccessModalProps) {
-    const { t } = useTranslation();
+function SuccessModal({show, onClose}: SuccessModalProps) {
+    const {t} = useTranslation();
     if (!show) {
         return null;
     }
@@ -21,10 +23,13 @@ function SuccessModal({ show, onClose }: SuccessModalProps) {
     return (
         <div className="modal-overlay" onClick={onClose}>
             <div className="modal" onClick={stopPropagation}>
-                <button className="modal-close-button" onClick={onClose}>
-                    <CloseIcon />
+                <button className={"modal-close-button"} onClick={onClose}>
+                    <CloseIcon className="svg_icons"/>
                 </button>
-                <h2 style={{color: 'green'}}>{t('main.successModal.title')}</h2>
+                <div className={"success-modal-container"}>
+                    <h2 style={{color: 'green'}}>{t('main.successModal.title')}</h2>
+                    <Success/>
+                </div>
             </div>
         </div>
     );

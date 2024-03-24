@@ -158,7 +158,7 @@ class UserDriveControllerTest {
         );
 
         //then
-        assertEquals("Cloud platform not found", exception.getRootCause().getMessage());
+        assertEquals("Cloud platform not found OneDrive", exception.getRootCause().getMessage());
     }
 
     @Test
@@ -183,7 +183,7 @@ class UserDriveControllerTest {
         );
 
         //then
-        assertEquals("Cloud platform not found", exception.getRootCause().getMessage());
+        assertEquals("Cloud platform not found OneDrive", exception.getRootCause().getMessage());
     }
 
     @Test
