@@ -559,13 +559,14 @@ public class DriveInformationServiceTest {
 
                 String result = DriveInformationService.chatDiscussionWithAI(files, "GoogleDrive", 0);
                 ObjectMapper objectMapper = new ObjectMapper();
-                JsonNode expectedResult = objectMapper.readTree("{\"id\":null,\"name\":\"root\",\"type\":\"Folder\",\"createdDateTime\":null,\"lastModifiedDateTime\":null,\"webUrl\":null,\"children\":[{\"id\":\"123\",\"name\":\"file.txt\",\"type\":\"file\",\"createdDateTime\":null,\"lastModifiedDateTime\":null,\"webUrl\":\"https://example.com/file.txt\",\"children\":[],\"emails\":null},{\"id\":\"456\",\"name\":\"file.txt\",\"type\":\"file\",\"createdDateTime\":null,\"lastModifiedDateTime\":null,\"webUrl\":\"https://example.com/file.txt\",\"children\":[],\"emails\":null}],\"emails\":null}");
+                JsonNode expectedResult = objectMapper.readTree("{\"id\":null,\"name\":\"root\",\"type\":\"Folder\",\"createdDateTime\":null,\"lastModifiedDateTime\":null,\"webUrl\":null,\"children\":[{\"id\":\"123\",\"name\":\"file.txt\",\"type\":\"file\",\"createdDateTime\":null,\"lastModifiedDateTime\":null,\"webUrl\":\"https://example.com/file.txt\",\"children\":[],\"emails\":null,\"gaveGmailPermissions\":false},{\"id\":\"456\",\"name\":\"file.txt\",\"type\":\"file\",\"createdDateTime\":null,\"lastModifiedDateTime\":null,\"webUrl\":\"https://example.com/file.txt\",\"children\":[],\"emails\":null,\"gaveGmailPermissions\":false}],\"emails\":null,\"gaveGmailPermissions\":false}");
                 String expectedResultAsString = objectMapper.writeValueAsString(expectedResult);
 
                 assertEquals(expectedResultAsString, result);
             }
         }
     }
+
 
     @Test
     public void testChatDiscussionWithAI_InvalidResponseFormat() throws IOException {
