@@ -591,4 +591,18 @@ class UserServiceTest {
         //then
         assertEquals(expectedMessage, actualException.getMessage());
     }
+
+    @Test
+    void updateFirstLogin_firstLoginUpdated() {
+        //given
+        Optional<UserEntity> userEntity = Optional.of(generateUserEntityFirstLogin());
+
+        //when
+        given(userEntityRepository.findByEmail(userEntity.get().getEmail())).willReturn(userEntity);
+        userService.updateFirstLogin(userEntity.get().getEmail());
+
+        //then
+        assertFalse(userEntity.get().isFirstLogin());
+        verify(userEntityRepository).save(userEntity.get());
+    }
 }

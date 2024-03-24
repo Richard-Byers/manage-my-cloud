@@ -201,6 +201,10 @@
     "termsOfServiceModal": {
       "viewTermsOfService": "View Terms of Service",
       "termsOfServiceTitle": "Terms of Service"
+    },
+    "successModal": {
+      "title": "Successfully updated preferences",
+      "closeButton": "Close"
     }
   },
   "helpers": {

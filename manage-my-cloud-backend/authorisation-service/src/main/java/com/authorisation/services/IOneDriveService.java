@@ -7,4 +7,6 @@ public interface IOneDriveService {
     OneDriveTokenResponse getAndStoreUserTokens(String authCode, String email);
     void unlinkOneDrive(String email, String driveEmail);
 
+    OneDriveTokenResponse refreshToken(String refreshToken, String driveEmail, String email);
+
 }

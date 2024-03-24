@@ -3,6 +3,7 @@ package com.authorisation.controllers;
 import com.authorisation.entities.CloudPlatform;
 import com.authorisation.entities.UserEntity;
 import com.authorisation.services.CloudPlatformService;
+import com.authorisation.services.OneDriveService;
 import com.authorisation.services.UserService;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.RequiredArgsConstructor;
@@ -28,18 +29,24 @@ public class UserDriveController {
     private final UserService userService;
     private final CloudPlatformService cloudPlatformService;
     private final SimpMessagingTemplate simpMessagingTemplate;
+    private final OneDriveService oneDriveService;
 
     @GetMapping("/drive-information")
     public ResponseEntity<DriveInformationReponse> getUserDriveInformation(@RequestParam("email") String email,
                                                                            @RequestParam("provider") String connectionProvider,
                                                                            @RequestParam("driveEmail") String driveEmail) {
 
-        UserEntity userEntity = userService.findUserByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
-        CloudPlatform cloudPlatform = cloudPlatformService.getUserCloudPlatform(userEntity.getEmail(), connectionProvider, driveEmail);
-
+        CloudPlatform cloudPlatform = cloudPlatformService.getUserCloudPlatform(email, connectionProvider, driveEmail);
         if (cloudPlatform == null) {
             throw new RuntimeException(String.format("Cloud platform not found %s", connectionProvider));
         }
+
+        if (connectionProvider.equals(ONEDRIVE) && cloudPlatformService.isTokenRefreshNeeded(email, connectionProvider, driveEmail)) {
+            oneDriveService.refreshToken(cloudPlatform.getRefreshToken(), driveEmail, email);
+        }
+
+        UserEntity userEntity = userService.findUserByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
+        cloudPlatform = cloudPlatformService.getUserCloudPlatform(userEntity.getEmail(), connectionProvider, driveEmail);
 
         if (connectionProvider.equals(ONEDRIVE)) {
             String accessToken = decrypt(cloudPlatform.getAccessToken());
@@ -74,6 +81,10 @@ public class UserDriveController {
 
         if (cloudPlatform == null) {
             throw new RuntimeException(String.format("Cloud platform not found %s", connectionProvider));
+        }
+
+        if (connectionProvider.equals(ONEDRIVE) && cloudPlatformService.isTokenRefreshNeeded(email, connectionProvider, driveEmail)) {
+            oneDriveService.refreshToken(cloudPlatform.getRefreshToken(), driveEmail, email);
         }
 
         if (connectionProvider.equals(ONEDRIVE)) {
@@ -128,6 +139,10 @@ public class UserDriveController {
             throw new RuntimeException(String.format("Cloud platform not found %s", connectionProvider));
         }
 
+        if (connectionProvider.equals(ONEDRIVE) && cloudPlatformService.isTokenRefreshNeeded(email, connectionProvider, driveEmail)) {
+            oneDriveService.refreshToken(cloudPlatform.getRefreshToken(), driveEmail, email);
+        }
+
         if (connectionProvider.equals(ONEDRIVE)) {
             String accessToken = decrypt(cloudPlatform.getAccessToken());
             Date accessTokenExpiryDate = cloudPlatform.getAccessTokenExpiryDate();
@@ -172,17 +187,20 @@ public class UserDriveController {
         if (cloudPlatform == null) {
             throw new RuntimeException(String.format("Cloud platform not found %s", connectionProvider));
         }
+        if (connectionProvider.equals(ONEDRIVE) && cloudPlatformService.isTokenRefreshNeeded(email, connectionProvider, driveEmail)) {
+            oneDriveService.refreshToken(cloudPlatform.getRefreshToken(), driveEmail, email);
+        }
 
         if (connectionProvider.equals(ONEDRIVE)) {
             try {
-                JsonNode jsonNode = driveInformationService.getDuplicatesFoundByAI( ONEDRIVE, files);
+                JsonNode jsonNode = driveInformationService.getDuplicatesFoundByAI(ONEDRIVE, files);
                 return ResponseEntity.ok(jsonNode);
             } catch (Exception e) {
                 return ResponseEntity.badRequest().build();
             }
         } else if (connectionProvider.equals(GOOGLEDRIVE)) {
             try {
-                JsonNode jsonNode = driveInformationService.getDuplicatesFoundByAI( GOOGLEDRIVE, files);
+                JsonNode jsonNode = driveInformationService.getDuplicatesFoundByAI(GOOGLEDRIVE, files);
                 return ResponseEntity.ok(jsonNode);
             } catch (Exception e) {
                 return ResponseEntity.badRequest().build();

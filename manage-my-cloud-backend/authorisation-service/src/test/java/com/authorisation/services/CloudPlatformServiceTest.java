@@ -13,8 +13,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
+import static com.authorisation.Constants.EXPIRATION_THRESHOLD_MILLISECONDS;
 import static com.authorisation.givens.CloudPlatformGivens.generateCloudPlatform;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -164,6 +166,17 @@ class CloudPlatformServiceTest {
     }
 
     @Test
+    void saveCloudPlatform_SavesCloudPlatform() {
+        CloudPlatform cloudPlatform = new CloudPlatform();
+
+        cloudPlatformService.saveCloudPlatform(cloudPlatform);
+
+        verify(cloudPlatformRepository, times(1)).save(cloudPlatform);
+    }
+
+
+
+    @Test
     void isDriveLinked_returnsTrue() {
         String userEmail = "email@example.com";
         String platformName = "provider";
@@ -187,5 +200,62 @@ class CloudPlatformServiceTest {
         boolean driveLinked = cloudPlatformService.isDriveLinked(userEmail, platformName, driveEmail);
 
         assertFalse(driveLinked);
+    }
+
+    @Test
+    void testIsTokenRefreshNeeded() {
+        String userEmail = "user@example.com";
+        String platformName = "OneDrive";
+        String driveEmail = "drive@example.com";
+
+        // Token is not about to expire
+        CloudPlatform cloudPlatformFutureExpiry = new CloudPlatform();
+        cloudPlatformFutureExpiry.setAccessTokenExpiryDate(new Date(System.currentTimeMillis() + 3600 * 1000)); // 1 hour in the future
+
+        when(cloudPlatformService.getUserCloudPlatform(userEmail, platformName, driveEmail)).thenReturn(cloudPlatformFutureExpiry);
+        assertFalse(cloudPlatformService.isTokenRefreshNeeded(userEmail, platformName, driveEmail));
+
+        // Token has expired
+        CloudPlatform cloudPlatformPastExpiry = new CloudPlatform();
+        cloudPlatformPastExpiry.setAccessTokenExpiryDate(new Date(System.currentTimeMillis() - 3600 * 1000)); // 1 hour in the past
+
+        when(cloudPlatformService.getUserCloudPlatform(userEmail, platformName, driveEmail)).thenReturn(cloudPlatformPastExpiry);
+        assertTrue(cloudPlatformService.isTokenRefreshNeeded(userEmail, platformName, driveEmail));
+    }
+
+    @Test
+    void testIsTokenRefreshNeeded_TokenAboutToExpire() {
+        // Given
+        String userEmail = "user@example.com";
+        String platformName = "OneDrive";
+        String driveEmail = "drive@example.com";
+        CloudPlatform cloudPlatform = new CloudPlatform();
+        cloudPlatform.setAccessTokenExpiryDate(new Date(System.currentTimeMillis() + EXPIRATION_THRESHOLD_MILLISECONDS - 1000)); // Token is about to expire
+
+        when(cloudPlatformService.getUserCloudPlatform(userEmail, platformName, driveEmail)).thenReturn(cloudPlatform);
+
+        // When
+        boolean result = cloudPlatformService.isTokenRefreshNeeded(userEmail, platformName, driveEmail);
+
+        // Then
+        assertTrue(result);
+    }
+
+    @Test
+    void testIsTokenRefreshNeeded_TokenNotAboutToExpire() {
+        // Given
+        String userEmail = "user@example.com";
+        String platformName = "OneDrive";
+        String driveEmail = "drive@example.com";
+        CloudPlatform cloudPlatform = new CloudPlatform();
+        cloudPlatform.setAccessTokenExpiryDate(new Date(System.currentTimeMillis() + EXPIRATION_THRESHOLD_MILLISECONDS + 1000)); // Token is not about to expire
+
+        when(cloudPlatformService.getUserCloudPlatform(userEmail, platformName, driveEmail)).thenReturn(cloudPlatform);
+
+        // When
+        boolean result = cloudPlatformService.isTokenRefreshNeeded(userEmail, platformName, driveEmail);
+
+        // Then
+        assertFalse(result);
     }
 }
