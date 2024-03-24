@@ -4,18 +4,18 @@ import {CONNECTION_LOGOS, CONNECTION_TITLE} from "../../../constants/ConnectionC
 import RemoveConnectionModal from "../../modals/managingConnections/RemoveConnectionModal";
 
 interface ConnectionProps {
-    connectionProvider: string,
-    isConnected: boolean | number
+    accountType: string,
+    accountEmail: string
 }
 
-const Connection: React.FC<ConnectionProps> = ({connectionProvider, isConnected}) => {
-
+const Connection: React.FC<ConnectionProps> = ({accountType, accountEmail}) => {
 
     return (
-        <div className={"connection-container"}>
-            <img src={CONNECTION_LOGOS[connectionProvider]} alt={`Logo for ${connectionProvider}`}/>
-            <p>{CONNECTION_TITLE[connectionProvider]}</p>
-            <RemoveConnectionModal connectionProvider={CONNECTION_TITLE[connectionProvider]}/>
+        <div className={"connection-container"} id={`${accountType}-container`}>
+            <img src={CONNECTION_LOGOS[accountType]} alt={`Logo for ${accountType}`}/>
+            <p className={"linked-drive-information-text"} id={"linked-drive-type"}>{CONNECTION_TITLE[accountType]}</p>
+            <p className={"linked-drive-information-text"} id={"linked-drive-email"}>{accountEmail}</p>
+            <RemoveConnectionModal connectionProvider={CONNECTION_TITLE[accountType]} driveEmail={accountEmail}/>
         </div>
     )
 }

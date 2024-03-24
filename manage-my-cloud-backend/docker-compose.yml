@@ -2,8 +2,8 @@ version: "3.1"
 
 services:
   manage-my-cloud:
-    image: manage-my-cloud:latest
-    container_name: manage-my-cloud
+    image: manage-my-cloud-backend:latest
+    container_name: manage-my-cloud-backend
     ports:
       - "8080:8080"
     depends_on:
@@ -11,9 +11,19 @@ services:
     environment:
       - ONEDRIVE_CLIENT_ID=
       - ONEDRIVE_CLIENT_SECRET=
-      - ONEDRIVE_REDIRECT_URI=
+      - ONEDRIVE_REDIRECT_URI=http://localhost:3000/manage-connections
       - MMC_EMAIL_PASSWORD=
-      - "SPRING_PROFILES_ACTIVE=dev"
+      - GOOGLE_CREDENTIALS_JSON=
+      - OPENAI_API_KEY=
+      - WEB_CONFIG_ENVIRONMENT=development
+      - ENCRYPTION_SECRET_KEY=
+      - JWT_SECRET_KEY=
+      - "SPRING_PROFILES_ACTIVE=docker"
+  manage-my-cloud-frontend:
+    image: manage-my-cloud-frontend:latest
+    container_name: manage-my-cloud-frontend
+    ports:
+      - "3000:3000"
   postgres:
     image: postgres:latest
     container_name: postgres

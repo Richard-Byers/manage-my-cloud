@@ -1,0 +1,38 @@
+.profile-img-button {
+    position: relative;
+    overflow: hidden;
+    border-radius: 50%;
+    width: 200px;
+    height: 200px;
+    background-color: #ffffff;
+    background-size: cover;
+    background-position: center;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: none;
+}
+
+.profile-img-button::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: inherit;
+    filter: blur(0px);
+    transition: filter 0.3s ease;
+}
+
+.profile-img-button:hover::before {
+    filter: blur(2px);
+}
+
+.profile-img-button:hover::after {
+    content: "⬆";
+    position: absolute;
+    font-size: 140px;
+    color: grey;
+}

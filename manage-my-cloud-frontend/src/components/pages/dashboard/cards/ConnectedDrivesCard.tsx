@@ -1,75 +1,93 @@
-import React from 'react';
+import React, {useRef, useState} from 'react';
 import './ConnectedDrivesCard.css';
 import {AuthData} from "../../../routing/AuthWrapper";
 import {buildAxiosRequestWithHeaders} from "../../../helpers/AxiosHelper";
 import {CONNECTION_LOGOS, CONNECTION_TITLE} from "../../../../constants/ConnectionConstants";
 import LoadingSpinner from "../../../helpers/LoadingSpinner";
 import StorageProgressBar from "../storage_bar/StorageProgressBar";
+import DashboardCardModal from "../../../modals/dashboard/DashboardCardModal";
+import {useTranslation} from "react-i18next";
 
 interface DriveInformation {
     displayName: string,
-    driveType: string,
+    email: string,
     total: number,
     used: number,
 }
 
 interface ConnectedDrivesCardProps {
     connectionProvider: string,
+    driveEmail: string
 }
 
-const CardContainer: React.FC<ConnectedDrivesCardProps> = ({connectionProvider}) => {
+const CardContainer: React.FC<ConnectedDrivesCardProps> = ({connectionProvider, driveEmail}) => {
 
     const {user} = AuthData();
+    const {t} = useTranslation();
     const [driveInformation, setDriveInformation] = React.useState<DriveInformation | null>(null);
+    const [dashboardModal, setShowDashboardModal] = useState(false);
 
+    const toggleModal = () => {
+        setShowDashboardModal(!dashboardModal);
+    }
+
+    const shouldRun = useRef(true);
     React.useEffect(() => {
+        if (!shouldRun.current) return;
+        shouldRun.current = false;
         const fetchDriveInformation = async () => {
-            const info = await getUserDrives(user, connectionProvider);
+            const info = await getUserDrives(user, connectionProvider, driveEmail);
             setDriveInformation(info);
         };
 
         fetchDriveInformation();
-    }, [user]);
+    }, [user, connectionProvider]);
 
     if (!driveInformation) {
         return <LoadingSpinner/>
     }
 
     return (
-        <div className="dashboard-connection-item">
-            <img src={CONNECTION_LOGOS[connectionProvider]}
-                 alt={`Logo for ${connectionProvider}`}/>
-            <div className="item-drive-name">
-                <h2>{driveInformation.displayName}</h2>
+        <>
+            {driveInformation && dashboardModal &&
+                <DashboardCardModal setShowModal={setShowDashboardModal} showModal={dashboardModal}
+                                    connectionProvider={connectionProvider}
+                                    totalStorage={driveInformation.total}
+                                    usedStorage={driveInformation.used}
+                                    email={driveInformation.email}
+                                    driveEmail={driveEmail}/>}
+            <div className="dashboard-connection-item" onClick={toggleModal}
+                 id={`${connectionProvider}-connected-item`}>
+                <img src={CONNECTION_LOGOS[connectionProvider]}
+                     alt={`Logo for ${connectionProvider}`}/>
+                <div className="item-drive-name" id={"drive-name"}>
+                    <h2>{driveInformation.displayName}</h2>
+                </div>
+                <div className='item-storage-used' id={"drive-used-storage"}>
+                    <h2>{t('main.dashboard.connectedDrivesCard.storageUsed')}:</h2>
+                    <h2>{driveInformation.used > 0.0 ? driveInformation.used : "< 0"}GB/{driveInformation.total}GB</h2>
+                </div>
+                <StorageProgressBar used={driveInformation.used} total={driveInformation.total}/>
             </div>
-            <div className="item-drive-type">
-                <h2>Drive Type:</h2>
-                <h2>{driveInformation.driveType}</h2>
-            </div>
-            <div className='item-storage-used'>
-                <h2>Storage Used:</h2>
-                <h2>{driveInformation.used}GB/{driveInformation.total}GB</h2>
-            </div>
-            <StorageProgressBar used={driveInformation.used} total={driveInformation.total}/>
-        </div>
+        </>
     );
 }
 
-async function getUserDrives(user: any, connectionProvider: string): Promise<DriveInformation> {
+async function getUserDrives(user: any, connectionProvider: string, driveEmail: string): Promise<DriveInformation> {
 
     const headers = {
         'Authorization': `Bearer ${user.token}`
     }
 
     const connectionProviderTitle = CONNECTION_TITLE[connectionProvider];
-    const response = await buildAxiosRequestWithHeaders('GET', `/drive-information?email=${user.email}&provider=${connectionProviderTitle}`, headers, {});
+    const response = await buildAxiosRequestWithHeaders('GET', `/drive-information?email=${user.email}&provider=${connectionProviderTitle}&driveEmail=${driveEmail}`, headers, {});
 
     if (!response.data) {
         throw new Error('Invalid response data');
     }
     return {
         displayName: response.data.displayName,
-        driveType: response.data.driveType,
+        email: response.data.email,
         total: response.data.total,
         used: response.data.used,
     };

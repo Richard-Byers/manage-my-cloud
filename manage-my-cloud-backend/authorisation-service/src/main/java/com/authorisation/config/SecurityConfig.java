@@ -28,6 +28,9 @@ public class SecurityConfig {
                 .and()
                 .authorizeHttpRequests(requests -> requests
                         .requestMatchers("/register/**").permitAll()
+                        .requestMatchers("/progress/**").permitAll()
+                        .requestMatchers("/recommendation-progress/**").permitAll()
+                        .requestMatchers("/deletion-progress/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/registergoogleuser").permitAll()
                         .requestMatchers(HttpMethod.POST, "/refresh-token").permitAll()

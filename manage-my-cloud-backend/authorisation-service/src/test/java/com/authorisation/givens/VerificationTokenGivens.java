@@ -16,13 +16,14 @@ public class VerificationTokenGivens {
                 1L,
                 "John",
                 "Doe",
+                false,
                 "johndoe@gmail.com",
                 "password",
                 "USER",
                 true,
                 null,
-                null,
-                new LinkedAccounts()
+                new LinkedAccounts(),
+                null
         ));
         return verificationToken;
     }
@@ -35,13 +36,14 @@ public class VerificationTokenGivens {
                 1L,
                 "John",
                 "Doe",
+                false,
                 "johndoe@gmail.com",
                 "password",
                 "USER",
                 false,
                 null,
-                null,
-                new LinkedAccounts()
+                new LinkedAccounts(),
+                null
         ));
         return verificationToken;
     }

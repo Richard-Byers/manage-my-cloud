@@ -1,25 +1,26 @@
 import Navbar from "../../nav/Navbar";
-import React, {useEffect} from "react";
+import React, {useEffect, useRef} from "react";
 import './ManageConnectionsPage.css';
-import { useTranslation } from 'react-i18next';
+import {useTranslation} from 'react-i18next';
 import {AuthData} from "../../routing/AuthWrapper";
 import AddConnectionsModal from "../../modals/managingConnections/AddConnectionsModal"
 import {buildAxiosRequestWithHeaders} from "../../helpers/AxiosHelper";
 import Connection from "./Connection";
+import ToolTip from "../../ui_components/ToolTip";
+import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 
 const ManageConnectionsPage = () => {
-    const { t } = useTranslation();
+    const {t} = useTranslation();
     const {user, refreshUser} = AuthData();
-
-    const linkedAccountsArray = Object.entries(user?.linkedAccounts || {})
-        .filter(([key]) => key !== 'linkedAccountsCount')
-        .map(([key, value]) => ({key, value}));
 
     const linkAccountsClassname = user?.linkedAccounts.linkedAccountsCount === 0 ?
         "manage-connections-page-link-accounts-container-center" :
         "manage-connections-page-link-accounts-container";
 
+    const shouldRun = useRef(true);
     useEffect(() => {
+        if (!shouldRun.current) return;
+        shouldRun.current = false;
         const urlSearchParams = new URLSearchParams(window.location.search);
         const code = urlSearchParams.get('code');
         refreshUser(user?.email);
@@ -45,29 +46,37 @@ const ManageConnectionsPage = () => {
             <div className={"manage-connections-page-content-grid"}>
                 <div className="manage-connections-page-title-container">
                     {t('main.manageConnectionsPage.title')}
+                    <ToolTip
+                        message={t("main.tooltip.manageConnections.manageConnectionMain")}
+                        children={<HelpOutlineIcon/>}/>
                 </div>
 
-                {user?.linkedAccounts.linkedAccountsCount === 0 ? (
-                    <>
-                        <div className={linkAccountsClassname}>
-                            <div className={"manage-connections-page-link-text"}>
-                                To link an account press the button below
-                            </div>
-                            <AddConnectionsModal oneDrive={user?.linkedAccounts.oneDrive}
-                                                 googleDrive={user?.linkedAccounts.googleDrive}/>
+                {user?.linkedAccounts.linkedAccountsCount === 0 ?
+
+                    <div className={linkAccountsClassname}>
+                        <div className={"manage-connections-page-link-text"}>
+                            {t('main.manageConnectionsPage.linkButton')}
                         </div>
-                    </>) : linkedAccountsArray.filter(({value}) => value).map(({
-                                                                                   key,
-                                                                                   value
-                                                                               }) => (
-                    <Connection key={key} connectionProvider={key} isConnected={value}/>
-                ))}
+                        <AddConnectionsModal/>
+                    </div>
+                    : null
+                }
+
+                {user?.linkedAccounts.linkedAccountsCount === 0 ? null :
+                    <div className="overflow-container">
+                        {user?.linkedAccounts.linkedAccountsCount === 0 ? null
+                            :
+                            user?.linkedAccounts.linkedDriveAccounts.map(({accountEmail, accountType}) => (
+                                <Connection key={accountEmail} accountEmail={accountEmail} accountType={accountType}/>
+                            ))}
+                    </div>
+                }
 
                 {user?.linkedAccounts.linkedAccountsCount !== undefined && user?.linkedAccounts.linkedAccountsCount >= 1 ? (
                     <div className={"manage-connections-page-link-button-container"}>
-                        <AddConnectionsModal oneDrive={user?.linkedAccounts.oneDrive}
-                                             googleDrive={user?.linkedAccounts.googleDrive}/>
+                        <AddConnectionsModal/>
                     </div>) : null}
+
             </div>
         </div>
     )

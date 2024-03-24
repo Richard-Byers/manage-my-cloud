@@ -1,18 +1,12 @@
-.dashboard-button-container{
+.dashboard-button-container {
     display: flex;
     justify-content: flex-end;
     align-items: center;
+    gap: 1em;
 }
 
-.dashboard-button-container button:first-child{
-    margin-right: auto;
-}
-
-.dashboard-button-container button:nth-child(2){
-    margin-right: 2vh;
-}
-
-.dashboard-button{
+.dashboard-button {
+    width: 100%;
     justify-content: center;
     align-items: center;
     border-radius: 10px;
@@ -23,12 +17,155 @@
     padding: 0.8em 1.6em;
     border: none;
     cursor: pointer;
-    box-shadow: 6px 9px 5px 0px rgba(0,0,0,0.18);
-    -webkit-box-shadow: 6px 9px 5px 0px rgba(0,0,0,0.18);
-    -moz-box-shadow: 6px 9px 5px 0px rgba(0,0,0,0.18);
+    box-shadow: 6px 9px 5px 0px rgba(0, 0, 0, 0.18);
+    -webkit-box-shadow: 6px 9px 5px 0px rgba(0, 0, 0, 0.18);
+    -moz-box-shadow: 6px 9px 5px 0px rgba(0, 0, 0, 0.18);
 }
 
-.dashboard-button:hover{
+.dashboard-button:hover {
     background: #5ab06b;
     transition: 0.2s ease-in-out;
+}
+
+.recommended-file-button-container {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    margin-top: 2vh;
+    grid-row: 3 / span 1;
+    grid-column: 1 / span 2;
+}
+
+.success-button-container{
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    grid-row: 3 / span 1;
+    grid-column: 1 / span 2;
+}
+
+.success-button-container p {
+    margin: 1em 0 0 0;
+}
+
+.deletion-recommendation-description {
+    width: 70%;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    align-self: center;
+}
+
+.deletion-recommendation-select-all-description {
+    margin: 0;
+    padding-left: 1.1em;
+    display: flex;
+    justify-content: center;
+    align-self: flex-start;
+    align-content: center;
+    align-items: center;
+}
+
+.deletion-recommendation-container {
+    grid-row: 1 / span 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.dashboard-page-buttons-modal-grid {
+    display: grid;
+    justify-content: center;
+    grid-template-columns: auto;
+    grid-template-rows: 1fr;
+    gap: 10px;
+    max-width: 100%;
+    height: 100%;
+    padding: 1em;
+}
+
+.deletion-recommendation-file-container {
+    grid-row: 2 / span 1;
+    width: 100%;
+    height: 50vh;
+    overflow: auto;
+}
+
+.deletion-recommendation-files-grid {
+    display: grid;
+    justify-items: center;
+    align-items: flex-start;
+    grid-template-columns: repeat(2, 1fr);
+    height: fit-content;
+    padding: 0.1em;
+    gap: 1em;
+}
+
+.item-recommendation-count-container {
+    display: flex;
+    gap: 0.1em;
+    height: fit-content;
+}
+
+.item-recommendation-count-container h2{
+    margin: 0;
+}
+
+@media only screen and (max-width: 768px) {
+
+    .item-recommendation-count-container {
+        flex-direction: column;
+    }
+
+    .deletion-recommendation-select-all-description{
+        padding: 0;
+    }
+
+    .deletion-recommendation-files-grid {
+        width: 100%;
+        grid-template-columns: repeat(1, 1fr);
+        padding: 0;
+    }
+
+    .dashboard-button-container {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 1em;
+        padding-bottom: 10px;
+    }
+
+    .deletion-recommendation-file-container {
+        grid-row: 2 / span 1;
+        display: flex;
+        width: 100%;
+        height: 50vh;
+        overflow: auto;
+        padding: 0.2em;
+    }
+
+    .deletion-recommendation-container {
+        grid-row: 1 / span 3;
+    }
+
+    .deletion-recommendation-container h2 {
+        font-size: 1em;
+        margin-bottom: 0;
+    }
+
+    .deletion-recommendation-container p {
+        width: auto;
+        font-size: 0.8em;
+    }
+
+    .dashboard-page-buttons-modal-grid {
+        display: grid;
+        grid-template-columns: 100%;
+        grid-template-rows: 24vh 50vh auto;
+        overflow-y: auto;
+    }
 }

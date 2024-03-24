@@ -32,6 +32,7 @@ import static com.authorisation.givens.UserEntityGivens.generateUserEntity;
 import static com.authorisation.givens.VerificationTokenGivens.generateDisabledEntityToken;
 import static com.authorisation.givens.VerificationTokenGivens.generateEnabledEntityToken;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
@@ -44,6 +45,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith(MockitoExtension.class)
 class RegistrationControllerTest {
 
+    private static final String REGISTER_URL = "/register";
+    private static final String VERIFY_EMAIL = REGISTER_URL + "/verifyEmail";
+    private static final String RESEND_VERIFICATION_EMAIL = REGISTER_URL + "/resendVerificationEmail";
+    private static final String RESET_USER_PASSWORD = REGISTER_URL + "/resetUserPassword";
+    private static final String RESET_PASSWORD = REGISTER_URL + "/resetPassword";
+    ObjectMapper objectMapper = new ObjectMapper();
     @Autowired
     private MockMvc mockMvc;
     @MockBean
@@ -56,13 +63,6 @@ class RegistrationControllerTest {
     private RegistrationCompleteEventListener eventListener;
     @MockBean
     private PasswordResetTokenRepository passwordResetTokenRepository;
-
-    private static final String REGISTER_URL = "/register";
-    private static final String VERIFY_EMAIL = REGISTER_URL + "/verifyEmail";
-    private static final String RESEND_VERIFICATION_EMAIL = REGISTER_URL + "/resendVerificationEmail";
-    private static final String RESET_USER_PASSWORD = REGISTER_URL + "/resetUserPassword";
-    private static final String RESET_PASSWORD = REGISTER_URL + "/resetPassword";
-    ObjectMapper objectMapper = new ObjectMapper();
 
     @Test
     void registrationController_register_returnsOkWithVerificationEmail() throws Exception {
@@ -106,11 +106,11 @@ class RegistrationControllerTest {
                                         .contentType("application/json")
                                         .content(objectMapper.writeValueAsString(registrationRequest)))
                         // then
-                        .andExpect(status().isBadRequest())
+                        .andExpect(status().isOk())
                         .andReturn();
-        UserAlreadyExistsException actualMessage = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), UserAlreadyExistsException.class);
+        String actualMessage = mvcResult.getResponse().getContentAsString();
         //then
-        assertEquals(expectedException.getMessage(), actualMessage.getMessage());
+        assertEquals(expectedException.getMessage(), actualMessage);
     }
 
     @Test
@@ -118,7 +118,6 @@ class RegistrationControllerTest {
         // given
         String tokenRequest = "token";
         VerificationToken expectedVerificationToken = generateEnabledEntityToken();
-        String expectedMessage = "this account has already been verified, please login";
 
         // when
         given(verificationTokenRepository.findByToken(tokenRequest)).willReturn(expectedVerificationToken);
@@ -126,14 +125,12 @@ class RegistrationControllerTest {
                 mockMvc
                         .perform(
                                 get(VERIFY_EMAIL)
-                                        .contentType("application/json").queryParam("token", tokenRequest))
+                                        .param("token", tokenRequest)
+                        )
                         // then
-                        .andExpect(status().isOk())
+                        .andExpect(status().isFound())
+                        .andExpect(result -> assertTrue(result.getResponse().getRedirectedUrl().contains("/login?message=already_verified")))
                         .andReturn();
-        String actualMessage = mvcResult.getResponse().getContentAsString();
-
-        //then
-        assertEquals(expectedMessage, actualMessage);
     }
 
     @Test
@@ -141,23 +138,20 @@ class RegistrationControllerTest {
         // given
         String tokenRequest = "token";
         VerificationToken expectedVerificationToken = generateDisabledEntityToken();
-        String expectedMessage = "The link is invalid or broken, <a href=\"http://localhost:80/register/resendVerificationEmail?token=token\">Click Here</a> to resend verification email";
 
         // when
         given(verificationTokenRepository.findByToken(tokenRequest)).willReturn(expectedVerificationToken);
         given(userService.validateToken(tokenRequest)).willReturn("Invalid verification token");
-        MvcResult mvcResult =
-                mockMvc
-                        .perform(
-                                get(VERIFY_EMAIL)
-                                        .contentType("application/json").queryParam("token", tokenRequest))
-                        // then
-                        .andExpect(status().isOk())
-                        .andReturn();
-        String actualMessage = mvcResult.getResponse().getContentAsString();
 
-        //then
-        assertEquals(expectedMessage, actualMessage);
+        mockMvc
+                .perform(
+                        get(VERIFY_EMAIL)
+                                .param("token", tokenRequest)
+                )
+                // then
+                .andExpect(status().isFound())
+                .andExpect(result -> assertTrue(result.getResponse().getRedirectedUrl().contains("http://localhost:3000/login?message=link_broken&resendLink=http://localhost:80/register/resendVerificationEmail?token=token")));
+
     }
 
     @Test
@@ -165,23 +159,20 @@ class RegistrationControllerTest {
         // given
         String tokenRequest = "token";
         VerificationToken expectedVerificationToken = generateDisabledEntityToken();
-        String expectedMessage = "Email has been verified successfully. You can now login";
 
         // when
         given(verificationTokenRepository.findByToken(tokenRequest)).willReturn(expectedVerificationToken);
         given(userService.validateToken(tokenRequest)).willReturn("valid");
-        MvcResult mvcResult =
-                mockMvc
-                        .perform(
-                                get(VERIFY_EMAIL)
-                                        .contentType("application/json").queryParam("token", tokenRequest))
-                        // then
-                        .andExpect(status().isOk())
-                        .andReturn();
-        String actualMessage = mvcResult.getResponse().getContentAsString();
 
-        //then
-        assertEquals(expectedMessage, actualMessage);
+        mockMvc
+                .perform(
+                        get(VERIFY_EMAIL)
+                                .param("token", tokenRequest)
+                )
+                // then
+                .andExpect(status().isFound())
+                .andExpect(result -> assertTrue(result.getResponse().getRedirectedUrl().contains("/login?message=verification_success")));
+
     }
 
     @Test
@@ -238,7 +229,7 @@ class RegistrationControllerTest {
         // given
         PasswordResetRequest passwordResetRequest = generatePasswordResetRequest();
         Optional<UserEntity> expectedUserEntity = Optional.of(generateUserEntity());
-        String expectedMessage = String.format("A new password reset link has been sent to %s. Please check your email", expectedUserEntity.get().getEmail());
+        String expectedMessage = expectedUserEntity.get().getEmail();
 
         // when
         given(userService.findUserByEmail(passwordResetRequest.getEmail())).willReturn(expectedUserEntity);
@@ -264,7 +255,7 @@ class RegistrationControllerTest {
         // given
         PasswordResetRequest passwordResetRequest = generatePasswordResetRequest();
         Optional<UserEntity> expectedUserEntity = Optional.empty();
-        String expectedMessage = String.format("No user found with email %s", passwordResetRequest.getEmail());
+        String expectedMessage = "User is not registered";
 
         // when
         given(userService.findUserByEmail(passwordResetRequest.getEmail())).willReturn(expectedUserEntity);

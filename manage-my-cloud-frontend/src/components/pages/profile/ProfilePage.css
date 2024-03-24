@@ -1,38 +1,72 @@
 .profile-page-content-grid {
-    justify-content: center;
-    display: grid;
-    grid-template-columns: 24% 24% 24% 24%;
-    grid-template-rows: auto auto;
-    grid-gap: 1em;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 60vh;
     margin: 0 2%;
 }
 
-.profile-page-title-container {
-    font-family: MontserratBold, serif;
-    font-size: 2.5rem;
-    color: white;
-    grid-row: 1 / 1;
-    grid-column: 1 / 1;
+.main-card-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    height: 70vh;
+    width: 50%;
+    background: #FFF;
+    box-shadow: 10px 10px 5px 0px rgba(0, 0, 0, 0.18);
+    -webkit-box-shadow: 10px 10px 5px 0px rgba(0, 0, 0, 0.18);
+    -moz-box-shadow: 10px 10px 5px 0px rgba(0, 0, 0, 0.18);
+    border-radius: 20px;
+    padding: 1em;
 }
 
-.user-profile-card-container {
-    grid-row: 2 / 2;
-    grid-column: span 2;
+.profile-page-navigation-bar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    gap: 2em;
+    height: fit-content;
+    padding: 0.3em;
+    margin-bottom: 1em;
 }
 
-.profile-actions-card-container {
-    grid-row: 2 / 2;
-    grid-column: 3 / 4;
+.profile-page-navigation-bar button {
+    background: none;
+    color: black;
+    border: none;
+    cursor: pointer;
+    font-size: 1.6rem;
+    font-family: montserratregular, serif;
 }
 
-.profile-preferences-card-container {
-    grid-row: 2 / 2;
-    grid-column: 4 / 4;
-
+.profile-page-navigation-bar button:hover {
+    color: #218b97;
+    text-decoration: underline;
 }
 
-body {
-    height: 100%;
-    margin: 0;
-    background: linear-gradient(180deg, #16969E 0%, #04D3E0 50%, #4382AB 100%) no-repeat fixed;
+@media only screen and (max-width: 820px) {
+
+    .main-card-container{
+        width: 80%;
+        height: 80vh;
+    }
+
+    .profile-page-navigation-bar{
+        box-shadow: none;
+        gap: 0.5em;
+    }
+
+    .profile-page-navigation-bar button{
+        font-size: 1.1rem;
+    }
+
+    .profile-page-content-grid{
+        margin: 0;
+        width: 100%;
+    }
+
 }

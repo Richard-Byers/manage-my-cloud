@@ -1,29 +1,63 @@
 
-.connection-container{
-    padding-top: 0.5em;
+.connection-container {
     display: flex;
     flex-direction: column;
-    align-items: center;
     justify-content: center;
-    width: 100%;
-    height: auto;
-    background-color: white;
-    color: black;
+    align-items: center;
+    width: 23%;
+    height: 34vh;
+    background-color: rgb(254, 254, 254);
+    padding: 1em;
+    font-weight: 700;
+    text-align: center;
     border-radius: 10px;
-    box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.18);
-    -webkit-box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.18);
-    -moz-box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.18);
-    transition: 0.2s ease-in-out;
+    box-shadow: 10px 10px 5px 0px rgba(0, 0, 0, 0.18);
+    -webkit-box-shadow: 10px 10px 5px 0px rgba(0, 0, 0, 0.18);
+    -moz-box-shadow: 10px 10px 5px 0px rgba(0, 0, 0, 0.18);
+    transition: transform 0.2s ease-in-out;
 }
 
 .connection-container img {
-    width: 80%;
-    height: 80%;
+    width: 50%;
+    height: 50%;
     object-fit: contain;
 }
 
-.connection-container p {
+.linked-drive-information-text {
     margin: 0.5em 0 0.5em 0;
-    font-size: 1.8rem;
-    font-family: MontserratBold, serif;
+    font-size: 1.2rem;
+    font-family: MontserratRegular, serif;
+    word-wrap: anywhere;
+}
+
+@media only screen and (max-width: 940px) {
+
+    .connection-container {
+        height: auto;
+        width: 75%;
+    }
+
+    .connection-container img {
+        width: 35%;
+        height: 35%;
+        object-fit: contain;
+    }
+
+    .linked-drive-information-text {
+        font-size: 1rem;
+    }
+
+}
+
+/* For mobile screens */
+@media only screen and (max-width: 500px) {
+    .connection-container {
+        height: 22vh;
+        width: 75%;
+        grid-column: 1 / span 4;
+    }
+
+    .linked-drive-information-text p {
+        font-size: 0.8rem;
+    }
 }

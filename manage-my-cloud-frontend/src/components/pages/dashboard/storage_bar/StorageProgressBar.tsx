@@ -19,7 +19,7 @@ const StorageProgressBar: React.FC<StorageProgressBarProps> = ({ used, total }) 
     }
 
     return (
-        <div className="progress-bar">
+        <div className="storage-progress-bar" id={"storage-used-progress-bar"}>
             <span className="progress-bar-label">{percentageUsed}%</span>
             <div className="progress-bar-fill" style={{ width: `${percentageUsed}%`, backgroundColor: color }}></div>
         </div>

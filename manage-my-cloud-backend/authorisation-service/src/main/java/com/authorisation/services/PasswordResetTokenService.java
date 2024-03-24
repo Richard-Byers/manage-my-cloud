@@ -1,7 +1,7 @@
 package com.authorisation.services;
 
-import com.authorisation.entities.UserEntity;
 import com.authorisation.entities.PasswordResetToken;
+import com.authorisation.entities.UserEntity;
 import com.authorisation.registration.password.PasswordResetRequest;
 import com.authorisation.repositories.PasswordResetTokenRepository;
 import lombok.RequiredArgsConstructor;

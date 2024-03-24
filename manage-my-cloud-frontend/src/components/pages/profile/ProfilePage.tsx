@@ -1,37 +1,59 @@
-import React, {useEffect} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import './ProfilePage.css';
 import Navbar from '../../nav/Navbar';
 import ProfileActionsCard from './cards/ProfileActionsCard';
 import UserProfileCard from "./cards/UserProfileCard";
 import ProfilePreferencesCard from "./cards/ProfilePreferencesCard";
-import { useTranslation } from 'react-i18next'; 
-
+import {useTranslation} from 'react-i18next';
+import {AuthData} from "../../routing/AuthWrapper";
 
 const ProfilePage = () => {
-    const { t } = useTranslation();
+    const {t} = useTranslation();
+    const [activeCard, setActiveCard] = useState('userProfile');
+    const {user, refreshUser} = AuthData();
 
+    const shouldRun = useRef(true);
     useEffect(() => {
+        if (!shouldRun.current) return;
+        shouldRun.current = false;
         document.body.style.overflow = "hidden";
+    
+        if (user && user.email) {
+            refreshUser(user.email);
+        }
     }, []);
 
+    const handleCardChange = (cardName: React.SetStateAction<string>) => {
+        setActiveCard(cardName);
+    }
+
     return (
-        <div>
+        <>
             <Navbar/>
             <div className={"profile-page-content-grid"}>
-                <div className={"profile-page-title-container"}>
-                    {t('main.profile.title')}
-                </div>
-                <div className={"user-profile-card-container"}>
-                    <UserProfileCard/>
-                </div>
-                <div className={"profile-actions-card-container"}>
-                    <ProfileActionsCard/>
-                </div>
-                <div className={"profile-preferences-card-container"}>
-                    <ProfilePreferencesCard/>
+                <div className={"main-card-container"}>
+                    <div className={"profile-page-navigation-bar"} id={"profile-navigation-menu"}>
+                        <button onClick={() => handleCardChange('userProfile')}
+                                id={"user-profile-button"}>{t("main.profile.profileButton")}</button>
+                        <button
+                            onClick={() => handleCardChange('profilePreferences')}
+                            id={"user-preferences-button"}>{t("main.profile.preferencesButton")}</button>
+                        <button
+                            onClick={() => handleCardChange('profileActions')}
+                            id={"user-profile-actions-button"}>{t("main.profile.profileActionsButton")}</button>
+                    </div>
+                    {activeCard === 'userProfile' &&
+                        <UserProfileCard/>
+                    }
+                    {activeCard === 'profilePreferences' &&
+                        <ProfilePreferencesCard/>
+                    }
+                    {activeCard === 'profileActions' &&
+                        <ProfileActionsCard/>
+                    }
                 </div>
             </div>
-        </div>
+        </>
     )
 };
 

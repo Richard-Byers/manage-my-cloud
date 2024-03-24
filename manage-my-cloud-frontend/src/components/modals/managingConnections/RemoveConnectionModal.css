@@ -13,7 +13,7 @@
 }
 
 .remove-connections-unlink-button:hover {
-    background-color: #da0000;
+    background-color: #ce0000;
 }
 
 .remove-connections-modal {
@@ -27,32 +27,36 @@
     border-radius: 8px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
     text-align: center;
-    font-family: MontserratBold, serif;
     font-size: 1.2rem;
     animation: fadeInPopUp 0.3s ease-in-out;
 }
 
 .remove-connections-modal button {
-    font-family: MontserratBold, serif;
+    font-family: MontserratMedium, serif;
     font-size: 1.2rem;
     padding: 0.5em 1em;
 }
 
-.remove-connections-modal p {
+.unlink-confirmation-text{
+    display: flex;
+    word-wrap: normal;
+    justify-content: center;
     grid-column: 1 / -1;
     grid-row: 1;
-    font-size: 1.5rem;
-    font-weight: 600;
     margin: 0;
+    font-family: MontserratRegular, serif;
 }
 
 .yes-button {
-    background-color: #e60000;
+    background-color: #b50000;
     color: #ffffff;
     border: none;
     border-radius: 5px;
     cursor: pointer;
     transition: all 0.2s ease-in-out;
+    box-shadow: 10px 10px 5px 0px rgba(0, 0, 0, 0.18);
+    -webkit-box-shadow: 10px 10px 5px 0px rgba(0, 0, 0, 0.18);
+    -moz-box-shadow: 10px 10px 5px 0px rgba(0, 0, 0, 0.18);
 }
 
 .yes-button:hover {
@@ -66,8 +70,34 @@
     border-radius: 5px;
     cursor: pointer;
     transition: all 0.2s ease-in-out;
+    box-shadow: 10px 10px 5px 0px rgba(0, 0, 0, 0.18);
+    -webkit-box-shadow: 10px 10px 5px 0px rgba(0, 0, 0, 0.18);
+    -moz-box-shadow: 10px 10px 5px 0px rgba(0, 0, 0, 0.18);
 }
 
 .no-button:hover {
     background-color: #29d754;
+}
+
+@media only screen and (max-width: 768px) {
+    .remove-connections-unlink-button{
+        font-size: 1rem;
+    }
+
+    .remove-connections-modal {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        height: 100%;
+        font-size: 1rem;
+    }
+
+    .unlink-confirmation-text{
+        font-size: 1.2rem;
+    }
+}
+
+/* For mobile screens */
+@media only screen and (max-width: 500px) {
+
 }

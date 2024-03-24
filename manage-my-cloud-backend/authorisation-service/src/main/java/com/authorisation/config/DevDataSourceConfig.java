@@ -1,11 +1,10 @@
 package com.authorisation.config;
 
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
-
-import com.zaxxer.hikari.HikariConfig;
-import com.zaxxer.hikari.HikariDataSource;
 
 import javax.sql.DataSource;
 
@@ -13,10 +12,11 @@ import javax.sql.DataSource;
 @Profile("dev")
 public class DevDataSourceConfig {
 
+    // Create connection to local postgres docker database if running the auth service using dev profile
     @Bean
     public DataSource createDevConnectionPool() {
         HikariConfig config = new HikariConfig();
-        config.setJdbcUrl(String.format("jdbc:postgresql://postgres/%s", "postgres"));
+        config.setJdbcUrl(String.format("jdbc:postgresql://localhost/%s", "postgres"));
         config.setUsername("postgres");
         config.setPassword("postgres");
 

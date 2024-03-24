@@ -11,11 +11,11 @@ interface ConnectionTitles {
 }
 
 export const CONNECTION_LOGOS: ConnectionLogos = {
-    oneDrive : OneDriveLogo,
-    googleDrive : GoogleDriveLogo
+    OneDrive : OneDriveLogo,
+    GoogleDrive : GoogleDriveLogo
 }
 
 export const CONNECTION_TITLE: ConnectionTitles = {
-    oneDrive : "OneDrive",
-    googleDrive : "GoogleDrive"
+    OneDrive : "OneDrive",
+    GoogleDrive : "GoogleDrive"
 }

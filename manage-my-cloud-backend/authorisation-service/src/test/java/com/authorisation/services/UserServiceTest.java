@@ -1,7 +1,10 @@
 package com.authorisation.services;
 
 import com.authorisation.dto.CredentialsDto;
+import com.authorisation.dto.EmailDto;
 import com.authorisation.dto.UserDto;
+import com.authorisation.entities.CloudPlatform;
+import com.authorisation.entities.RecommendationSettings;
 import com.authorisation.entities.UserEntity;
 import com.authorisation.entities.VerificationToken;
 import com.authorisation.exception.InvalidPasswordException;
@@ -9,12 +12,18 @@ import com.authorisation.exception.UserAlreadyExistsException;
 import com.authorisation.exception.UserNotFoundException;
 import com.authorisation.exception.UserNotVerifiedException;
 import com.authorisation.mappers.UserMapper;
+import com.authorisation.mappers.UserPreferencesMapper;
+import com.authorisation.pojo.Account;
 import com.authorisation.registration.RegistrationRequest;
 import com.authorisation.registration.password.PasswordResetRequest;
+import com.authorisation.repositories.CloudPlatformRepository;
+import com.authorisation.repositories.RecommendationSettingsRepository;
 import com.authorisation.repositories.UserEntityRepository;
 import com.authorisation.repositories.VerificationTokenRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mmc.pojo.UserPreferences;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -25,18 +34,20 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
+import static com.authorisation.givens.CloudPlatformGivens.generateCloudPlatform;
 import static com.authorisation.givens.CredentialsGivens.generateCredentialsDto;
+import static com.authorisation.givens.CredentialsGivens.generateEmailDto;
+import static com.authorisation.givens.RecommendationSettingsGivens.generateRecommendationSettings;
 import static com.authorisation.givens.RegistrationRequestGivens.generateRegistrationRequest;
-import static com.authorisation.givens.UserEntityGivens.generateUserEntity;
-import static com.authorisation.givens.UserEntityGivens.generateUserEntityEnabled;
+import static com.authorisation.givens.UserEntityGivens.*;
 import static com.authorisation.givens.VerificationTokenGivens.generateDisabledEntityToken;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.*;
 
 @SpringBootTest(classes = UserService.class)
 @ExtendWith(MockitoExtension.class)
@@ -47,13 +58,18 @@ class UserServiceTest {
     private UserEntityRepository userEntityRepository;
     @MockBean
     private VerificationTokenRepository verificationTokenRepository;
+    @MockBean
+    private RecommendationSettingsRepository recommendationSettingsRepository;
+    @MockBean
+    private CloudPlatformRepository cloudPlatformRepository;
     @Autowired
     private PasswordEncoder passwordEncoder;
     @MockBean
     private PasswordResetTokenService passwordResetTokenService;
-    @MockBean
+    @Autowired
     private UserMapper userMapper;
-
+    @Autowired
+    private UserPreferencesMapper userPreferencesMapper;
     @Autowired
     private UserService userService;
 
@@ -77,10 +93,46 @@ class UserServiceTest {
         //given
         UserEntity expecteduserEntity = generateUserEntity();
         RegistrationRequest registrationRequest = generateRegistrationRequest();
-        UserAlreadyExistsException expected = new UserAlreadyExistsException(String.format("User with email %s already exists", registrationRequest.email()));
+        UserAlreadyExistsException expected = new UserAlreadyExistsException("User already exists");
 
         //when
         given(userEntityRepository.findByEmail(registrationRequest.email())).willReturn(Optional.of(expecteduserEntity));
+
+        UserAlreadyExistsException actual = assertThrows(UserAlreadyExistsException.class, () -> userService.registerUser(registrationRequest));
+        //then
+        assertEquals(expected.getMessage(), actual.getMessage());
+    }
+
+    @Test
+    void registerGoogleUser_userDoesntAlreadyExist_returnsNewUserEntity() {
+        //given
+        UserEntity expectedUserEntity = generateGoogleUserEntity();
+        RegistrationRequest registrationRequest = generateRegistrationRequest();
+        String pictureUrl = "picture";
+        byte[] mockImageBytes = new byte[0];
+
+        UserService userServiceSpy = Mockito.spy(userService);
+        doReturn(mockImageBytes).when(userServiceSpy).loadGoogleProfileImage(pictureUrl);
+
+        //when
+        given(userEntityRepository.findByEmail(registrationRequest.email())).willReturn(Optional.empty());
+        given(userEntityRepository.save(any(UserEntity.class))).willReturn(expectedUserEntity);
+
+        UserEntity actualResult = userServiceSpy.registerGoogleUser(registrationRequest.email(), registrationRequest.firstName(), registrationRequest.lastName(), pictureUrl);
+        //then
+        assertEquals(expectedUserEntity.getEmail(), actualResult.getEmail());
+        assertArrayEquals(mockImageBytes, actualResult.getProfileImage());
+    }
+
+    @Test
+    void registerGoogleUser_userExists_throwsUserAlreadyExistsException() {
+        //given
+        UserEntity expectedUserEntity = generateGoogleUserEntity();
+        RegistrationRequest registrationRequest = generateRegistrationRequest();
+        UserAlreadyExistsException expected = new UserAlreadyExistsException("User already exists");
+
+        //when
+        given(userEntityRepository.findByEmail(registrationRequest.email())).willReturn(Optional.of(expectedUserEntity));
 
         UserAlreadyExistsException actual = assertThrows(UserAlreadyExistsException.class, () -> userService.registerUser(registrationRequest));
         //then
@@ -327,5 +379,216 @@ class UserServiceTest {
         verify(userEntityRepository).save(userEntity);
     }
 
+    @Test
+    void getUserRecommendationSettings_returnsRecommendationSettings() {
+        //given
+        UserEntity userEntity = generateUserEntityEnabled();
+        RecommendationSettings recommendationSettings = generateRecommendationSettings(userEntity);
+        UserPreferences expectedUserPreferences = userPreferencesMapper.toUserPreferences(recommendationSettings);
 
+        //when
+        given(userEntityRepository.findByEmail(userEntity.getEmail())).willReturn(Optional.of(userEntity));
+        given(recommendationSettingsRepository.findByUserEntityEmail(userEntity.getEmail())).willReturn(recommendationSettings);
+        UserPreferences userPreferences = userService.getUserRecommendationSettings(userEntity.getEmail());
+
+        //then
+        assertEquals(expectedUserPreferences.isDeleteDocuments(), userPreferences.isDeleteDocuments());
+        assertEquals(expectedUserPreferences.isDeleteImages(), userPreferences.isDeleteImages());
+        assertEquals(expectedUserPreferences.isDeleteVideos(), userPreferences.isDeleteVideos());
+        assertEquals(expectedUserPreferences.isDeleteEmails(), userPreferences.isDeleteEmails());
+        assertEquals(expectedUserPreferences.getDeleteItemsNotChangedSinceDays(), userPreferences.getDeleteItemsNotChangedSinceDays());
+        assertEquals(expectedUserPreferences.getDeleteItemsCreatedAfterDays(), userPreferences.getDeleteItemsCreatedAfterDays());
+    }
+
+    @Test
+    void updateProfileImage_updatesProfileImage() {
+        //given
+        UserEntity userEntity = generateUserEntityEnabled();
+        byte[] newImage = new byte[10];
+
+        //when
+        given(userEntityRepository.save(any(UserEntity.class))).willReturn(userEntity);
+
+        userService.updateProfileImage(userEntity, newImage);
+        //then
+        assertEquals(newImage, userEntity.getProfileImage());
+    }
+
+    @Test
+    void updateDetails_updatesUserDetails() {
+        //given
+        UserEntity userEntity = generateUserEntityEnabled();
+        String newFirstName = "NewFirstName";
+        String newLastName = "NewLastName";
+
+        //when
+        given(userEntityRepository.save(any(UserEntity.class))).willReturn(userEntity);
+
+        userService.updateDetails(userEntity, newFirstName, newLastName);
+        //then
+        assertEquals(newFirstName, userEntity.getFirstName());
+        assertEquals(newLastName, userEntity.getLastName());
+    }
+
+    @Test
+    void getUserData_returnsUserData() {
+        //given
+        UserEntity userEntity = generateUserEntityEnabled();
+        userEntity.getLinkedAccounts().setLinkedAccountsCount(1);
+        userEntity.getLinkedAccounts().setLinkedDriveAccounts(List.of(new Account("johndoe@gmail.com", "OneDrive"),
+                new Account("johndoe2@gmail.com", "GoogleDrive")));
+        String expectedData = String.format("Email: %s%nFirst Name: %s%nLast Name: %s%nLinked Drives: %s",
+                userEntity.getEmail(), userEntity.getFirstName(), userEntity.getLastName(), "[Drive Email: johndoe@gmail.com, Drive Type: OneDrive] [Drive Email: johndoe2@gmail.com, Drive Type: GoogleDrive] ");
+
+        //when
+        String actualData = userService.getUserData(userEntity);
+
+        //then
+        assertEquals(expectedData, actualData);
+    }
+
+    @Test
+    void deleteUser_deletesUser() {
+        //given
+        CredentialsDto credentialsDto = generateCredentialsDto();
+        UserEntity userEntity = generateUserEntityEnabled();
+        String password = passwordEncoder.encode("password");
+        userEntity.setPassword(password);
+        List<CloudPlatform> linkedAccounts = List.of(generateCloudPlatform());
+
+        //when
+        given(userEntityRepository.findByEmail(credentialsDto.getEmail())).willReturn(Optional.of(userEntity));
+        doNothing().when(recommendationSettingsRepository).deleteByUserEntityEmail(userEntity.getEmail());
+        given(cloudPlatformRepository.findAllByUserEntityEmail(userEntity.getEmail())).willReturn(linkedAccounts);
+        doNothing().when(cloudPlatformRepository).deleteAll(linkedAccounts);
+        doNothing().when(userEntityRepository).delete(userEntity);
+
+        userService.deleteUser(credentialsDto);
+
+        //then
+        verify(recommendationSettingsRepository).deleteByUserEntityEmail(userEntity.getEmail());
+        verify(cloudPlatformRepository).deleteAll(linkedAccounts);
+        verify(userEntityRepository).delete(userEntity);
+    }
+
+    @Test
+    void deleteUser_passwordsDontMatch_throwRuntimeException() {
+        //given
+        CredentialsDto credentialsDto = generateCredentialsDto();
+        UserEntity userEntity = generateUserEntityEnabled();
+        String password = passwordEncoder.encode("password1");
+        userEntity.setPassword(password);
+        String expectedMessage = "Password doesn't match";
+
+        //when
+        given(userEntityRepository.findByEmail(credentialsDto.getEmail())).willReturn(Optional.of(userEntity));
+
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> userService.deleteUser(credentialsDto));
+
+        //then
+        assertEquals(expectedMessage, exception.getMessage());
+    }
+
+    @Test
+    void deleteUser_nullCloudAccounts_deletesUser() {
+        //given
+        CredentialsDto credentialsDto = generateCredentialsDto();
+        UserEntity userEntity = generateUserEntityEnabled();
+        String password = passwordEncoder.encode("password");
+        userEntity.setPassword(password);
+
+        //when
+        given(userEntityRepository.findByEmail(credentialsDto.getEmail())).willReturn(Optional.of(userEntity));
+        doNothing().when(recommendationSettingsRepository).deleteByUserEntityEmail(userEntity.getEmail());
+        given(cloudPlatformRepository.findAllByUserEntityEmail(userEntity.getEmail())).willReturn(null);
+        doNothing().when(userEntityRepository).delete(userEntity);
+
+        userService.deleteUser(credentialsDto);
+
+        //then
+        verify(recommendationSettingsRepository).deleteByUserEntityEmail(userEntity.getEmail());
+        verify(userEntityRepository).delete(userEntity);
+    }
+
+    @Test
+    void deleteUser_deletingCloudAccount_throwsRuntimeException() {
+        //given
+        CredentialsDto credentialsDto = generateCredentialsDto();
+        UserEntity userEntity = generateUserEntityEnabled();
+        String password = passwordEncoder.encode("password");
+        userEntity.setPassword(password);
+        List<CloudPlatform> linkedAccounts = List.of(generateCloudPlatform());
+        String expectedMessage = "Error deleting cloud accounts";
+
+        //when
+        given(userEntityRepository.findByEmail(credentialsDto.getEmail())).willReturn(Optional.of(userEntity));
+        doNothing().when(recommendationSettingsRepository).deleteByUserEntityEmail(userEntity.getEmail());
+        doThrow(new RuntimeException()).when(cloudPlatformRepository).deleteAll(linkedAccounts);
+        given(cloudPlatformRepository.findAllByUserEntityEmail(userEntity.getEmail())).willReturn(linkedAccounts);
+
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> userService.deleteUser(credentialsDto));
+
+        //then
+        verify(recommendationSettingsRepository).deleteByUserEntityEmail(userEntity.getEmail());
+        verify(cloudPlatformRepository).deleteAll(linkedAccounts);
+        assertEquals(expectedMessage, exception.getMessage());
+    }
+
+    @Test
+    void googleLogin_userFound_returnsUser() {
+        //given
+        UserEntity userEntity = generateGoogleUserEntity();
+        UserDto expectedUserDto = userMapper.toUserDto(userEntity);
+
+        //when
+        given(userEntityRepository.findByEmail(userEntity.getEmail())).willReturn(Optional.of(userEntity));
+        UserDto actualUser = userService.googleLogin(userEntity.getEmail());
+
+        //then
+        assertEquals(expectedUserDto, actualUser);
+    }
+
+    @Test
+    void googleLogin_userNotFound_throwsUserNotFoundException() {
+        //given
+        UserEntity userEntity = generateGoogleUserEntity();
+        String expectedMessage = "Unknown user";
+
+        //when
+        given(userEntityRepository.findByEmail(userEntity.getEmail())).willReturn(Optional.empty());
+        UserNotFoundException actualException = assertThrows(UserNotFoundException.class, () -> userService.googleLogin(userEntity.getEmail()));
+
+        //then
+        assertEquals(expectedMessage, actualException.getMessage());
+    }
+
+    @Test
+    void refreshUser_userFound_returnsUser() {
+        //given
+        EmailDto emailDto = generateEmailDto();
+        UserEntity userEntity = generateGoogleUserEntity();
+        UserDto expectedUserDto = userMapper.toUserDto(userEntity);
+
+        //when
+        given(userEntityRepository.findByEmail(emailDto.getEmail())).willReturn(Optional.of(userEntity));
+        UserDto actualUser = userService.refreshUser(emailDto);
+
+        //then
+        assertEquals(expectedUserDto, actualUser);
+    }
+
+    @Test
+    void refreshUser_userNotFound_throwsUserNotFoundException() {
+        //given
+        EmailDto emailDto = generateEmailDto();
+        UserEntity userEntity = generateGoogleUserEntity();
+        String expectedMessage = "Unknown user";
+
+        //when
+        given(userEntityRepository.findByEmail(userEntity.getEmail())).willReturn(Optional.empty());
+        UserNotFoundException actualException = assertThrows(UserNotFoundException.class, () -> userService.refreshUser(emailDto));
+
+        //then
+        assertEquals(expectedMessage, actualException.getMessage());
+    }
 }

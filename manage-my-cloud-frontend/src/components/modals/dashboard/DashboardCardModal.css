@@ -1,0 +1,246 @@
+.dashboard-card-modal-grid {
+    display: grid;
+    grid-template-columns: auto auto auto;
+    grid-template-rows: 1fr;
+    gap: 0.8em;
+    max-width: 100%;
+    height: 100%;
+    padding: 1em;
+}
+
+.dashboard-card-modal-file-container {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    grid-column: 1/ span;
+    max-width: 100%;
+    width: 100%;
+    height: auto;
+    gap: 0.6em;
+    padding-bottom: 0.3em;
+    border-bottom: 1px solid black;
+}
+
+.dashboard-card-modal-file-container span {
+    font-size: 0.9rem;
+    word-wrap: anywhere;
+    margin-right: auto;
+}
+
+.dashboard-card-modal-drive-information {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    grid-column: 1/ span;
+    width: 22vw;
+    height: 100%;
+    border-right: 1px solid black;
+    padding-right: 1em;
+}
+
+.dashboard-card-modal-drive-information img {
+    height: 14vh;
+    object-fit: contain;
+}
+
+.dashboard-card-modal-drive-information p {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 0.5em;
+}
+
+.dashboard-card-modal-drive-information span {
+    font-size: 1.3rem;
+    margin: 1em 0 1em 0;
+    overflow-wrap: anywhere;
+}
+
+.dashboard-card-modal-drive-files-container {
+    display: flex;
+    flex-direction: column;
+    width: 30vw;
+    height: 65vh;
+    overflow: auto;
+}
+
+.dashboard-card-modal-drive-files-grid {
+    display: grid;
+    justify-items: center;
+    align-items: flex-start;
+    grid-template-columns: repeat(1, 1fr);
+    width: auto;
+    height: fit-content;
+    padding: 1em;
+    gap: 1em;
+}
+
+.google-drive-item-type-navigation-container {
+    display: flex;
+    justify-content: center;
+    gap: 1em;
+    padding: 1em;
+    position: sticky;
+    top: 0;
+    background: white;
+    width: auto;
+}
+
+.google-drive-item-type-navigation-container button {
+    display: flex;
+    align-items: center;
+    background: none;
+    border: none;
+    font-family: MontserratRegular, serif;
+    font-size: 1rem;
+    padding: 0.3em;
+    gap: 0.2em;
+    cursor: pointer;
+    background: rgb(100, 189, 120);
+    width: 8em;
+    border-radius: 0.1em;
+    transition: 0.1s ease-in-out;
+    color: white;
+    box-shadow: 6px 9px 5px 0px rgba(0, 0, 0, 0.18);
+    -webkit-box-shadow: 6px 9px 5px 0px rgba(0, 0, 0, 0.18);
+    -moz-box-shadow: 6px 9px 5px 0px rgba(0, 0, 0, 0.18);
+}
+
+.google-drive-item-type-navigation-container button:hover {
+    transform: scale(1.1);
+}
+
+.google-drive-item-type-navigation-container button:active {
+    transform: scale(1);
+}
+
+.svg-icon {
+    width: 5em;
+    height: 5em;
+    padding-bottom: 0.2em;
+    cursor: pointer;
+}
+
+.dashboard-page-buttons-container {
+    grid-row: 3 / span 1;
+    grid-column: 1 / span 2;
+}
+
+.dashboard-page-buttons-checkbox {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0;
+    width: 1.5rem;
+    height: 1.5rem;
+}
+
+.dashboard-page-buttons-select-all-checkbox {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 1.5rem;
+    height: 1.5rem;
+}
+
+@media only screen and (max-width: 768px) {
+
+    .google-drive-item-type-navigation-container {
+        width: 100%;
+        padding: 0.5em 0 0.5em 0;
+    }
+
+    .google-drive-item-type-navigation-container button {
+        width: 44%;
+        box-shadow: none;
+        height: 5vh;
+    }
+
+    .google-drive-item-type-navigation-container button:hover {
+        transform: scale(1);
+    }
+
+    .dashboard-card-modal-drive-files-grid {
+        width: 98%;
+        padding: 0;
+    }
+
+    .dashboard-card-modal-drive-files-container {
+        display: flex;
+        justify-content: flex-start;
+        width: 100%;
+        height: 100%;
+        grid-row: 2 / 2;
+        grid-column: 1 / 1;
+        padding: 0;
+    }
+
+    .dashboard-card-modal-grid {
+        display: grid;
+        grid-template-columns: 100%;
+        grid-template-rows: 20vh 50vh auto;
+        overflow-y: auto;
+    }
+
+    .dashboard-card-modal-drive-information {
+        height: fit-content;
+        width: 100%;
+        grid-row: 1 / 1;
+        grid-column: 1 / 1;
+        border: none;
+        padding: 0;
+    }
+
+    .dashboard-card-modal-drive-information p {
+        display: none;
+    }
+
+    .dashboard-card-modal-drive-information span {
+        font-size: 1.2rem;
+        margin: 0.3em 0 0.3em 0;
+        overflow-wrap: unset;
+    }
+
+    .dashboard-card-modal-drive-information img {
+        height: 10vh;
+        object-fit: contain;
+    }
+
+    .dashboard-card-modal-file-container {
+        width: 100%;
+    }
+
+    .dashboard-card-modal-file-container span {
+        display: flex;
+        width: 80%;
+    }
+
+    .dashboard-page-buttons-container {
+        height: fit-content;
+        width: 100%;
+        grid-row: 3 / span 1;
+        grid-column: 1 / 1;
+    }
+
+    .svg-icon {
+        width: 3em;
+        height: 3em;
+        padding-bottom: 0.2em;
+    }
+
+    .dashboard-card-modal-pie-chart {
+        display: none;
+    }
+}
+
+@media only screen and (max-width: 400px) {
+    .dashboard-card-modal-grid {
+        display: grid;
+        grid-template-columns: 100%;
+        grid-template-rows: 25vh 40vh auto;
+        overflow-y: auto;
+    }
+
+    .dashboard-card-modal-pie-chart {
+        display: none;
+    }
+}

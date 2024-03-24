@@ -1,15 +1,16 @@
 package com.authorisation.controllers;
 
 import com.authorisation.entities.PasswordResetToken;
+import com.authorisation.entities.UserEntity;
+import com.authorisation.entities.VerificationToken;
 import com.authorisation.event.RegistrationCompleteEvent;
 import com.authorisation.event.RegistrationCompleteEventListener;
 import com.authorisation.exception.EmailException;
+import com.authorisation.exception.UserAlreadyExistsException;
 import com.authorisation.registration.RegistrationRequest;
 import com.authorisation.registration.password.PasswordResetRequest;
-import com.authorisation.entities.VerificationToken;
 import com.authorisation.repositories.PasswordResetTokenRepository;
 import com.authorisation.repositories.VerificationTokenRepository;
-import com.authorisation.entities.UserEntity;
 import com.authorisation.services.UserService;
 import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -18,10 +19,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.view.RedirectView;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Optional;
 import java.util.UUID;
+
+import static com.authorisation.config.WebConfig.ENVIRONMENT;
 
 @Slf4j
 @RestController
@@ -45,31 +49,45 @@ public class RegistrationController {
     public String registerUser(@RequestBody RegistrationRequest registrationRequest, final HttpServletRequest request) {
 
         //Call register user method to register a user
-        UserEntity userEntity = userService.registerUser(registrationRequest);
+        try {
+            UserEntity userEntity = userService.registerUser(registrationRequest);
 
-        //Publish event for email sending
-        eventPublisher.publishEvent(new RegistrationCompleteEvent(userEntity, applicationUrl(request)));
+            //Publish event for email sending
+            eventPublisher.publishEvent(new RegistrationCompleteEvent(userEntity, applicationUrl(request)));
 
-        //Return the email of the user to use in the confirmation message
-        return userEntity.getEmail();
+            //Return the email of the user to use in the confirmation message
+            return userEntity.getEmail();
+        } catch (UserAlreadyExistsException e) {
+            return e.getMessage();
+        }
     }
 
     @GetMapping("verifyEmail")
-    public String verifyEmail(@RequestParam("token") String token) {
+    public RedirectView verifyEmail(@RequestParam("token") String token) {
         VerificationToken verificationToken = verificationTokenRepository.findByToken(token);
+        String redirectUrl;
+        String baseUrl;
 
-        if (verificationToken.getUserEntity().isEnabled()) {
-            return "this account has already been verified, please login";
-        }
-
-        String verificationResult = userService.validateToken(token);
-
-        if (verificationResult.equals("valid")) {
-            return "Email has been verified successfully. You can now login";
+        if (ENVIRONMENT != null && ENVIRONMENT.equals("production")) {
+            baseUrl = System.getenv("FRONTEND_URL");
         } else {
-            String resendUrl = applicationUrl(request) + "/register/resendVerificationEmail?token=" + token;
-            return "The link is invalid or broken, <a href=\"" + resendUrl + "\">Click Here</a> to resend verification email";
+            baseUrl = "http://localhost:3000";
         }
+
+        if (verificationToken == null || verificationToken.getUserEntity().isEnabled()) {
+            redirectUrl = String.format("%s/login?message=already_verified", baseUrl);
+        } else {
+            String verificationResult = userService.validateToken(token);
+
+            if ("valid".equals(verificationResult)) {
+                redirectUrl = String.format("%s/login?message=verification_success", baseUrl);
+            } else {
+                String resendUrl = applicationUrl(request) + "/register/resendVerificationEmail?token=" + token;
+                redirectUrl = String.format("%s/login?message=link_broken&resendLink=%s", baseUrl, resendUrl);
+            }
+        }
+
+        return new RedirectView(redirectUrl);
     }
 
     @GetMapping("/resendVerificationEmail")
@@ -89,12 +107,18 @@ public class RegistrationController {
         Optional<UserEntity> userEntity = userService.findUserByEmail(passwordResetRequest.getEmail());
 
         if (userEntity.isPresent()) {
+            Optional<PasswordResetToken> passwordResetTokenEntity = passwordResetTokenRepository.findByUserEntityId(userEntity.get().getId());
+
+            if (passwordResetTokenEntity.isPresent()) {
+                return "Password reset link already sent";
+            }
+
             String passwordResetToken = UUID.randomUUID().toString();
             userService.createPasswordResetToken(userEntity.get(), passwordResetToken, passwordResetRequest);
             sendPasswordResetEmailLink(userEntity.get(), applicationUrl(request), passwordResetToken);
-            return String.format("A new password reset link has been sent to %s. Please check your email", userEntity.get().getEmail());
+            return userEntity.get().getEmail();
         } else {
-            return String.format("No user found with email %s", passwordResetRequest.getEmail());
+            return "User is not registered";
         }
     }
 
@@ -128,7 +152,16 @@ public class RegistrationController {
     }
 
     public String applicationUrl(HttpServletRequest request) {
-        return "http://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath();
+
+        String prefix;
+
+        if (ENVIRONMENT != null && ENVIRONMENT.equals("production")) {
+            prefix = "https://";
+        } else {
+            prefix = "http://";
+        }
+
+        return prefix + request.getServerName() + ":" + request.getServerPort() + request.getContextPath();
     }
 
     private void sendPasswordResetEmailLink(UserEntity userEntity, String applicationUrl, String passwordResetToken) {

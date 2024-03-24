@@ -1,15 +1,14 @@
 package com.authorisation.config;
 
 
-import com.microsoft.graph.requests.GraphServiceClient;
 import org.mmc.drive.DriveInformationService;
 import org.slf4j.Logger;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
@@ -30,12 +29,25 @@ public class WebConfig {
         return org.slf4j.LoggerFactory.getLogger("com.authorisation");
     }
 
+    public static String ENVIRONMENT = System.getenv("WEB_CONFIG_ENVIRONMENT");
+
     @Bean
     public FilterRegistrationBean corsFilter() {
+
+        String allowedOrigin;
+
+        if (ENVIRONMENT != null && ENVIRONMENT.equals("production")) {
+            allowedOrigin = System.getenv("FRONTEND_URL");
+        } else {
+            allowedOrigin = "http://localhost:3000";
+        }
+
+        logger().info("Allowed origin: " + allowedOrigin);
+
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
-        config.addAllowedOrigin("http://localhost:3000");
+        config.addAllowedOrigin(allowedOrigin);
         config.setAllowedHeaders(Arrays.asList(
                 HttpHeaders.AUTHORIZATION,
                 HttpHeaders.CONTENT_TYPE,

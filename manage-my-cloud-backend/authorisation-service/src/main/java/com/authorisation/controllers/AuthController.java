@@ -9,13 +9,13 @@ import com.authorisation.requests.RefreshTokenRequest;
 import com.authorisation.response.JwtResponse;
 import com.authorisation.services.RefreshTokenService;
 import com.authorisation.services.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import jakarta.validation.Valid;
 
 @RequiredArgsConstructor
 @RestController
@@ -31,6 +31,7 @@ public class AuthController {
     public ResponseEntity<UserDto> login(@RequestBody @Valid CredentialsDto credentialsDto) {
         UserDto userDto = userService.login(credentialsDto);
         userDto.setToken(userAuthenticationProvider.createToken(userDto.getEmail()));
+        userService.updateFirstLogin(userDto.getEmail());
         RefreshToken refreshTokenObject = refreshTokenService.createRefreshtoken(userDto.getEmail());
         userDto.setRefreshToken(refreshTokenObject.getToken());
         return ResponseEntity.ok(userDto);

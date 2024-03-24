@@ -1,39 +1,224 @@
 {
-    "main": {
-      "header": "Manage My Cloud",
-      "dashboard": {
-        "title": "Dashboard",
-        "manageConnectionsTextBeforeLink": "To add or remove drives, please head to ",
-        "manageConnectionsLink": "Manage Connections"        
-      },
-      "landingPage": {
-        "mainText": "Optimise your cloud storage",
-        "subText": "and save money",
-        "subTextDescription": "We aim to de-clutter your cloud storage, \nsave you money, \nand reduce the cloud storage carbon footprint."
-      }, 
-      "manageConnectionsPage": {
-        "title": "Manage Connections"
-      },
+  "main": {
+    "header": "Manage My Cloud",
+    "welcome": {
+      "welcomeTo": "Welcome to Manage My Cloud",
+      "toGetStarted1": "To get started, you'll need to navigate to the ",
+      "toGetStarted2": "Manage Connections Page",
+      "toGetStarted3": " by clicking the button located in the navigation bar.",
+      "keepAnEyeOut1": "Keep an eye out for this icon",
+      "keepAnEyeOut2": " which will provide tips and insights into our features.",
+      "whenFinished1": "When you're finished reading, click the",
+      "whenFinished2": " button to close this message.",
+      "gotIt": "Got It!"
+    },
+    "tooltip": {
       "profile": {
-        "title": "Profile"
+        "drivePreferences": "The options below for videos, images and documents relate to items stored directly inside your drive(s). The options for \"Recommend Items Created After\" and \"Recommend Items Not Edited Since\" will recommend items that match either condition.",
+        "emailPreferences": "Email preferences currently only apply to Google Drive accounts. Only emails that have been read, are in your inbox or spam folder will be recommended for deletion"
       },
-      "userProfileCard": {
-        "firstName": "First Name",
-        "lastName": "Last Name",
-        "emailAddress": "Email Address",
-        "password": "Password",
-        "updateProfileDetails": "Update Profile Details",
-        "logout": "Log Out"
+      "manageConnections": {
+        "addConnectionsModalText": "We currently support One Drive and Google Drive, you can link as many of each as you'd like. After linking your account(s), you may proceed to the dashboard page to see general drive information.",
+        "manageConnectionMain": "This page enables you to link and unlink your cloud storage accounts. Any linked accounts will appear on the dashboard page. Any unlinked accounts may be re-linked at any time."
       },
-      "profileActionsCard": {
-        "accountActions": "Account Actions",
-        "deleteAccount": "Delete Account",
-        "requestData": "Request Data",
-        "viewTermsOfService": "View Terms of Service",
-        "downloadTermsOfService": "Download Terms of Service"
-      },
-      "profilePreferencesCard": {
-        "preferences": "Preferences"
+      "dashboard": {
+        "dashboardMain": "The dashboard page displays all of your connected drives and their respective storage usage. Each card is clickable and will display more information about the drive, we will also provide you the ability to delete recommended and duplicate items on that drive.",
+        "deleteRecommendedFiles": "The recommendations are based on the preferences you set in your profile. You can delete all recommended files at once by clicking \"Select All\" or select individual files for deletion.",
+        "deleteRecommendedEmails": "The recommended emails are based on the email preferences you set in your profile. You can delete all recommended emails at once by clicking \"Select All\" or select individual emails for deletion.",
+        "deleteDuplicates": "The duplicates are detected by AI and may not be 100% accurate. You can delete all duplicates at once by clicking \"Select All\" or select individual duplicates for deletion."
       }
+    },
+    "dashboard": {
+      "title": "Dashboard",
+      "manageConnectionsTextBeforeLink": "To add or remove drives, please head to ",
+      "manageConnectionsLink": "Manage Connections",
+      "dashboardCardModal": {
+        "driveInformation": {
+          "accountDetails": "Account Details",
+          "usedStorage": "Used Storage",
+          "totalStorage": "Total Storage",
+          "driveFiles": "Drive Files",
+          "noEmailsFoundMessage": "No emails found",
+          "noFilesFoundMessage": "No files found"
+        }
+      },
+      "connectedDrivesCard": {
+        "storageUsed": "Storage Used"
+      },
+      "dashboardPageButtons": {
+        "deleteDuplicates": "Delete Duplicates",
+        "deleteRecommended": "Delete Recommended"
+      },
+      "deletionModals": {
+        "deleteRecommended": {
+          "title": "File(s) have been recommended for deletion",
+          "titleEmail": "Email(s) have been recommended for deletion",
+          "mainText": "Select the file(s) you would like to delete and click delete.",
+          "mainTextEmail": "Select the emails(s) you would like to delete and click delete.",
+          "noFiles": "You do not have any files that have been recommended for deletion.",
+          "deleteButton": "Delete",
+          "closeRecommendation": "Done",
+          "closeRecommendationTryAgain": "Try Again",
+          "selectAll": "Select All",
+          "successfullyDeleted": "Successfully deleted",
+          "files": "file(s) and",
+          "emails": "email(s) from your drive.",
+          "itemsNotDeleted": "Item(s) were not deleted"
+        },
+        "deleteDuplicates": {
+          "title": "File(s) detected by AI that are duplicates",
+          "mainText": "Select the file(s) you would like to delete and click delete.",
+          "noFiles": "You do not have any files that are duplicates.",
+          "deleteButton": "Delete",
+          "closeRecommendation": "Done",
+          "closeRecommendationTryAgain": "Try Again"
+        }
+      }
+    },
+    "landingPage": {
+      "mainText": "Optimise your cloud storage",
+      "subText": "and save money",
+      "subTextDescription": "We aim to de-clutter your cloud storage, \nsave you money, \nand reduce the cloud storage carbon footprint.",
+      "loginModal": {
+        "getStartedButton": "Get Started",
+        "mainTextOne": "Are you ready to start saving money",
+        "mainTextTwo": "and help the environment?",
+        "loginUsingGoogleButton": "Log in using Google",
+        "invalidUserOrEmailError": "Invalid email or password",
+        "loginButton": "Log In",
+        "signUpText": "Sign Up",
+        "resetPasswordText": "Reset Password"
+      },
+      "signUpModal": {
+        "signUpTitle": "Sign up",
+        "mainTextOne": "Are you ready to start saving money",
+        "mainTextTwo": "and help the environment?",
+        "signUpButton": "Sign up",
+        "signUpConfirmationText": "Confirmation email sent to:"
+      },
+      "resetPasswordModal": {
+        "resetPasswordTitle": "Reset Password",
+        "mainTextOne": "Enter your email and passwords",
+        "mainTextTwo": "and we will send you a password reset link.",
+        "resetPasswordButton": "Reset Password",
+        "resetPasswordConfirmationText": "Reset link sent to:"
+      }
+    },
+    "manageConnectionsPage": {
+      "title": "Manage Connections",
+      "linkButton": "To link an account press the button below",
+      "addConnectionModal": {
+        "linkWithSupportedProviderText": "Link with one of our available providers below",
+        "linkWithOneDrive": "Link with One Drive",
+        "linkWithGoogleDrive": "Link with Google Drive"
+      }
+    },
+    "profile": {
+      "title": "Profile",
+      "profileButton": "Profile",
+      "preferencesButton": "Preferences",
+      "profileActionsButton": "Help"
+    },
+    "userProfileCard": {
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "emailAddress": "Email Address",
+      "password": "Password",
+      "updateProfileDetails": "Update Profile Details",
+      "logout": "Log Out"
+    },
+    "profileActionsCard": {
+      "accountActions": "Account Actions",
+      "deleteAccount": "Delete Account",
+      "requestData": "Request Data",
+      "viewTermsOfService": "View Terms of Service",
+      "ContactUs": "Contact Us"
+    },
+    "changeProfileImage": {
+      "changeProfileImage": "Change Profile Image",
+      "uploadImage": "Upload Image",
+      "noImageSelected": "No image selected. Please select an image to upload.",
+      "success": "Profile image successfully updated.",
+      "fileSizeError": "File size must be less than 2MB.",
+      "uploading": "Upload a new profile image"
+    },
+    "navbar": {
+      "dashboard": "Dashboard",
+      "manageConnections": "Manage Connections",
+      "profile": "Profile",
+      "logout": "Log Out"
+    },
+    "deleteAccountModal": {
+      "deleteAccount": "Delete Account",
+      "enterPassword": "Enter password",
+      "confirmPassword": "Confirm password",
+      "confirm": "Confirm",
+      "cancel": "Cancel",
+      "modalDescription": "Please confirm your Password to delete your account.<br/>This action is irreversible.",
+      "errorMessage": {
+        "enterBothPasswords": "Please enter password in both fields",
+        "fillBothPasswords": "Please fill out both password fields",
+        "passwordsDoNotMatch": "Passwords do not match",
+        "accountDeletedSuccessfully": "Account deleted successfully",
+        "errorDeletingAccount": "Error deleting account",
+        "userNotLoggedIn": "User is not logged in",
+        "invalidPassword": "Invalid password"
+      }
+    },
+    "updateDetailsModal": {
+      "updateDetails": "Update Details",
+      "enterFirstName": "Enter New First Name",
+      "enterLastName": "Enter New Last Name",
+      "enterNewName": "Enter New First Name, Last Name",
+      "orBoth": "or Both",
+      "enterNewEmail": "Enter New Email",
+      "confirm": "Confirm",
+      "cancel": "Cancel",
+      "FirstName": "First Name:",
+      "LastName": "Last Name:",
+      "Reset": "Reset Password",
+      "errorMessage": {
+        "userNotLoggedIn": "User is not logged in",
+        "successMessage": "Details updated successfully",
+        "emailExists": "Email already exists",
+        "errorUpdatingDetails": "Error updating details",
+        "enterSomething": "Please enter something in at least one field"
+      }
+    },
+    "profilePreferencesCard": {
+      "preferences": "Preferences",
+      "deleteVideos": "Recommend and Delete Videos",
+      "deleteImages": "Recommend and Delete Images",
+      "deleteDocuments": "Recommend and Delete Documents",
+      "deleteEmails": "Recommend and Delete Emails",
+      "deleteEmailsAfter": "Recommend Emails Older Than",
+      "createdAfter": "Recommend Items Created After",
+      "weeksSinceLastEdited": "Recommend Items Not Edited Since",
+      "updatePreferences": "Update Preferences",
+      "drivePreferences": "Drive Preferences",
+      "emailPreferences": "Email Preferences"
+    },
+    "termsOfServiceModal": {
+      "viewTermsOfService": "View Terms of Service",
+      "termsOfServiceTitle": "Terms of Service"
+    }
+  },
+  "helpers": {
+    "nothingFound": {
+      "caughtUpOne": "All caught up with",
+      "caughtUpTwo": "Nothing to recommend"
+    },
+    "emailContainer": {
+      "noSubject": "No Subject"
+    }
+  },
+  "verificationMessages": {
+    "verificationSuccess": "Account verified successfully",
+    "alreadyVerified": "Account already verified",
+    "linkBroken": "The link is broken ",
+    "clickHere": "Click here",
+    "toResend": " to resend."
   }
 }
+
+

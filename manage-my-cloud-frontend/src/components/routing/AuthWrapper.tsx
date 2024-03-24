@@ -8,6 +8,10 @@ import Cookies from 'universal-cookie'
 import {jwtDecode} from 'jwt-decode';
 
 
+interface Account {
+    accountEmail: string;
+    accountType: string;
+}
 
 interface User {
     id: number;
@@ -17,11 +21,12 @@ interface User {
     token: string;
     refreshToken: string;
     accountType: string | null;
+    profileImage: Uint8Array | null;
     linkedAccounts: {
         linkedAccountsCount: number;
-        oneDrive: boolean;
-        googleDrive: boolean;
+        linkedDriveAccounts: Account[];
     }
+    firstLogin: boolean;
 }
 
 interface AuthContextProps {
@@ -62,7 +67,9 @@ export const AuthWrapper = () => {
             const response = await buildAxiosRequest("POST", "/login", {email, password});
             const userData = response.data;
             setUser(userData);
-            cookies.set('user', JSON.stringify(userData));
+            const { profileImage, ...userDataWithoutImage } = userData; // Exclude profileImage
+            cookies.set('user', JSON.stringify(userDataWithoutImage)); // Save user data without image in the cookie
+            localStorage.setItem('profileImage', `data:image/jpeg;base64,${profileImage}`); // Store profile image URL in local storage
             return userData;
         } catch (error) {
             throw error;
@@ -80,7 +87,7 @@ export const AuthWrapper = () => {
                 const data = response.data;
                 setUser(data);
                 cookies.set('user', JSON.stringify(data));
-                navigate("/profile")
+                navigate(ROUTES.DASHBOARD)
             } catch (error) {
                 // Handle the error
                 console.error('Error:', error);
@@ -203,7 +210,9 @@ export const AuthWrapper = () => {
             const response = await buildAxiosRequestWithHeaders("POST", "/refresh-user", headers, {email});
             const userData = response.data;
             setUser(userData);
-            cookies.set('user', JSON.stringify(userData));
+            const { profileImage, ...userDataWithoutImage } = userData; // Exclude profileImage
+            cookies.set('user', JSON.stringify(userDataWithoutImage)); // Save user data without image in the cookie
+            localStorage.setItem('profileImage', `data:image/jpeg;base64,${profileImage}`); // Store profile image URL in local storage
         } catch (error) {
             throw error;
         }
