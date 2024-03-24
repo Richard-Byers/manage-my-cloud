@@ -4,6 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.google.api.services.drive.model.About;
 import com.google.api.services.drive.model.File;
@@ -515,14 +517,45 @@ public class DriveInformationService implements IDriveInformationService {
     }
 
     public JsonNode getDuplicatesFoundByAI(String provider, JsonNode files) throws IOException, InterruptedException {
-
         ObjectMapper mapper = new ObjectMapper();
-        JsonNode result = JsonUtils.removeEmailFields(files);
-        String prettyJson = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(result);
-        return mapper.readTree(chatDiscussionWithAI(prettyJson, provider, 0));
+        JsonNode allFiles = JsonUtils.extractChildren(files);
+
+        // Convert allFiles to a list and sort it
+        List<JsonNode> sortedFilesList = new ArrayList<>();
+        allFiles.elements().forEachRemaining(sortedFilesList::add);
+        sortedFilesList.sort(Comparator.comparing(node -> node.get("name").asText()));
+
+        // Convert the sorted list back to a JsonNode
+        JsonNode sortedFiles = mapper.valueToTree(sortedFilesList);
+
+        int batchSize = 5;
+        ObjectNode root = mapper.createObjectNode();
+        root.set("id", (JsonNode) null);
+        root.put("name", "root");
+        root.put("type", "Folder");
+        root.set("createdDateTime", (JsonNode) null);
+        root.set("lastModifiedDateTime", (JsonNode) null);
+        root.set("webUrl", (JsonNode) null);
+        root.set("emails", (JsonNode) null);
+        ArrayNode childrenArray = root.putArray("children");
+
+        for (int i = 0; i < sortedFiles.size(); i += batchSize) {
+            int end = Math.min(i + batchSize, sortedFiles.size());
+            List<JsonNode> batch = new ArrayList<>(sortedFilesList.subList(i, end));
+            ArrayNode batchNode = mapper.createArrayNode().addAll(batch);
+            JsonNode batchRoot = mapper.createObjectNode();
+            ((ObjectNode) batchRoot).putArray("children").addAll(batchNode);
+            JsonNode batchResult = JsonUtils.removeEmailFields(batchRoot);
+            String prettyJson = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(batchResult);
+            JsonNode batchDuplicates = mapper.readTree(chatDiscussionWithAI(prettyJson, provider, 0));
+            if (batchDuplicates.has("children")) {
+                batchDuplicates.get("children").forEach(childrenArray::add);
+            }
+        }
+        return root;
     }
 
-    private static String chatDiscussionWithAI(String files, String provider, int timesTried) throws IOException {
+    public static String chatDiscussionWithAI(String files, String provider, int timesTried) throws IOException {
         // OpenAI API endpoint
         String url = "https://api.openai.com/v1/chat/completions";
         String openApiKey = System.getenv("OPENAI_API_KEY");

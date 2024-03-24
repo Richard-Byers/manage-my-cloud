@@ -24,7 +24,8 @@
       "dashboard": {
         "dashboardMain": "The dashboard page displays all of your connected drives and their respective storage usage. Each card is clickable and will display more information about the drive, we will also provide you the ability to delete recommended and duplicate items on that drive.",
         "deleteRecommendedFiles": "The recommendations are based on the preferences you set in your profile. You can delete all recommended files at once by clicking \"Select All\" or select individual files for deletion.",
-        "deleteRecommendedEmails": "The recommended emails are based on the email preferences you set in your profile. You can delete all recommended emails at once by clicking \"Select All\" or select individual emails for deletion."
+        "deleteRecommendedEmails": "The recommended emails are based on the email preferences you set in your profile. You can delete all recommended emails at once by clicking \"Select All\" or select individual emails for deletion.",
+        "deleteDuplicates": "The duplicates are detected by AI and may not be 100% accurate. You can delete all duplicates at once by clicking \"Select All\" or select individual duplicates for deletion."
       }
     },
     "dashboard": {
@@ -66,7 +67,7 @@
           "itemsNotDeleted": "Item(s) were not deleted"
         },
         "deleteDuplicates": {
-          "title": "File(s) detected by AI that are duplicates (Disclaimer: Results may not be 100% accurate)",
+          "title": "File(s) detected by AI that are duplicates",
           "mainText": "Select the file(s) you would like to delete and click delete.",
           "noFiles": "You do not have any files that are duplicates.",
           "deleteButton": "Delete",
@@ -117,7 +118,7 @@
       "title": "Profile",
       "profileButton": "Profile",
       "preferencesButton": "Preferences",
-      "profileActionsButton": "Advanced"
+      "profileActionsButton": "Help"
     },
     "userProfileCard": {
       "firstName": "First Name",
@@ -214,7 +215,10 @@
   },
   "verificationMessages": {
     "verificationSuccess": "Account verified successfully",
-    "alreadyVerified": "Account already verified"
+    "alreadyVerified": "Account already verified",
+    "linkBroken": "The link is broken ",
+    "clickHere": "Click here",
+    "toResend": " to resend."
   }
 }
 

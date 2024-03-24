@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, {useEffect, useState} from 'react';
 import './termsOfServiceModal.css';
 import CloseIcon from '@mui/icons-material/Close';
 import ReactMarkdown from 'react-markdown';
@@ -9,10 +9,10 @@ interface TermsOfServiceModalProps {
     handleClose: () => void;
 }
 
-function TermsOfServiceModal({ show: showModal, handleClose: closeHandle }: TermsOfServiceModalProps) {
+function TermsOfServiceModal({show: showModal, handleClose: closeHandle}: TermsOfServiceModalProps) {
     const [show, setShow] = useState(showModal);
     const [termsOfServiceText, setTermsOfServiceText] = useState('');
-    const { t } = useTranslation();
+    const {t} = useTranslation();
 
     useEffect(() => {
         if (show) {
@@ -37,20 +37,19 @@ function TermsOfServiceModal({ show: showModal, handleClose: closeHandle }: Term
     return (
         <>
             <button className="actions-button"
-                    onClick={handleShow} id={"terms-of-service-button"}>{t('main.termsOfServiceModal.viewTermsOfService')}</button>
+                    onClick={handleShow}
+                    id={"terms-of-service-button"}>{t('main.termsOfServiceModal.viewTermsOfService')}</button>
 
             {show && (
-                <div className="modal-overlay terms-of-service-modal" onClick={handleClose}>
-                    <div className="modal modal-dialog" onClick={stopPropagation}>
-                        <div className="modal-header">
-                            <h5 className="modal-title">{t('main.termsOfServiceModal.termsOfServiceTitle')}</h5>
+                <div className={"modal-overlay"} onClick={handleClose}>
+                    <div className="modal" onClick={stopPropagation}>
 
-                        </div>
+                        <button className={"modal-close-button"} onClick={handleClose}>
+                            <CloseIcon className="svg_icons"/>
+                        </button>
+
                         <div className="modal-body">
                             <ReactMarkdown>{termsOfServiceText}</ReactMarkdown>
-                        </div>
-                        <div className="modal-footer">
-
                         </div>
                     </div>
                 </div>

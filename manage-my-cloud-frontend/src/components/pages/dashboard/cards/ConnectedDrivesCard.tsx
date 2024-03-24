@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useRef, useState} from 'react';
 import './ConnectedDrivesCard.css';
 import {AuthData} from "../../../routing/AuthWrapper";
 import {buildAxiosRequestWithHeaders} from "../../../helpers/AxiosHelper";
@@ -36,12 +36,15 @@ const CardContainer: React.FC<ConnectedDrivesCardProps> = ({connectionProvider, 
         setShowDashboardModal(!dashboardModal);
     }
 
+    const shouldRun = useRef(true);
     const handleCloseErrorModal = () => {
         setShowErrorModal(false);
         navigate('/manage-connections');
     }
 
     React.useEffect(() => {
+        if (!shouldRun.current) return;
+        shouldRun.current = false;
         const fetchDriveInformation = async () => {
             try {
                 const info = await getUserDrives(user, connectionProvider, driveEmail);
@@ -79,14 +82,14 @@ const CardContainer: React.FC<ConnectedDrivesCardProps> = ({connectionProvider, 
 
     return (
         <>
-                        {driveInformation && dashboardModal &&
+            {driveInformation && dashboardModal &&
                 <DashboardCardModal setShowModal={setShowDashboardModal} showModal={dashboardModal}
                                     connectionProvider={connectionProvider}
                                     totalStorage={driveInformation.total}
                                     usedStorage={driveInformation.used}
                                     email={driveInformation.email}
                                     driveEmail={driveEmail}/>}
-                        <div className="dashboard-connection-item" onClick={toggleModal}
+            <div className="dashboard-connection-item" onClick={toggleModal}
                  id={`${connectionProvider}-connected-item`}>
                 <img src={CONNECTION_LOGOS[connectionProvider]}
                      alt={`Logo for ${connectionProvider}`}/>

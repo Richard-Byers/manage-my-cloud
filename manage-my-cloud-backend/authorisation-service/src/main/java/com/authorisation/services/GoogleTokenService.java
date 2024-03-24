@@ -12,6 +12,9 @@ import java.io.StringReader;
 public class GoogleTokenService {
 
     public static GoogleTokenResponse getGoogleTokenResponse(String authCodeOutput, String googleCredentialsJson) throws IOException {
+
+        String redirectUri = System.getenv("GOOGLE_REDIRECT_URI") != null ? System.getenv("GOOGLE_REDIRECT_URI") : "http://localhost:3000";
+
         GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(
                 GsonFactory.getDefaultInstance(), new StringReader(googleCredentialsJson));
         return new GoogleAuthorizationCodeTokenRequest(
@@ -21,7 +24,7 @@ public class GoogleTokenService {
                 clientSecrets.getDetails().getClientId(),
                 clientSecrets.getDetails().getClientSecret(),
                 authCodeOutput,
-                "postmessage")
+                redirectUri)
                 .execute();
     }
 }

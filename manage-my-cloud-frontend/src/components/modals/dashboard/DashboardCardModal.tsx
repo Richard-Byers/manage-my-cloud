@@ -1,10 +1,10 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import "../Modal.css";
 import "./DashboardCardModal.css";
 import { CONNECTION_LOGOS, CONNECTION_TITLE } from "../../../constants/ConnectionConstants";
 import { getFileType } from "../../../constants/FileTypesConstants";
 import DashboardPageButtons from "../../pages/dashboard/DashboardPageButtons";
-import { buildAxiosRequestWithHeaders } from "../../helpers/AxiosHelper";
+import { buildAxiosRequestWithHeaders, DEFAULT_PROGRESS_ENDPOINT } from "../../helpers/AxiosHelper";
 import { AuthData } from "../../routing/AuthWrapper";
 import { useTranslation } from "react-i18next";
 import { Cell, Pie, PieChart, Tooltip, TooltipProps } from "recharts";
@@ -103,35 +103,35 @@ const DashboardCardModal: React.FC<DashboardCardModalProps> = ({
     return null;
   };
 
-  const handleGmailLink = useGoogleLogin({
-    onSuccess: async (codeResponse) => {
-      // Get the code from the response
-      const authCode = codeResponse.code;
+    const handleGmailLink = useGoogleLogin({
+        onSuccess: async (codeResponse) => {
+            // Get the code from the response
+            const authCode = codeResponse.code;
 
-      const headers = {
-        Authorization: `Bearer ${user?.token}`
+            const headers = {
+                Authorization: `Bearer ${user?.token}`
             }
 
-      // Send the code to the server
-      try {
-        await buildAxiosRequestWithHeaders("POST", `/link-gmail?email=${encodeURIComponent(user?.email ?? '')}`, headers, {authCode});
-        window.location.reload();
-      } catch (error) {
-        // Handle the error
-        console.error('Error:', error);
-      }
-    },
-    flow: 'auth-code',
-    scope: 'https://www.googleapis.com/auth/drive https://mail.google.com/',
-  });
+            // Send the code to the server
+            try {
+                await buildAxiosRequestWithHeaders("POST", `/link-gmail?email=${encodeURIComponent(user?.email ?? '')}`, headers, {authCode});
+                window.location.reload();
+            } catch (error) {
+                // Handle the error
+                console.error('Error:', error);
+            }
+        },
+        flow: 'auth-code',
+        scope: 'https://www.googleapis.com/auth/drive https://mail.google.com/',
+    });
 
-  React.useEffect(() => {
-
-    const fetchDriveData = async () => {
-      const info = await getDriveItems(user, connectionProvider);
-      setDriveData(info);
-
-      console.log(info.gaveGmailPermissions);
+    const shouldRun = useRef(true);
+    React.useEffect(() => {
+        if (!shouldRun.current) return;
+        shouldRun.current = false;
+        const fetchDriveData = async () => {
+            const info = await getDriveItems(user, connectionProvider);
+            setDriveData(info);
 
       if (connectionProvider === "GoogleDrive") {
         info.children.forEach((item: FileNode) => {
@@ -185,10 +185,10 @@ const DashboardCardModal: React.FC<DashboardCardModalProps> = ({
 
   const FileNode: React.FC<FileNodeProps> = ({node}) => {
 
-    // recursive method call to render the files
-    // if the node type is not a folder then render the file
-    // if the node is a folder then proceed down to the second return to recursively call the method again and repeat
-    // until all children are rendered
+        // recursive method call to render the files
+        // if the node type is not a folder then render the file
+        // if the node is a folder then proceed down to the second return to recursively call the method again and repeat
+        // until all children are rendered
 
     if (node.type !== "Folder") {
       return (
@@ -241,15 +241,15 @@ const DashboardCardModal: React.FC<DashboardCardModalProps> = ({
 
     const connectionProviderTitle = CONNECTION_TITLE[connectionProvider];
 
-    const client = new Client({
-      webSocketFactory: () => new SockJS('http://localhost:8080/progress'),
-      onConnect: () => {
-        client.subscribe(`/user/${user?.email}/queue/progress`, (message) => {
-          const progress = JSON.parse(message.body);
-          setProgress(progress);
+        const client = new Client({
+            webSocketFactory: () => new SockJS(DEFAULT_PROGRESS_ENDPOINT),
+            onConnect: () => {
+                client.subscribe(`/user/${user?.email}/queue/progress`, (message) => {
+                    const progress = JSON.parse(message.body);
+                    setProgress(progress);
+                });
+            }
         });
-      }
-    });
 
     await client.activate();
 
@@ -280,111 +280,111 @@ const DashboardCardModal: React.FC<DashboardCardModalProps> = ({
     return driveData.children.every(child => child.type === 'Folder');
   }
 
-  return (
-    <div className={"modal-overlay"} onClick={closeModal}>
-      {loading ? (
-        <>
-          <LoadingProgress filled={progress} />
-        </>
-      ) : (
-        <div className={"modal"} onClick={stopPropagation} id={"connected-drive-modal"}>
-          <button className={"modal-close-button"} onClick={closeModal}>
-            <CloseIcon className="svg_icons" />
-          </button>
+    return (
+        <div className={"modal-overlay"} onClick={closeModal}>
+            {loading ? (
+                <>
+                    <LoadingProgress filled={progress} />
+                </>
+            ) : (
+                <div className={"modal"} onClick={stopPropagation} id={"connected-drive-modal"}>
+                    <button className={"modal-close-button"} onClick={closeModal}>
+                        <CloseIcon className="svg_icons" />
+                    </button>
 
-          <div className={"dashboard-card-modal-grid"}>
-            {/* This div displays the general information about the user's drive */}
-            <div className={"dashboard-card-modal-drive-information"}>
-              <img src={CONNECTION_LOGOS[connectionProvider]} alt={`Logo for ${connectionProvider}`} />
-              <p> {t("main.dashboard.dashboardCardModal.driveInformation.accountDetails")} </p>
-              <span>{driveEmail}</span>
-              <span> {t("main.dashboard.dashboardCardModal.driveInformation.usedStorage")}{usedStorage > 0.0 ? convertGBtoTB(usedStorage) : "< 0GB"}</span>
-              <span>{t("main.dashboard.dashboardCardModal.driveInformation.totalStorage")}
-                {convertGBtoTB(totalStorage)}</span>
-              {!showEmails && driveData && !areAllChildrenFolders(driveData) ? (
-                <PieChart className="dashboard-card-modal-pie-chart" width={200} height={200}>
-                  <Pie
-                    data={pieChartData}
-                    cx="50%"
-                    cy="50%"
-                    labelLine={false}
-                    outerRadius={80}
-                    fill="#8884d8"
-                    dataKey="value"
-                    isAnimationActive={false}
-                  >
-                    {pieChartData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLOURS[index % COLOURS.length]}/>
-                    ))}
-                  </Pie>
-                  <Tooltip content={<CustomTooltip/>}/>
-                </PieChart>
-              ) : null}
-            </div>
+                    <div className={"dashboard-card-modal-grid"}>
+                        {/* This div displays the general information about the user's drive */}
+                        <div className={"dashboard-card-modal-drive-information"}>
+                            <img src={CONNECTION_LOGOS[connectionProvider]} alt={`Logo for ${connectionProvider}`} />
+                            <p> {t("main.dashboard.dashboardCardModal.driveInformation.accountDetails")} </p>
+                            <span>{driveEmail}</span>
+                            <span> {t("main.dashboard.dashboardCardModal.driveInformation.usedStorage")}{usedStorage > 0.0 ? convertGBtoTB(usedStorage) : "< 0GB"}</span>
+                            <span>{t("main.dashboard.dashboardCardModal.driveInformation.totalStorage")}
+                                {convertGBtoTB(totalStorage)}</span>
+                            {!showEmails && driveData && !areAllChildrenFolders(driveData) ? (
+                                <PieChart className="dashboard-card-modal-pie-chart" width={200} height={200}>
+                                    <Pie
+                                        data={pieChartData}
+                                        cx="50%"
+                                        cy="50%"
+                                        labelLine={false}
+                                        outerRadius={80}
+                                        fill="#8884d8"
+                                        dataKey="value"
+                                        isAnimationActive={false}
+                                    >
+                                        {pieChartData.map((entry, index) => (
+                                            <Cell key={`cell-${index}`} fill={COLOURS[index % COLOURS.length]}/>
+                                        ))}
+                                    </Pie>
+                                    <Tooltip content={<CustomTooltip/>}/>
+                                </PieChart>
+                            ) : null}
+                        </div>
 
-            {/* This div displays all the files inside the user drive */}
-            <div className={"dashboard-card-modal-drive-files-container"}>
-              {/* If google provider then display options to view emails and files */}
-              {connectionProvider === "GoogleDrive" ?
-                <div className={"google-drive-item-type-navigation-container"}>
-                  <button onClick={handleShowDriveData}>
-                    <ArticleIcon />{t("main.dashboard.dashboardCardModal.driveInformation.driveFiles")}</button>
-                  <button onClick={handleShowEmails}><EmailIcon /> Gmail</button>
-                </div>
-               : null}
+                        {/* This div displays all the files inside the user drive */}
+                        <div className={"dashboard-card-modal-drive-files-container"}>
+                            {/* If google provider then display options to view emails and files */}
+                            {connectionProvider === "GoogleDrive" ?
+                                <div className={"google-drive-item-type-navigation-container"}>
+                                    <button onClick={handleShowDriveData}>
+                                        <ArticleIcon />{t("main.dashboard.dashboardCardModal.driveInformation.driveFiles")}</button>
+                                    <button onClick={handleShowEmails}><EmailIcon /> Gmail</button>
+                                </div>
+                                : null}
 
-              {showDriveData && (
-                <div className={"dashboard-card-modal-drive-files-grid"}>
-                  {driveData && !areAllChildrenFolders(driveData) ?
-                    <FileTree data={driveData}/>
-                  : <DashboardCardModalEmptyFiles message={
+                            {showDriveData && (
+                                <div className={"dashboard-card-modal-drive-files-grid"}>
+                                    {driveData && !areAllChildrenFolders(driveData) ?
+                                        <FileTree data={driveData}/>
+                                        : <DashboardCardModalEmptyFiles message={
                                             t('main.dashboard.dashboardCardModal.driveInformation.noFilesFoundMessage')
                                         }/>}
-                </div>
-              )}
+                                </div>
+                            )}
 
-              {showEmails && (
-                <div className={"dashboard-card-modal-drive-files-grid"}>
-                  {driveData && driveData.gaveGmailPermissions === false ? (
-                    <div>
-                      <DashboardCardModalEmptyFiles message={t(
-                        "main.dashboard.dashboardCardModal.driveInformation.gmailNotLinkedMessage"
-                      )}/>
-                      <div className={"gmail-islinked-container"}>
-                        <button onClick={handleGmailLink}>
-                          <EmailIcon /> Link Gmail
-                        </button>
-                      </div>
+                            {showEmails && (
+                                <div className={"dashboard-card-modal-drive-files-grid"}>
+                                    {driveData && driveData.gaveGmailPermissions === false ? (
+                                        <div>
+                                            <DashboardCardModalEmptyFiles message={t(
+                                                "main.dashboard.dashboardCardModal.driveInformation.gmailNotLinkedMessage"
+                                            )}/>
+                                            <div className={"gmail-islinked-container"}>
+                                                <button onClick={handleGmailLink}>
+                                                    <EmailIcon /> Link Gmail
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ) : driveData &&
+                                    driveData.emails !== null &&
+                                    driveData.emails.length > 0 ? (
+                                        <EmailContainer emails={driveData.emails} />
+                                    ) : (
+                                        <DashboardCardModalEmptyFiles
+                                            message={t(
+                                                "main.dashboard.dashboardCardModal.driveInformation.noEmailsFoundMessage"
+                                            )}
+                                        />
+                                    )}
+                                </div>
+                            )}
+                        </div>
+                        {driveData && (
+                            <div className={"dashboard-page-buttons-container"}>
+                                <DashboardPageButtons data={driveData}
+                                                      connectionProvider={CONNECTION_TITLE[connectionProvider]}
+                                                      setShowModal={setShowModal}
+                                                      driveEmail={driveEmail}
+                                                      setHaveFilesBeenDeleted={setHaveFilesBeenDeleted}
+                                />
+                            </div>
+                        )}
                     </div>
-                  ) : driveData &&
-                    driveData.emails !== null &&
-                    driveData.emails.length > 0 ? (
-                    <EmailContainer emails={driveData.emails} />
-                  ) : (
-                    <DashboardCardModalEmptyFiles
-                      message={t(
-                        "main.dashboard.dashboardCardModal.driveInformation.noEmailsFoundMessage"
-                      )}
-                    />
-                  )}
                 </div>
-              )}
-            </div>
-            {driveData && (
-              <div className={"dashboard-page-buttons-container"}>
-                <DashboardPageButtons data={driveData}
-                  connectionProvider={CONNECTION_TITLE[connectionProvider]}
-                  setShowModal={setShowModal}
-                  driveEmail={driveEmail}
-                  setHaveFilesBeenDeleted={setHaveFilesBeenDeleted}
-                />
-              </div>
             )}
-          </div>
         </div>
-      )}
-    </div>
-  );
+    );
 };
 
 export default DashboardCardModal;

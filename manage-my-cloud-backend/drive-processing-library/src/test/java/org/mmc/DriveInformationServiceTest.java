@@ -1,12 +1,20 @@
 package org.mmc;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.api.services.drive.model.About;
 import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.model.Message;
 import com.microsoft.graph.models.Drive;
 import com.microsoft.graph.requests.*;
 import okhttp3.Request;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpStatus;
+import org.apache.http.StatusLine;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.junit.Test;
 import org.junit.jupiter.api.BeforeEach;
 import org.mmc.auth.DriveAuthManager;
@@ -14,11 +22,15 @@ import org.mmc.drive.DriveInformationService;
 import org.mmc.pojo.UserPreferences;
 import org.mmc.response.DriveInformationReponse;
 import org.mmc.response.FilesDeletedResponse;
+import org.mmc.util.JsonUtils;
+import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -30,8 +42,7 @@ import static org.mmc.givens.DriveInformationResponseGivens.*;
 import static org.mmc.givens.UserPreferencesGivens.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class DriveInformationServiceTest {
 
@@ -39,6 +50,18 @@ public class DriveInformationServiceTest {
     private final SimpMessagingTemplate simpMessagingTemplate = mock(SimpMessagingTemplate.class);
 
     private final String EMAIL = "johndoe@gmail.com";
+
+    @Mock
+    private CloseableHttpClient httpClient;
+
+    @Mock
+    private CloseableHttpResponse httpResponse;
+
+    @Mock
+    private HttpEntity httpEntity;
+
+    @Mock
+    private StatusLine statusLine;
 
     @BeforeEach
     public void setUp() {
@@ -461,6 +484,143 @@ public class DriveInformationServiceTest {
             //then
             assertEquals(3, filesDeletedResponse.getFilesDeleted());
             assertEquals(1, filesDeletedResponse.getEmailsDeleted());
+        }
+    }
+
+    @Test
+    public void testGetDuplicatesFoundByAI() throws IOException, InterruptedException {
+        // Mock the chatDiscussionWithAI method
+        try (MockedStatic<DriveInformationService> mockedDriveInformationService = Mockito.mockStatic(DriveInformationService.class)) {
+            mockedDriveInformationService.when(() -> DriveInformationService.chatDiscussionWithAI(any(), any(), eq(0)))
+                    .thenReturn("{\"children\":[{\"id\":\"15-MDoBanVH8wZbDtyTGB2JcUWkI9wTG9\",\"name\":\"SaulGone (2) copy 4.jpg\",\"type\":\"image/jpeg\",\"createdDateTime\":null,\"lastModifiedDateTime\":null,\"webUrl\":\"https://drive.google.com/file/d/15-MDoBanVH8wZbDtyTGB2JcUWkI9wTG9/view?usp=drivesdk\",\"children\":[],\"emails\":null},{\"id\":\"1obXvOUBSOqLsj__AXGJqyUylJI1kJuav\",\"name\":\"SaulGone (2) copy 3.jpg\",\"type\":\"image/jpeg\",\"createdDateTime\":null,\"lastModifiedDateTime\":null,\"webUrl\":\"https://drive.google.com/file/d/1obXvOUBSOqLsj__AXGJqyUylJI1kJuav/view?usp=drivesdk\",\"children\":[],\"emails\":null},{\"id\":\"1TQoBmJmS8vspgjqwShdkqKSQ6Wyyavel\",\"name\":\"SaulGone (2) copy 8.jpg\",\"type\":\"image/jpeg\",\"createdDateTime\":null,\"lastModifiedDateTime\":null,\"webUrl\":\"https://drive.google.com/file/d/1TQoBmJmS8vspgjqwShdkqKSQ6Wyyavel/view?usp=drivesdk\",\"children\":[],\"emails\":null},{\"id\":\"1HZuDDTRS3FQUASiueRY3vs_NlwwF7aCb\",\"name\":\"SaulGone (2) copy 6.jpg\",\"type\":\"image/jpeg\",\"createdDateTime\":null,\"lastModifiedDateTime\":null,\"webUrl\":\"https://drive.google.com/file/d/1HZuDDTRS3FQUASiueRY3vs_NlwwF7aCb/view?usp=drivesdk\",\"children\":[],\"emails\":null},{\"id\":\"18hFfQMFeIPv-qKzRYgnYXiESpmrFJxwD\",\"name\":\"SaulGone (2) copy 9.jpg\",\"type\":\"image/jpeg\",\"createdDateTime\":null,\"lastModifiedDateTime\":null,\"webUrl\":\"https://drive.google.com/file/d/18hFfQMFeIPv-qKzRYgnYXiESpmrFJxwD/view?usp=drivesdk\",\"children\":[],\"emails\":null}]}");
+
+            // Mock the JsonUtils.removeEmailFields method
+            JsonNode files = new ObjectMapper().readTree("{\"name\":\"root\",\"children\":[{\"id\":\"123\",\"name\":\"file.txt\",\"type\":\"file\"}]}");
+            JsonNode expectedResult = new ObjectMapper().readTree("{\"id\":null,\"name\":\"root\",\"type\":\"Folder\",\"createdDateTime\":null,\"lastModifiedDateTime\":null,\"webUrl\":null,\"children\":[{\"id\":\"15-MDoBanVH8wZbDtyTGB2JcUWkI9wTG9\",\"name\":\"SaulGone (2) copy 4.jpg\",\"type\":\"image/jpeg\",\"createdDateTime\":null,\"lastModifiedDateTime\":null,\"webUrl\":\"https://drive.google.com/file/d/15-MDoBanVH8wZbDtyTGB2JcUWkI9wTG9/view?usp=drivesdk\",\"children\":[],\"emails\":null},{\"id\":\"1obXvOUBSOqLsj__AXGJqyUylJI1kJuav\",\"name\":\"SaulGone (2) copy 3.jpg\",\"type\":\"image/jpeg\",\"createdDateTime\":null,\"lastModifiedDateTime\":null,\"webUrl\":\"https://drive.google.com/file/d/1obXvOUBSOqLsj__AXGJqyUylJI1kJuav/view?usp=drivesdk\",\"children\":[],\"emails\":null},{\"id\":\"1TQoBmJmS8vspgjqwShdkqKSQ6Wyyavel\",\"name\":\"SaulGone (2) copy 8.jpg\",\"type\":\"image/jpeg\",\"createdDateTime\":null,\"lastModifiedDateTime\":null,\"webUrl\":\"https://drive.google.com/file/d/1TQoBmJmS8vspgjqwShdkqKSQ6Wyyavel/view?usp=drivesdk\",\"children\":[],\"emails\":null},{\"id\":\"1HZuDDTRS3FQUASiueRY3vs_NlwwF7aCb\",\"name\":\"SaulGone (2) copy 6.jpg\",\"type\":\"image/jpeg\",\"createdDateTime\":null,\"lastModifiedDateTime\":null,\"webUrl\":\"https://drive.google.com/file/d/1HZuDDTRS3FQUASiueRY3vs_NlwwF7aCb/view?usp=drivesdk\",\"children\":[],\"emails\":null},{\"id\":\"18hFfQMFeIPv-qKzRYgnYXiESpmrFJxwD\",\"name\":\"SaulGone (2) copy 9.jpg\",\"type\":\"image/jpeg\",\"createdDateTime\":null,\"lastModifiedDateTime\":null,\"webUrl\":\"https://drive.google.com/file/d/18hFfQMFeIPv-qKzRYgnYXiESpmrFJxwD/view?usp=drivesdk\",\"children\":[],\"emails\":null}],\"emails\":null}");
+
+            JsonNode result = new DriveInformationService().getDuplicatesFoundByAI("GoogleDrive", files);
+
+            assertEquals(expectedResult, result);
+        }
+    }
+
+    @Test
+    public void testChatDiscussionWithAI() throws IOException {
+        // Initialize mocks
+        httpClient = Mockito.mock(CloseableHttpClient.class);
+        httpResponse = Mockito.mock(CloseableHttpResponse.class);
+        httpEntity = Mockito.mock(HttpEntity.class);
+        statusLine = Mockito.mock(StatusLine.class);
+
+        try (MockedStatic<HttpClients> httpClientsMock = Mockito.mockStatic(HttpClients.class)) {
+            httpClientsMock.when(HttpClients::createDefault).thenReturn(httpClient);
+
+            // Mock the API response
+            String responseBody = "{\"choices\":[{\"message\":{\"content\":\"{\\\"duplicates\\\":[{\\\"name\\\":\\\"file.txt\\\",\\\"count\\\":2,\\\"files\\\":[{\\\"id\\\":\\\"123\\\",\\\"name\\\":\\\"file.txt\\\",\\\"type\\\":\\\"file\\\",\\\"createdDateTime\\\":\\\"2023-03-19T10:00:00Z\\\",\\\"lastModifiedDateTime\\\":\\\"2023-03-19T10:00:00Z\\\",\\\"webUrl\\\":\\\"https://example.com/file.txt\\\"},{\\\"id\\\":\\\"456\\\",\\\"name\\\":\\\"file.txt\\\",\\\"type\\\":\\\"file\\\",\\\"createdDateTime\\\":\\\"2023-03-19T11:00:00Z\\\",\\\"lastModifiedDateTime\\\":\\\"2023-03-19T11:00:00Z\\\",\\\"webUrl\\\":\\\"https://example.com/file.txt\\\"}]}]}\"}}]}";
+
+            // Mock the HTTP client behavior
+            when(httpClient.execute(any(HttpPost.class))).thenReturn(httpResponse);
+            when(httpResponse.getEntity()).thenReturn(httpEntity);
+            when(httpEntity.getContent()).thenReturn(new ByteArrayInputStream(responseBody.getBytes(StandardCharsets.UTF_8)));
+            when(httpResponse.getStatusLine()).thenReturn(statusLine);
+            when(statusLine.getStatusCode()).thenReturn(HttpStatus.SC_OK);
+
+            // Prepare the files parameter
+            String files = "{\n" +
+                    "  \"id\" : null,\n" +
+                    "  \"name\" : \"root\",\n" +
+                    "  \"type\" : \"Folder\",\n" +
+                    "  \"createdDateTime\" : null,\n" +
+                    "  \"lastModifiedDateTime\" : null,\n" +
+                    "  \"webUrl\" : null,\n" +
+                    "  \"children\" : [ {\n" +
+                    "    \"id\" : \"1kDnvf1fZ6F_fgVByNKosPwECDy8XegCb\",\n" +
+                    "    \"name\" : \"SaulGone (2) copy 2 (4).jpg\",\n" +
+                    "    \"type\" : \"image/jpeg\",\n" +
+                    "    \"createdDateTime\" : 1.710871335593E9,\n" +
+                    "    \"lastModifiedDateTime\" : 1709945523,\n" +
+                    "    \"webUrl\" : \"https://drive.google.com/file/d/1kDnvf1fZ6F_fgVByNKosPwECDy8XegCb/view?usp=drivesdk\",\n" +
+                    "    \"children\" : null\n" +
+                    "  }, {\n" +
+                    "    \"id\" : \"1rq8gDtQnqMfv3TFLq4PVmNA15KrlMcKk\",\n" +
+                    "    \"name\" : \"SaulGone (2) copy 2 (3).jpg\",\n" +
+                    "    \"type\" : \"image/jpeg\",\n" +
+                    "    \"createdDateTime\" : 1.710871317885E9,\n" +
+                    "    \"lastModifiedDateTime\" : 1709945523,\n" +
+                    "    \"webUrl\" : \"https://drive.google.com/file/d/1rq8gDtQnqMfv3TFLq4PVmNA15KrlMcKk/view?usp=drivesdk\",\n" +
+                    "    \"children\" : null\n" +
+                    "  }]\n" +
+                    "}";
+
+            // Mock the JsonUtils.validateContentFormat method
+            try (MockedStatic<JsonUtils> mockedJsonUtils = Mockito.mockStatic(JsonUtils.class)) {
+                mockedJsonUtils.when(() -> JsonUtils.validateContentFormat(any())).thenReturn(true);
+                mockedJsonUtils.when(() -> JsonUtils.transformJson(any())).thenCallRealMethod();
+
+                String result = DriveInformationService.chatDiscussionWithAI(files, "GoogleDrive", 0);
+                ObjectMapper objectMapper = new ObjectMapper();
+                JsonNode expectedResult = objectMapper.readTree("{\"id\":null,\"name\":\"root\",\"type\":\"Folder\",\"createdDateTime\":null,\"lastModifiedDateTime\":null,\"webUrl\":null,\"children\":[{\"id\":\"123\",\"name\":\"file.txt\",\"type\":\"file\",\"createdDateTime\":null,\"lastModifiedDateTime\":null,\"webUrl\":\"https://example.com/file.txt\",\"children\":[],\"emails\":null},{\"id\":\"456\",\"name\":\"file.txt\",\"type\":\"file\",\"createdDateTime\":null,\"lastModifiedDateTime\":null,\"webUrl\":\"https://example.com/file.txt\",\"children\":[],\"emails\":null}],\"emails\":null}");
+                String expectedResultAsString = objectMapper.writeValueAsString(expectedResult);
+
+                assertEquals(expectedResultAsString, result);
+            }
+        }
+    }
+
+    @Test
+    public void testChatDiscussionWithAI_InvalidResponseFormat() throws IOException {
+        // Initialize mocks
+        httpClient = Mockito.mock(CloseableHttpClient.class);
+        httpResponse = Mockito.mock(CloseableHttpResponse.class);
+        httpEntity = Mockito.mock(HttpEntity.class);
+        statusLine = Mockito.mock(StatusLine.class);
+
+        try (MockedStatic<HttpClients> httpClientsMock = Mockito.mockStatic(HttpClients.class)) {
+            httpClientsMock.when(HttpClients::createDefault).thenReturn(httpClient);
+
+            // Mock an invalid API response
+            String responseBody = "{\"choices\":[{\"message\":{\"content\":\"invalid response\"}}]}";
+
+            // Mock the HTTP client behavior
+            when(httpClient.execute(any(HttpPost.class))).thenReturn(httpResponse);
+            when(httpResponse.getEntity()).thenReturn(httpEntity);
+            when(httpEntity.getContent()).thenReturn(new ByteArrayInputStream(responseBody.getBytes(StandardCharsets.UTF_8)));
+            when(httpResponse.getStatusLine()).thenReturn(statusLine);
+            when(statusLine.getStatusCode()).thenReturn(HttpStatus.SC_OK);
+
+            // Prepare the files parameter
+            String files = "{\n" +
+                    "  \"id\" : null,\n" +
+                    "  \"name\" : \"root\",\n" +
+                    "  \"type\" : \"Folder\",\n" +
+                    "  \"createdDateTime\" : null,\n" +
+                    "  \"lastModifiedDateTime\" : null,\n" +
+                    "  \"webUrl\" : null,\n" +
+                    "  \"children\" : [ {\n" +
+                    "    \"id\" : \"1kDnvf1fZ6F_fgVByNKosPwECDy8XegCb\",\n" +
+                    "    \"name\" : \"SaulGone (2) copy 2 (4).jpg\",\n" +
+                    "    \"type\" : \"image/jpeg\",\n" +
+                    "    \"createdDateTime\" : 1.710871335593E9,\n" +
+                    "    \"lastModifiedDateTime\" : 1709945523,\n" +
+                    "    \"webUrl\" : \"https://drive.google.com/file/d/1kDnvf1fZ6F_fgVByNKosPwECDy8XegCb/view?usp=drivesdk\",\n" +
+                    "    \"children\" : null\n" +
+                    "  }, {\n" +
+                    "    \"id\" : \"1rq8gDtQnqMfv3TFLq4PVmNA15KrlMcKk\",\n" +
+                    "    \"name\" : \"SaulGone (2) copy 2 (3).jpg\",\n" +
+                    "    \"type\" : \"image/jpeg\",\n" +
+                    "    \"createdDateTime\" : 1.710871317885E9,\n" +
+                    "    \"lastModifiedDateTime\" : 1709945523,\n" +
+                    "    \"webUrl\" : \"https://drive.google.com/file/d/1rq8gDtQnqMfv3TFLq4PVmNA15KrlMcKk/view?usp=drivesdk\",\n" +
+                    "    \"children\" : null\n" +
+                    "  }]\n" +
+                    "}";
+
+            // Mock the JsonUtils.validateContentFormat method to return false
+            try (MockedStatic<JsonUtils> mockedJsonUtils = Mockito.mockStatic(JsonUtils.class)) {
+                mockedJsonUtils.when(() -> JsonUtils.validateContentFormat(any())).thenReturn(false);
+
+                assertThrows(IOException.class, () -> DriveInformationService.chatDiscussionWithAI(files, "GoogleDrive", 0));
+            }
         }
     }
 }

@@ -22,21 +22,20 @@ import java.util.Date;
 public class UserAuthenticationProvider {
 
     private final UserService userService;
-    //:secret-key is the default value
-    @Value("${security.jwt.token.secret-key:secret-key}")
-    private String secretKey;
+
+    private String JWT_SECRET_KEY = System.getenv("JWT_SECRET_KEY");
 
     @PostConstruct
     protected void init() {
         // this is to avoid having the raw secret key available in the JVM
-        secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());
+        JWT_SECRET_KEY = Base64.getEncoder().encodeToString(JWT_SECRET_KEY.getBytes());
     }
 
     public String createToken(String login) {
         Date now = new Date();
         Date validity = new Date(now.getTime() + 3600000); // 1 hour
 
-        Algorithm algorithm = Algorithm.HMAC256(secretKey);
+        Algorithm algorithm = Algorithm.HMAC256(JWT_SECRET_KEY);
         return JWT.create()
                 .withSubject(login)
                 .withIssuedAt(now)
@@ -45,7 +44,7 @@ public class UserAuthenticationProvider {
     }
 
     public Authentication validateToken(String token) {
-        Algorithm algorithm = Algorithm.HMAC256(secretKey);
+        Algorithm algorithm = Algorithm.HMAC256(JWT_SECRET_KEY);
 
         JWTVerifier verifier = JWT.require(algorithm)
                 .build();

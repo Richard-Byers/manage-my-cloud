@@ -17,6 +17,9 @@
   - MMC_EMAIL_PASSWORD=
   - GOOGLE_CREDENTIALS_JSON=
   - "SPRING_PROFILES_ACTIVE=" <- This should be "SPRING_PROFILES_ACTIVE=dev" if running authorisation-service outside of docker, if running in docker it should be "SPRING_PROFILES_ACTIVE=docker"
+  - ENCRYPTION_SECRET_KEY= {This will be 1234567891234567 by default if not set}
+  - JWT_SECRET_KEY=
+  - WEB_CONFIG_ENVIRONMENT= {This will be development by default if not set}
 
 To run both the authorisation-service and the postgres docker containers you need to be in the root directory
 of ```manage-my-cloud-backend```
@@ -28,8 +31,11 @@ of ```manage-my-cloud-backend```
   - MMC_EMAIL_PASSWORD=
   - GOOGLE_CREDENTIALS_JSON=
   - "SPRING_PROFILES_ACTIVE=docker"
+  - ENCRYPTION_SECRET_KEY= {This will be 1234567891234567 by default if not set}
+  - JWT_SECRET_KEY=
+  - WEB_CONFIG_ENVIRONMENT= {This will be development by default if not set}
 
-then build the docker container using ```docker-build -t manage-my-cloud .``` and then run the following command:
+then build the docker container using ```docker build -t manage-my-cloud .``` and then run the following command:
 
 ### ```docker-compose up -d```
 
