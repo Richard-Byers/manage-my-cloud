@@ -7,7 +7,8 @@ import LoadingSpinner from "../../../helpers/LoadingSpinner";
 import StorageProgressBar from "../storage_bar/StorageProgressBar";
 import DashboardCardModal from "../../../modals/dashboard/DashboardCardModal";
 import {useTranslation} from "react-i18next";
-
+import ErrorModal from "../../../modals/dashboard/ErrorModal";
+import { useNavigate } from 'react-router-dom';
 interface DriveInformation {
     displayName: string,
     email: string,
@@ -26,26 +27,58 @@ const CardContainer: React.FC<ConnectedDrivesCardProps> = ({connectionProvider, 
     const {t} = useTranslation();
     const [driveInformation, setDriveInformation] = React.useState<DriveInformation | null>(null);
     const [dashboardModal, setShowDashboardModal] = useState(false);
+    const [showErrorModal, setShowErrorModal] = useState(false);
+    const [errorMessage, setErrorMessage] = useState('');
+
+    const navigate = useNavigate()
 
     const toggleModal = () => {
         setShowDashboardModal(!dashboardModal);
     }
 
     const shouldRun = useRef(true);
+    const handleCloseErrorModal = () => {
+        setShowErrorModal(false);
+        navigate('/manage-connections');
+    }
+
     React.useEffect(() => {
         if (!shouldRun.current) return;
         shouldRun.current = false;
         const fetchDriveInformation = async () => {
-            const info = await getUserDrives(user, connectionProvider, driveEmail);
-            setDriveInformation(info);
+            try {
+                const info = await getUserDrives(user, connectionProvider, driveEmail);
+                setDriveInformation(info);
+            } catch (error) {
+                if (error instanceof Error) {
+                    setErrorMessage(error.message);
+                    setShowErrorModal(true);
+                }
+            }
         };
-
         fetchDriveInformation();
-    }, [user, connectionProvider]);
+    }, [user, connectionProvider, driveEmail]);
+
+    if (showErrorModal) {
+        return (
+            <ErrorModal showModal={showErrorModal} handleClose={handleCloseErrorModal} errorMessage={errorMessage} buttonName={t(
+                "main.dashboard.manageConnectionsLink"
+              )}/>
+        );
+    }
 
     if (!driveInformation) {
         return <LoadingSpinner/>
     }
+
+    const convertGBtoTB= (sizeInGB: number) => {
+        if (sizeInGB >= 1024) {
+            // Convert to TB and format to 2 decimal places
+            return `${(sizeInGB / 1024).toFixed(2)}TB`;
+        } else {
+            return `${sizeInGB}GB`;
+        }
+    };
 
     return (
         <>
@@ -65,7 +98,7 @@ const CardContainer: React.FC<ConnectedDrivesCardProps> = ({connectionProvider, 
                 </div>
                 <div className='item-storage-used' id={"drive-used-storage"}>
                     <h2>{t('main.dashboard.connectedDrivesCard.storageUsed')}:</h2>
-                    <h2>{driveInformation.used > 0.0 ? driveInformation.used : "< 0"}GB/{driveInformation.total}GB</h2>
+                    <h2>{driveInformation.used > 0.0 ? convertGBtoTB(driveInformation.used) : "< 0GB"}/{convertGBtoTB(driveInformation.total)}</h2>
                 </div>
                 <StorageProgressBar used={driveInformation.used} total={driveInformation.total}/>
             </div>
@@ -74,13 +107,20 @@ const CardContainer: React.FC<ConnectedDrivesCardProps> = ({connectionProvider, 
 }
 
 async function getUserDrives(user: any, connectionProvider: string, driveEmail: string): Promise<DriveInformation> {
-
     const headers = {
         'Authorization': `Bearer ${user.token}`
     }
 
     const connectionProviderTitle = CONNECTION_TITLE[connectionProvider];
     const response = await buildAxiosRequestWithHeaders('GET', `/drive-information?email=${user.email}&provider=${connectionProviderTitle}&driveEmail=${driveEmail}`, headers, {});
+
+    if (response.status !== 200) {
+        if (connectionProvider === 'GoogleDrive') {
+            throw new Error(`Unable to access Google Drive (${driveEmail}). Please re-link your account in Manage Connections.`);
+        } else {
+            throw new Error(`Unable to access OneDrive (${driveEmail}). Please re-link your account in Manage Connections.`);
+        }
+    }
 
     if (!response.data) {
         throw new Error('Invalid response data');
@@ -91,7 +131,6 @@ async function getUserDrives(user: any, connectionProvider: string, driveEmail: 
         total: response.data.total,
         used: response.data.used,
     };
-
 }
 
 export default CardContainer

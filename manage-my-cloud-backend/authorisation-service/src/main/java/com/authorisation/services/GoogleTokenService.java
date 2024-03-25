@@ -4,7 +4,7 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeToken
 import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
 import com.google.api.client.googleapis.auth.oauth2.GoogleTokenResponse;
 import com.google.api.client.http.javanet.NetHttpTransport;
-import com.google.api.client.json.jackson2.JacksonFactory;
+import com.google.api.client.json.gson.GsonFactory;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -16,10 +16,10 @@ public class GoogleTokenService {
         String redirectUri = System.getenv("GOOGLE_REDIRECT_URI") != null ? System.getenv("GOOGLE_REDIRECT_URI") : "http://localhost:3000";
 
         GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(
-                JacksonFactory.getDefaultInstance(), new StringReader(googleCredentialsJson));
+                GsonFactory.getDefaultInstance(), new StringReader(googleCredentialsJson));
         return new GoogleAuthorizationCodeTokenRequest(
                 new NetHttpTransport(),
-                JacksonFactory.getDefaultInstance(),
+                GsonFactory.getDefaultInstance(),
                 "https://www.googleapis.com/oauth2/v4/token",
                 clientSecrets.getDetails().getClientId(),
                 clientSecrets.getDetails().getClientSecret(),

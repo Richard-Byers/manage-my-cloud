@@ -89,7 +89,8 @@ public class OneDriveService implements IOneDriveService {
                 oneDriveTokenResponse.getAccessToken(),
                 oneDriveTokenResponse.getRefreshToken(),
                 accessExpiryDate,
-                driveEmail);
+                driveEmail,
+                false);
 
     }
 

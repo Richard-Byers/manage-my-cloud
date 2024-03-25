@@ -72,7 +72,7 @@ class OneDriveServiceTest {
         OneDriveTokenResponse actualOneDriveTokenResponse = oneDriveService.getAndStoreUserTokens(authCode, email);
 
         assertEquals(expectedOneDriveTokenResponse, actualOneDriveTokenResponse);
-        verify(cloudPlatformService, times(1)).addCloudPlatform(anyString(), anyString(), anyString(), anyString(), any(Date.class), anyString());
+        verify(cloudPlatformService, times(1)).addCloudPlatform(anyString(), anyString(), anyString(), anyString(), any(Date.class), anyString(), anyBoolean());
     }
 
     @Test

@@ -88,8 +88,9 @@ public class UserDriveController {
         } else if (connectionProvider.equals(GOOGLEDRIVE)) {
             String decryptedRefreshToken = decrypt(cloudPlatform.getRefreshToken());
             String decryptedAccessToken = decrypt(cloudPlatform.getAccessToken());
+            boolean gaveGmailPermissions = cloudPlatform.isGaveGmailPermissions();
             try {
-                JsonNode jsonNode = driveInformationService.fetchAllGoogleDriveFiles(decryptedRefreshToken, decryptedAccessToken, simpMessagingTemplate, userEntity.getEmail());
+                JsonNode jsonNode = driveInformationService.fetchAllGoogleDriveFiles(decryptedRefreshToken, decryptedAccessToken, simpMessagingTemplate, userEntity.getEmail(), gaveGmailPermissions);
                 return ResponseEntity.ok(jsonNode);
             } catch (Exception e) {
                 return ResponseEntity.badRequest().build();

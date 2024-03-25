@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.authorisation.givens.CloudPlatformGivens.generateCloudPlatform;
+import static com.authorisation.util.EncryptionUtil.decrypt;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -49,10 +50,37 @@ class CloudPlatformServiceTest {
         when(userEntityRepository.findByEmail(userEmail)).thenReturn(java.util.Optional.of(userEntity));
         when(cloudPlatformRepository.save(any(CloudPlatform.class))).thenReturn(expectedCloudPlatform);
 
-        CloudPlatform actualCloudPlatform = cloudPlatformService.addCloudPlatform(userEmail, platformName, accessToken, refreshToken, null, driveEmail);
+        CloudPlatform actualCloudPlatform = cloudPlatformService.addCloudPlatform(userEmail, platformName, accessToken, refreshToken, null, driveEmail, true);
 
         assertEquals(expectedCloudPlatform, actualCloudPlatform);
         verify(userEntityRepository, times(1)).save(userEntity);
+    }
+
+    @Test
+    void updateCloudPlatform() {
+        String userEmail = "email@example.com";
+        String driveEmail = "email@example.com";
+        String platformName = "OneDrive";
+        String accessToken = "new_access_token";
+        String refreshToken = "new_refresh_token";
+        boolean gaveGmailPermissions = true;
+
+        UserEntity userEntity = new UserEntity();
+        userEntity.setEmail(userEmail);
+
+        CloudPlatform existingCloudPlatform = generateCloudPlatform();
+        existingCloudPlatform.setUserEntity(userEntity);
+        existingCloudPlatform.setPlatformName(platformName);
+        existingCloudPlatform.setDriveEmail(driveEmail);
+
+        when(cloudPlatformRepository.findByUserEntityEmailAndPlatformNameAndDriveEmail(userEmail, platformName, driveEmail)).thenReturn(existingCloudPlatform);
+        when(cloudPlatformRepository.save(any(CloudPlatform.class))).thenAnswer(i -> i.getArguments()[0]);
+
+        CloudPlatform updatedCloudPlatform = cloudPlatformService.updateCloudPlatform(userEmail, platformName, accessToken, refreshToken, null, driveEmail, gaveGmailPermissions);
+
+        assertEquals(accessToken, decrypt(updatedCloudPlatform.getAccessToken()));
+        assertEquals(refreshToken, decrypt(updatedCloudPlatform.getRefreshToken()));
+        assertEquals(gaveGmailPermissions, updatedCloudPlatform.isGaveGmailPermissions());
     }
 
     @Test
@@ -71,7 +99,7 @@ class CloudPlatformServiceTest {
         when(userEntityRepository.findByEmail(userEmail)).thenReturn(java.util.Optional.of(userEntity));
         when(cloudPlatformRepository.save(any(CloudPlatform.class))).thenReturn(expectedCloudPlatform);
 
-        CloudPlatform actualCloudPlatform = cloudPlatformService.addCloudPlatform(userEmail, platformName, accessToken, refreshToken, null, driveEmail);
+        CloudPlatform actualCloudPlatform = cloudPlatformService.addCloudPlatform(userEmail, platformName, accessToken, refreshToken, null, driveEmail, true);
 
         assertEquals(expectedCloudPlatform, actualCloudPlatform);
         verify(userEntityRepository, times(1)).save(userEntity);

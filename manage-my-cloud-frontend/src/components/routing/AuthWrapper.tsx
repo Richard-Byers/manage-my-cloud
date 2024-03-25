@@ -91,7 +91,7 @@ export const AuthWrapper = () => {
             }
         },
         flow: 'auth-code',
-        scope: 'https://www.googleapis.com/auth/drive',
+        scope: 'openid profile email'
     });
 
     const refreshUser = async (email: string | undefined): Promise<void> => {
