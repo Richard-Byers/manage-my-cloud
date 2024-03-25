@@ -15,7 +15,7 @@ build:
     - cd manage-my-cloud-backend
     - mvn clean install
 
-frontend:
+backend:
   stage: push-backend
   tags: [gcp]
   image: google/cloud-sdk:alpine
@@ -32,7 +32,7 @@ frontend:
     - sudo docker image remove -f manage-my-cloud-backend
     - rm /tmp/gcloud-service-key.json
 
-backend:
+frontend:
   stage: push-frontend
   tags: [gcp]
   image: google/cloud-sdk:alpine
