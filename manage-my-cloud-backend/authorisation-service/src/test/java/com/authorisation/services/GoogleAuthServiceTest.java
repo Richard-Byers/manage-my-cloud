@@ -101,6 +101,8 @@ class GoogleAuthServiceTest {
 
         MockedStatic<GoogleTokenService> googleTokenServiceMockedStatic = Mockito.mockStatic(GoogleTokenService.class);
 
+        GoogleAuthService googleAuthServiceSpy = Mockito.spy(googleAuthService);
+
         try (googleTokenServiceMockedStatic) {
             //when
             googleTokenServiceMockedStatic.when(() -> GoogleTokenService.getGoogleTokenResponse(any(), any())).thenReturn(mockResponse);
@@ -108,10 +110,12 @@ class GoogleAuthServiceTest {
             when(mockResponse.getAccessToken()).thenReturn(accessToken);
             when(driveInformationService.getGoogleDriveEmail(refreshToken, accessToken)).thenReturn(TESTER_EMAIL);
             when(cloudPlatformService.isDriveLinked(userEntity.getEmail(), TESTER_EMAIL, GOOGLEDRIVE)).thenReturn(false);
-            when(cloudPlatformService.addCloudPlatform(userEntity.getEmail(), GOOGLEDRIVE, accessToken, refreshToken, null, TESTER_EMAIL)).thenReturn(
+            when(cloudPlatformService.addCloudPlatform(userEntity.getEmail(), GOOGLEDRIVE, accessToken, refreshToken, null, TESTER_EMAIL, true)).thenReturn(
                     null);
 
-            GoogleDriveLinkResponse userDtoResponseEntity = googleAuthService.linkGoogleAccount(authCode, userEntity.getEmail());
+            doReturn("https://www.googleapis.com/auth/drive https://mail.google.com/").when(googleAuthServiceSpy).getAccessTokenScope(any());
+
+            GoogleDriveLinkResponse userDtoResponseEntity = googleAuthServiceSpy.linkGoogleAccount(authCode, userEntity.getEmail());
 
             //then
             assertNull(userDtoResponseEntity.getError());
@@ -130,6 +134,8 @@ class GoogleAuthServiceTest {
 
         MockedStatic<GoogleTokenService> googleTokenServiceMockedStatic = Mockito.mockStatic(GoogleTokenService.class);
 
+        GoogleAuthService googleAuthServiceSpy = Mockito.spy(googleAuthService);
+
         try (googleTokenServiceMockedStatic) {
             //when
             googleTokenServiceMockedStatic.when(() -> GoogleTokenService.getGoogleTokenResponse(any(), any())).thenReturn(mockResponse);
@@ -138,7 +144,10 @@ class GoogleAuthServiceTest {
             when(driveInformationService.getGoogleDriveEmail(refreshToken, accessToken)).thenReturn(TESTER_EMAIL);
             when(cloudPlatformService.isDriveLinked(userEntity.getEmail(), TESTER_EMAIL, GOOGLEDRIVE)).thenReturn(true);
 
-            GoogleDriveLinkResponse userDtoResponseEntity = googleAuthService.linkGoogleAccount(authCode, userEntity.getEmail());
+            // Mock the getAccessTokenScope method
+            doReturn("https://www.googleapis.com/auth/drive https://mail.google.com/").when(googleAuthServiceSpy).getAccessTokenScope(any());
+
+            GoogleDriveLinkResponse userDtoResponseEntity = googleAuthServiceSpy.linkGoogleAccount(authCode, userEntity.getEmail());
 
             //then
             assertEquals("Drive already linked", userDtoResponseEntity.getError());

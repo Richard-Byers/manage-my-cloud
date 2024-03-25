@@ -102,9 +102,9 @@ public class DriveGivens {
 
         ArrayList<CustomDriveItem> children = new ArrayList<>();
         ArrayList<CustomEmail> emails = new ArrayList<>();
-        children.add(new CustomDriveItem("1", "name1.png", "application/png", OffsetDateTime.now(), OffsetDateTime.now(), "url", List.of(new CustomDriveItem()), List.of(new CustomEmail())));
-        children.add(new CustomDriveItem("2", "name1.mp4", "mp4", OffsetDateTime.now(), OffsetDateTime.now(), "url", List.of(new CustomDriveItem()), List.of(new CustomEmail())));
-        children.add(new CustomDriveItem("3", "name1.csv", "application/png", OffsetDateTime.now(), OffsetDateTime.now(), "url", List.of(new CustomDriveItem()), List.of(new CustomEmail())));
+        children.add(new CustomDriveItem("1", "name1.png", "application/png", OffsetDateTime.now(), OffsetDateTime.now(), "url", List.of(new CustomDriveItem()), List.of(new CustomEmail()), true));
+        children.add(new CustomDriveItem("2", "name1.mp4", "mp4", OffsetDateTime.now(), OffsetDateTime.now(), "url", List.of(new CustomDriveItem()), List.of(new CustomEmail()), true));
+        children.add(new CustomDriveItem("3", "name1.csv", "application/png", OffsetDateTime.now(), OffsetDateTime.now(), "url", List.of(new CustomDriveItem()), List.of(new CustomEmail()), true));
 
         emails.add(new CustomEmail("id", "url", OffsetDateTime.now(), "subject"));
 
@@ -120,10 +120,10 @@ public class DriveGivens {
         recommendations.setType("Folder");
 
         ArrayList<CustomDriveItem> children = new ArrayList<>();
-        children.add(new CustomDriveItem("1", "name1.png", "application/png", OffsetDateTime.now(), OffsetDateTime.now(), "url", List.of(new CustomDriveItem()), List.of(new CustomEmail())));
-        children.add(new CustomDriveItem("2", "name1.mp4", "mp4", OffsetDateTime.now(), OffsetDateTime.now(), "url", List.of(new CustomDriveItem()), List.of(new CustomEmail())));
-        children.add(new CustomDriveItem("3", "name1.csv", "application/png", OffsetDateTime.now(), OffsetDateTime.now(), "url", List.of(new CustomDriveItem()), List.of(new CustomEmail())));
-        children.add(new CustomDriveItem("4", "name1.log", "log", OffsetDateTime.now(), OffsetDateTime.now(), "url", List.of(new CustomDriveItem()), List.of(new CustomEmail())));
+        children.add(new CustomDriveItem("1", "name1.png", "application/png", OffsetDateTime.now(), OffsetDateTime.now(), "url", List.of(new CustomDriveItem()), List.of(new CustomEmail()), true));
+        children.add(new CustomDriveItem("2", "name1.mp4", "mp4", OffsetDateTime.now(), OffsetDateTime.now(), "url", List.of(new CustomDriveItem()), List.of(new CustomEmail()), true));
+        children.add(new CustomDriveItem("3", "name1.csv", "application/png", OffsetDateTime.now(), OffsetDateTime.now(), "url", List.of(new CustomDriveItem()), List.of(new CustomEmail()), true));
+        children.add(new CustomDriveItem("4", "name1.log", "log", OffsetDateTime.now(), OffsetDateTime.now(), "url", List.of(new CustomDriveItem()), List.of(new CustomEmail()), true));
         recommendations.setChildren(Collections.synchronizedList(children));
 
 

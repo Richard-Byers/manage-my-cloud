@@ -29,5 +29,5 @@ public class CloudPlatform {
     @Column(length = 2000)
     private String refreshToken;
     private String driveEmail;
-
+    private boolean gaveGmailPermissions;
 }
