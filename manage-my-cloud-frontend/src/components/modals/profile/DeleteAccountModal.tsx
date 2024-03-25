@@ -2,9 +2,8 @@ import React, {useState} from "react";
 import {AuthData} from "../../routing/AuthWrapper";
 import './DeleteAccountModal.css';
 import "../Modal.css";
-import {useTranslation} from 'react-i18next';
+import {Trans, useTranslation} from 'react-i18next';
 import {buildAxiosRequestWithHeaders} from "../../helpers/AxiosHelper";
-import {Trans} from 'react-i18next';
 
 function DeleteAccountModal() {
     const {user, logout} = AuthData();
@@ -34,16 +33,19 @@ function DeleteAccountModal() {
 
             if (password === "" && confirmPassword === "") {
                 setErrorMessage(t('main.deleteAccountModal.errorMessage.enterBothPasswords'));
+                setIsDeleting(false);
                 return;
             }
 
             if (password === "" || confirmPassword === "") {
                 setErrorMessage(t('main.deleteAccountModal.errorMessage.fillBothPasswords'));
+                setIsDeleting(false)
                 return;
             }
 
             if (password !== confirmPassword) {
                 setErrorMessage(t('main.deleteAccountModal.errorMessage.passwordsDoNotMatch'));
+                setIsDeleting(false)
                 return;
             }
         }
@@ -56,13 +58,19 @@ function DeleteAccountModal() {
                 await buildAxiosRequestWithHeaders("DELETE", "/delete-user", headers, {
                     email: user.email,
                     password: password
-                });
-                setSuccessMessage(t('main.deleteAccountModal.errorMessage.accountDeletedSuccessfully'));
+                }).then((response) => {
+                    if (response.status !== 200) {
+                        setErrorMessage(t('main.deleteAccountModal.errorMessage.errorDeletingAccount'));
+                        setIsDeleting(false)
+                    } else {
+                        setSuccessMessage(t('main.deleteAccountModal.errorMessage.accountDeletedSuccessfully'));
 
-                setTimeout(() => {
-                    logout();
-                    resetModal();
-                }, 2000);
+                        setTimeout(() => {
+                            logout();
+                            resetModal();
+                        }, 2000);
+                    }
+                });
             } catch (error) {
                 const err = error as any;
                 if (err.response && err.response.data === 'Invalid password') {
@@ -100,7 +108,10 @@ function DeleteAccountModal() {
                                                type="password"
                                                placeholder={t('main.deleteAccountModal.enterPassword')}
                                                value={password}
-                                               onChange={(e) => setPassword(e.target.value)}
+                                               onChange={(e) => {
+                                                   setPassword(e.target.value)
+                                                   setErrorMessage("")
+                                               }}
                                                disabled={isDeleting}
                                         />
                                     </label>
@@ -111,7 +122,10 @@ function DeleteAccountModal() {
                                                type="password"
                                                placeholder={t('main.deleteAccountModal.confirmPassword')}
                                                value={confirmPassword}
-                                               onChange={(e) => setConfirmPassword(e.target.value)}
+                                               onChange={(e) => {
+                                                   setConfirmPassword(e.target.value)
+                                                   setErrorMessage("")
+                                               }}
                                                disabled={isDeleting}
                                         />
                                     </label>
@@ -129,7 +143,10 @@ function DeleteAccountModal() {
                                     </button>
                                     <button
                                         className="modal-form-submit-button"
-                                        onClick={() => setShowModal(false)}
+                                        onClick={() => {
+                                            setShowModal(false)
+                                            setErrorMessage("")
+                                        }}
                                         disabled={isDeleting}
                                     >{t('main.deleteAccountModal.cancel')}</button>
                                 </div>
