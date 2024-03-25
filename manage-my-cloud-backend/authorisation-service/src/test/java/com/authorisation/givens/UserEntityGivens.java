@@ -17,7 +17,7 @@ public class UserEntityGivens {
     }
 
     public static UserEntity generateUserEntityEnabled() {
-        return new UserEntity(1L, "John", "Doe", false,"johndoe@gmail.com", "password", "USER", true, null, new LinkedAccounts(), null);
+        return new UserEntity(1L, "John", "Doe", false,"johndoe@gmail.com", "password", "USER", true, "Manage_My_Cloud", new LinkedAccounts(), null);
     }
 
     public static UserEntity generateGoogleUserEntity() {

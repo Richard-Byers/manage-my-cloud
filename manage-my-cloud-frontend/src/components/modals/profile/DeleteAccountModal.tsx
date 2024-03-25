@@ -1,10 +1,10 @@
-import React, { useState } from "react";
-import { AuthData } from "../../routing/AuthWrapper";
+import React, {useState} from "react";
+import {AuthData} from "../../routing/AuthWrapper";
 import './DeleteAccountModal.css';
 import "../Modal.css";
-import { useTranslation } from 'react-i18next';
+import {useTranslation} from 'react-i18next';
 import {buildAxiosRequestWithHeaders} from "../../helpers/AxiosHelper";
-import { Trans } from 'react-i18next';
+import {Trans} from 'react-i18next';
 
 function DeleteAccountModal() {
     const {user, logout} = AuthData();
@@ -14,7 +14,7 @@ function DeleteAccountModal() {
     const [errorMessage, setErrorMessage] = useState("");
     const [successMessage, setSuccessMessage] = useState("");
     const [isDeleting, setIsDeleting] = useState(false);
-    const { t } = useTranslation();
+    const {t} = useTranslation();
 
     const resetModal = () => {
         setPassword("");
@@ -29,19 +29,23 @@ function DeleteAccountModal() {
     const handleDeleteAccount = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setIsDeleting(true);
-        if (password === "" && confirmPassword === "") {
-            setErrorMessage(t('main.deleteAccountModal.errorMessage.enterBothPasswords'));
-            return;
-        }
 
-        if (password === "" || confirmPassword === "") {
-            setErrorMessage(t('main.deleteAccountModal.errorMessage.fillBothPasswords'));
-            return;
-        }
+        if (user?.accountType !== "GOOGLE") {
 
-        if (password !== confirmPassword) {
-            setErrorMessage(t('main.deleteAccountModal.errorMessage.passwordsDoNotMatch'));
-            return;
+            if (password === "" && confirmPassword === "") {
+                setErrorMessage(t('main.deleteAccountModal.errorMessage.enterBothPasswords'));
+                return;
+            }
+
+            if (password === "" || confirmPassword === "") {
+                setErrorMessage(t('main.deleteAccountModal.errorMessage.fillBothPasswords'));
+                return;
+            }
+
+            if (password !== confirmPassword) {
+                setErrorMessage(t('main.deleteAccountModal.errorMessage.passwordsDoNotMatch'));
+                return;
+            }
         }
 
         if (user) {
@@ -49,7 +53,10 @@ function DeleteAccountModal() {
                 const headers = {
                     Authorization: `Bearer ${user.token}`
                 }
-                await buildAxiosRequestWithHeaders("DELETE", "/delete-user", headers, {email: user.email, password: password});
+                await buildAxiosRequestWithHeaders("DELETE", "/delete-user", headers, {
+                    email: user.email,
+                    password: password
+                });
                 setSuccessMessage(t('main.deleteAccountModal.errorMessage.accountDeletedSuccessfully'));
 
                 setTimeout(() => {
@@ -74,13 +81,15 @@ function DeleteAccountModal() {
 
     return (
         <>
-            <button className="actions-button" onClick={() => setShowModal(true)} id={"delete-account-button"}>Delete Account</button>
+            <button className="actions-button" onClick={() => setShowModal(true)} id={"delete-account-button"}>Delete
+                Account
+            </button>
             {showModal && (
                 <div className="modal-overlay" onClick={resetModal}>
                     <div className="modal" onClick={e => e.stopPropagation()}>
                         <div className={"modal-form-container"}>
                             <div className={"modal-description"}>
-                                <Trans i18nKey='main.deleteAccountModal.modalDescription' />
+                                <Trans i18nKey='main.deleteAccountModal.modalDescription'/>
                                 <br/>
                             </div>
 
@@ -107,8 +116,10 @@ function DeleteAccountModal() {
                                         />
                                     </label>
                                 </div>
-                                {errorMessage && <div className="modal-form-message" style={{color: '#ea1818'}}>{errorMessage}</div>}
-                                {successMessage && <div className="modal-form-message" style={{color: '#4caf50'}}>{successMessage}</div>}
+                                {errorMessage &&
+                                    <div className="modal-form-message" style={{color: '#ea1818'}}>{errorMessage}</div>}
+                                {successMessage && <div className="modal-form-message"
+                                                        style={{color: '#4caf50'}}>{successMessage}</div>}
                                 <div className="button-container">
                                     <button
                                         className="modal-form-submit-button"
