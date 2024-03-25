@@ -16,7 +16,7 @@ function TermsOfServiceModal({show: showModal, handleClose: closeHandle}: TermsO
 
     useEffect(() => {
         if (show) {
-            fetch('/termsOfService.txt')
+            fetch('/TermsOfService.txt')
                 .then(response => response.text())
                 .then(text => setTermsOfServiceText(text));
         }

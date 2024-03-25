@@ -54,7 +54,6 @@ function ProfileActionsCard() {
             <button className="actions-button"
                     onClick={handleUserDataRequest} id={"request-data-button"}>{t('main.profileActionsCard.requestData')}</button>
             <TermsOfServiceModal show={showTermsOfServiceModal} handleClose={handleTermsOfServiceModal}/>
-            <button className="actions-button" id={"contact-us-button"}>{t('main.profileActionsCard.ContactUs')}</button>
             <DeleteAccountModal/>
         </div>
     );
