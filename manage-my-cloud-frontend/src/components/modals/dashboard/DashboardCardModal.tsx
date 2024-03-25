@@ -141,7 +141,7 @@ const DashboardCardModal: React.FC<DashboardCardModalProps> = ({
             categories.Audio += 1;
           } else if (item.type.startsWith('video')) {
             categories.Video += 1;
-          } else if (item.type.startsWith('text') || item.type.includes('document')) {
+          } else if (item.type.startsWith('text') || item.type.includes('document') || item.type==='application/pdf') {
             categories.Documents += 1;
           } else {
             categories.Others += 1;
