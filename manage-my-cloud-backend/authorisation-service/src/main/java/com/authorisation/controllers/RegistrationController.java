@@ -157,11 +157,11 @@ public class RegistrationController {
 
         if (ENVIRONMENT != null && ENVIRONMENT.equals("production")) {
             prefix = "https://";
+            return prefix + request.getServerName() + request.getContextPath();
         } else {
             prefix = "http://";
+            return prefix + request.getServerName() + ":" + request.getServerPort() + request.getContextPath();
         }
-
-        return prefix + request.getServerName() + ":" + request.getServerPort() + request.getContextPath();
     }
 
     private void sendPasswordResetEmailLink(UserEntity userEntity, String applicationUrl, String passwordResetToken) {
