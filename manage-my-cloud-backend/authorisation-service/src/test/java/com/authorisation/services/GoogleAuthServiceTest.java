@@ -7,8 +7,10 @@ import com.authorisation.entities.UserEntity;
 import com.authorisation.mappers.UserMapper;
 import com.authorisation.mappers.UserMapperImpl;
 import com.authorisation.response.GoogleDriveLinkResponse;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleTokenResponse;
+import okhttp3.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mmc.drive.DriveInformationService;
@@ -41,9 +43,12 @@ class GoogleAuthServiceTest {
     private DriveInformationService driveInformationService;
     @Mock
     private RefreshTokenService refreshTokenService;
+    @Mock
+    OkHttpClient okHttpClient;
     @InjectMocks
     private GoogleAuthService googleAuthService;
     UserMapper userMapper = new UserMapperImpl();
+    ObjectMapper objectMapper = new ObjectMapper();
 
     @Test
     void storeAuthCode_ReturnsUserDto() {
@@ -115,10 +120,10 @@ class GoogleAuthServiceTest {
 
             doReturn("https://www.googleapis.com/auth/drive https://mail.google.com/").when(googleAuthServiceSpy).getAccessTokenScope(any());
 
-            GoogleDriveLinkResponse userDtoResponseEntity = googleAuthServiceSpy.linkGoogleAccount(authCode, userEntity.getEmail());
+            GoogleDriveLinkResponse googleDriveLinkResponse = googleAuthServiceSpy.linkGoogleAccount(authCode, userEntity.getEmail());
 
             //then
-            assertNull(userDtoResponseEntity.getError());
+            assertNull(googleDriveLinkResponse.getError());
         }
     }
 
@@ -147,11 +152,110 @@ class GoogleAuthServiceTest {
             // Mock the getAccessTokenScope method
             doReturn("https://www.googleapis.com/auth/drive https://mail.google.com/").when(googleAuthServiceSpy).getAccessTokenScope(any());
 
-            GoogleDriveLinkResponse userDtoResponseEntity = googleAuthServiceSpy.linkGoogleAccount(authCode, userEntity.getEmail());
+            GoogleDriveLinkResponse googleDriveLinkResponse = googleAuthServiceSpy.linkGoogleAccount(authCode, userEntity.getEmail());
 
             //then
-            assertEquals("Drive already linked", userDtoResponseEntity.getError());
+            assertEquals("Drive already linked", googleDriveLinkResponse.getError());
         }
+    }
+
+    @Test
+    void linkGmail_ReturnsGoogleDriveLinkResponse() throws IOException {
+        //given
+        ReflectionTestUtils.setField(googleAuthService, "googleCredentialsJson", "credentials");
+        UserEntity userEntity = generateUserEntityTesterEmail();
+        String authCode = "{authCode: \"auth_code\"}";
+        GoogleTokenResponse mockResponse = mock(GoogleTokenResponse.class);
+        String accessToken = "accessToken";
+        String refreshToken = "refreshToken";
+
+        MockedStatic<GoogleTokenService> googleTokenServiceMockedStatic = Mockito.mockStatic(GoogleTokenService.class);
+
+        GoogleAuthService googleAuthServiceSpy = Mockito.spy(googleAuthService);
+
+        try (googleTokenServiceMockedStatic) {
+            //when
+            googleTokenServiceMockedStatic.when(() -> GoogleTokenService.getGoogleTokenResponse(any(), any())).thenReturn(mockResponse);
+            when(mockResponse.getRefreshToken()).thenReturn(refreshToken);
+            when(mockResponse.getAccessToken()).thenReturn(accessToken);
+            when(driveInformationService.getGoogleDriveEmail(refreshToken, accessToken)).thenReturn(TESTER_EMAIL);
+            when(cloudPlatformService.updateCloudPlatform(userEntity.getEmail(), GOOGLEDRIVE, accessToken, refreshToken, null, TESTER_EMAIL, true)).thenReturn(
+                    null);
+
+            doReturn("https://www.googleapis.com/auth/gmail.modify https://mail.google.com/").when(googleAuthServiceSpy).getAccessTokenScope(any());
+
+            GoogleDriveLinkResponse googleDriveLinkResponse = googleAuthServiceSpy.linkGmail(authCode, userEntity.getEmail());
+
+            //then
+            assertNull(googleDriveLinkResponse.getError());
+        }
+    }
+
+    @Test
+    void linkGmail_DriveInformationThrowsException_ReturnsNullGoogleDriveLinkResponse() throws IOException {
+        //given
+        ReflectionTestUtils.setField(googleAuthService, "googleCredentialsJson", "credentials");
+        UserEntity userEntity = generateUserEntityTesterEmail();
+        String authCode = "{authCode: \"auth_code\"}";
+        GoogleTokenResponse mockResponse = mock(GoogleTokenResponse.class);
+        String accessToken = "accessToken";
+        String refreshToken = "refreshToken";
+
+        MockedStatic<GoogleTokenService> googleTokenServiceMockedStatic = Mockito.mockStatic(GoogleTokenService.class);
+
+        GoogleAuthService googleAuthServiceSpy = Mockito.spy(googleAuthService);
+
+        try (googleTokenServiceMockedStatic) {
+            //when
+            googleTokenServiceMockedStatic.when(() -> GoogleTokenService.getGoogleTokenResponse(any(), any())).thenReturn(mockResponse);
+            when(mockResponse.getRefreshToken()).thenReturn(refreshToken);
+            when(mockResponse.getAccessToken()).thenReturn(accessToken);
+            when(driveInformationService.getGoogleDriveEmail(refreshToken, accessToken)).thenThrow(new IOException());
+
+            doReturn("https://www.googleapis.com/auth/gmail.modify https://mail.google.com/").when(googleAuthServiceSpy).getAccessTokenScope(any());
+
+            GoogleDriveLinkResponse googleDriveLinkResponse = googleAuthServiceSpy.linkGmail(authCode, userEntity.getEmail());
+
+            //then
+            assertNull(googleDriveLinkResponse);
+        }
+    }
+
+    @Test
+    void getAccessTokenScope_ReturnsScope() throws IOException {
+        //given
+        String accessToken = "accessToken";
+        Call call = mock(Call.class);
+        Response response = mock(Response.class);
+        ResponseBody responseBody = ResponseBody.create(MediaType.parse("application/json"), "{\"scope\": \"https://mail.google.com/\"}");
+
+        //when
+        when(okHttpClient.newCall(any())).thenReturn(call);
+        when(call.execute()).thenReturn(response);
+        when(response.isSuccessful()).thenReturn(true);
+        when(response.body()).thenReturn(responseBody);
+        String scope = googleAuthService.getAccessTokenScope(accessToken);
+
+        //then
+        assertEquals("https://mail.google.com/", scope);
+    }
+
+    @Test
+    void getAccessTokenScope_ResponseUnsuccessful_ReturnsNull() throws IOException {
+        //given
+        String accessToken = "accessToken";
+        Call call = mock(Call.class);
+        Response response = mock(Response.class);
+        ResponseBody responseBody = ResponseBody.create(MediaType.parse("application/json"), "{\"scope\": \"https://mail.google.com/\"}");
+
+        //when
+        when(okHttpClient.newCall(any())).thenReturn(call);
+        when(call.execute()).thenReturn(response);
+        when(response.isSuccessful()).thenReturn(false);
+        String scope = googleAuthService.getAccessTokenScope(accessToken);
+
+        //then
+        assertNull(scope);
     }
 
     @Test

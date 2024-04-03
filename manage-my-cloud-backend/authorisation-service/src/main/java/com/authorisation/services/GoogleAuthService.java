@@ -37,19 +37,22 @@ public class GoogleAuthService {
     private String googleCredentialsJson;
     private DriveInformationService driveInformationService;
     private RefreshTokenService refreshTokenService;
+    private OkHttpClient okHttpClient;
 
     @Autowired
     public GoogleAuthService(@Value("${google.credentials}") String googleCredentialsJson,
                              CloudPlatformService cloudPlatformService,
                              UserService userService,
                              UserAuthenticationProvider userAuthenticationProvider,
-                             DriveInformationService driveInformationService, RefreshTokenService refreshTokenService) {
+                             DriveInformationService driveInformationService, RefreshTokenService refreshTokenService,
+                             OkHttpClient okHttpClient) {
         this.googleCredentialsJson = googleCredentialsJson;
         this.cloudPlatformService = cloudPlatformService;
         this.userService = userService;
         this.userAuthenticationProvider = userAuthenticationProvider;
         this.driveInformationService = driveInformationService;
         this.refreshTokenService = refreshTokenService;
+        this.okHttpClient = okHttpClient;
     }
 
     public ResponseEntity<UserDto> storeAuthCode(String authCode) {
@@ -135,7 +138,7 @@ public class GoogleAuthService {
                 gaveGmailPermissions = true;
             }
 
-            UpdateUserPlatformLink(tokenResponse, email, driveEmail, gaveGmailPermissions);
+            updateUserPlatformLink(tokenResponse, email, driveEmail, gaveGmailPermissions);
 
             return googleDriveLinkResponse;
         } catch (Exception e) {
@@ -145,16 +148,14 @@ public class GoogleAuthService {
         return null;
     }
 
-
     public String getAccessTokenScope(String accessToken) {
-        OkHttpClient client = new OkHttpClient();
         ObjectMapper mapper = new ObjectMapper();
 
         Request request = new Request.Builder()
                 .url("https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=" + accessToken)
                 .build();
 
-        try (Response response = client.newCall(request).execute()) {
+        try (Response response = okHttpClient.newCall(request).execute()) {
             if (!response.isSuccessful()) {
                 throw new IOException("Unexpected code " + response);
             }
@@ -178,7 +179,7 @@ public class GoogleAuthService {
                 tokenResponse.getRefreshToken(), null, driveEmail, gaveGmailPermissions);
     }
 
-    public void UpdateUserPlatformLink(GoogleTokenResponse tokenResponse, String email, String driveEmail, Boolean gaveGmailPermissions) {
+    public void updateUserPlatformLink(GoogleTokenResponse tokenResponse, String email, String driveEmail, Boolean gaveGmailPermissions) {
         cloudPlatformService.updateCloudPlatform(
                 email,
                 GOOGLEDRIVE,
