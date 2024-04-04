@@ -13,10 +13,7 @@ import com.authorisation.mappers.UserPreferencesMapper;
 import com.authorisation.pojo.Account;
 import com.authorisation.registration.RegistrationRequest;
 import com.authorisation.registration.password.PasswordResetRequest;
-import com.authorisation.repositories.CloudPlatformRepository;
-import com.authorisation.repositories.RecommendationSettingsRepository;
-import com.authorisation.repositories.UserEntityRepository;
-import com.authorisation.repositories.VerificationTokenRepository;
+import com.authorisation.repositories.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.mmc.pojo.UserPreferences;
@@ -49,6 +46,7 @@ public class UserService implements IUserService {
     private final PasswordResetTokenService passwordResetTokenService;
     private final UserMapper userMapper;
     private final UserPreferencesMapper userPreferencesMapper;
+    private final RefreshTokenRepository refreshTokenRepository;
 
     @Override
     public UserEntity registerUser(RegistrationRequest registrationRequest) {
@@ -286,6 +284,9 @@ public class UserService implements IUserService {
                     throw new RuntimeException("Error deleting cloud accounts");
                 }
             }
+
+            // Delete the RefreshToken associated with the user
+            refreshTokenRepository.deleteByUserEntity(user);
 
             userEntityRepository.delete(user);
         } else {
