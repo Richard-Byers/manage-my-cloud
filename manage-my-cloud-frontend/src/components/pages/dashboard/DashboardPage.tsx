@@ -24,6 +24,8 @@ const DashboardPage = () => {
     useEffect(() => {
         if (!shouldRun.current) return;
         shouldRun.current = false;
+
+        if (user?.firstLogin === true) return;
         refreshUser(user?.email);
     }, []);
 

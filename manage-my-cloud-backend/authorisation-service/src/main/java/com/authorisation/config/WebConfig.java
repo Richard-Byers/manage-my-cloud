@@ -1,6 +1,7 @@
 package com.authorisation.config;
 
 
+import okhttp3.OkHttpClient;
 import org.mmc.drive.DriveInformationService;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
@@ -69,6 +70,11 @@ public class WebConfig {
     @Bean
     public WebClient webClient() {
         return WebClient.builder().build();
+    }
+
+    @Bean
+    public OkHttpClient okHttpClient() {
+        return new OkHttpClient();
     }
 
     @Bean

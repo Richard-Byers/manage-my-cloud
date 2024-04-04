@@ -3,6 +3,7 @@ package com.authorisation.services;
 import com.authorisation.entities.RefreshToken;
 import com.authorisation.repositories.RefreshTokenRepository;
 import com.authorisation.repositories.UserEntityRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -10,12 +11,13 @@ import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 
+@RequiredArgsConstructor
 @Service
 public class RefreshTokenService {
-    @Autowired
-    private RefreshTokenRepository refreshTokenRepository;
-    @Autowired
-    private UserEntityRepository userEntityRepository;
+
+    private final RefreshTokenRepository refreshTokenRepository;
+
+    private final UserEntityRepository userEntityRepository;
 
     public RefreshToken createRefreshtoken(String email) {
         Optional<RefreshToken> existingToken = refreshTokenRepository.findByUserEntityEmail(email);

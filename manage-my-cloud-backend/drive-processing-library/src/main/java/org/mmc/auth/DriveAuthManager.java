@@ -2,14 +2,12 @@ package org.mmc.auth;
 
 import com.google.api.client.auth.oauth2.TokenResponse;
 import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
-import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 import com.google.api.client.googleapis.auth.oauth2.GoogleRefreshTokenRequest;
 import com.google.api.client.googleapis.auth.oauth2.GoogleTokenResponse;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.http.HttpRequestInitializer;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
-import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.gmail.Gmail;
 import com.google.auth.oauth2.AccessToken;
@@ -46,11 +44,9 @@ public class DriveAuthManager {
                 accessToken = generateNewGoogleAccessToken(refreshToken).getAccessToken();
             }
 
-            // Create a Credential instance with the access token
-            GoogleCredential credential = new GoogleCredential().setAccessToken(accessToken);
 
             // Create a Drive service
-            return new Drive.Builder(new NetHttpTransport(), new JacksonFactory(), credential)
+            return new Drive.Builder(new NetHttpTransport(), new GsonFactory(), getHttpRequestInitializer(String.valueOf(accessToken)))
                     .setApplicationName(MANAGE_MY_CLOUD)
                     .build();
         } catch (Exception e) {
@@ -67,14 +63,11 @@ public class DriveAuthManager {
                 accessToken = generateNewGoogleAccessToken(refreshToken).getAccessToken();
             }
 
-            // Create a Credential instance with the access token
-            GoogleCredential credential = new GoogleCredential().setAccessToken(accessToken);
-
             var httpTransport = GoogleNetHttpTransport.newTrustedTransport();
-            var jsonFactory = JacksonFactory.getDefaultInstance();
+            var jsonFactory = GsonFactory.getDefaultInstance();
 
             // Create a Gmail service
-            return new Gmail.Builder(httpTransport, jsonFactory, credential)
+            return new Gmail.Builder(httpTransport, jsonFactory, getHttpRequestInitializer(String.valueOf(accessToken)))
                     .setApplicationName(MANAGE_MY_CLOUD)
                     .build();
         } catch (Exception e) {
@@ -90,7 +83,7 @@ public class DriveAuthManager {
         try {
             String googleCredentialsJson = System.getenv("GOOGLE_CREDENTIALS_JSON");
             GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(
-                    JacksonFactory.getDefaultInstance(), new StringReader(googleCredentialsJson));
+                    GsonFactory.getDefaultInstance(), new StringReader(googleCredentialsJson));
             response = new GoogleRefreshTokenRequest(
                     new NetHttpTransport(),
                     new GsonFactory(),

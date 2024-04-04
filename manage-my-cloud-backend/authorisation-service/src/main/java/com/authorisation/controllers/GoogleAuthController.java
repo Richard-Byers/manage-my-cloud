@@ -29,4 +29,12 @@ public class GoogleAuthController {
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+    @PostMapping("/link-gmail")
+    public ResponseEntity<GoogleDriveLinkResponse> linkGmail(@RequestBody String authCode, @RequestParam("email") String email) {
+
+        GoogleDriveLinkResponse response = googleAuthService.linkGmail(authCode, email);
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
 }

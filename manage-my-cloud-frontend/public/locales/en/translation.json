@@ -35,11 +35,12 @@
       "dashboardCardModal": {
         "driveInformation": {
           "accountDetails": "Account Details",
-          "usedStorage": "Used Storage",
-          "totalStorage": "Total Storage",
+          "usedStorage": "Used Storage: ",
+          "totalStorage": "Total Storage: ",
           "driveFiles": "Drive Files",
           "noEmailsFoundMessage": "No emails found",
-          "noFilesFoundMessage": "No files found"
+          "noFilesFoundMessage": "No files found",
+          "gmailNotLinkedMessage": "It seems you have not gave us permission to link your Gmail, please link by pressing the button below."
         }
       },
       "connectedDrivesCard": {
@@ -154,7 +155,7 @@
       "confirmPassword": "Confirm password",
       "confirm": "Confirm",
       "cancel": "Cancel",
-      "modalDescription": "Please confirm your Password to delete your account.<br/>This action is irreversible.",
+      "modalDescription": "Please confirm your Password to delete your account.<br/>This action is irreversible. If you logged in with google, simply click confirm.",
       "errorMessage": {
         "enterBothPasswords": "Please enter password in both fields",
         "fillBothPasswords": "Please fill out both password fields",

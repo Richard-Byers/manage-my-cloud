@@ -42,11 +42,11 @@ public class UserService implements IUserService {
     private final UserEntityRepository userEntityRepository;
     private final VerificationTokenRepository verificationTokenRepository;
     private final RecommendationSettingsRepository recommendationSettingsRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
     private final PasswordEncoder passwordEncoder;
     private final PasswordResetTokenService passwordResetTokenService;
     private final UserMapper userMapper;
     private final UserPreferencesMapper userPreferencesMapper;
-    private final RefreshTokenRepository refreshTokenRepository;
 
     @Override
     public UserEntity registerUser(RegistrationRequest registrationRequest) {
@@ -65,6 +65,7 @@ public class UserService implements IUserService {
         newUser.setPassword(passwordEncoder.encode(registrationRequest.password()));
         newUser.setRole(registrationRequest.role());
         newUser.setLinkedAccounts(new LinkedAccounts());
+        newUser.setAccountType("MANAGE_MY_CLOUD");
 
         newUser.setProfileImage(loadDefaultProfileImage());
         return userEntityRepository.save(newUser);
@@ -272,26 +273,26 @@ public class UserService implements IUserService {
     public void deleteUser(CredentialsDto credentialsDto) {
         UserEntity user = findUserByEmail(credentialsDto.getEmail())
                 .orElseThrow(() -> new RuntimeException("User not found"));
-        if (passwordEncoder.matches(credentialsDto.getPassword(), user.getPassword())) {
-            // Delete the RecommendationSettings associated with the user
-            recommendationSettingsRepository.deleteByUserEntityEmail(user.getEmail());
 
-            List<CloudPlatform> cloudAccounts = cloudPlatformRepository.findAllByUserEntityEmail(user.getEmail());
-            if (cloudAccounts != null) {
-                try {
-                    cloudPlatformRepository.deleteAll(cloudAccounts);
-                } catch (Exception e) {
-                    throw new RuntimeException("Error deleting cloud accounts");
-                }
-            }
-
-            // Delete the RefreshToken associated with the user
-            refreshTokenRepository.deleteByUserEntity(user);
-
-            userEntityRepository.delete(user);
-        } else {
+        if (user.getAccountType() != null && !user.getAccountType().equals("GOOGLE") && !passwordEncoder.matches(credentialsDto.getPassword(), user.getPassword())) {
             throw new RuntimeException("Password doesn't match");
         }
+
+        // Delete the RecommendationSettings associated with the user
+        recommendationSettingsRepository.deleteByUserEntityEmail(user.getEmail());
+        refreshTokenRepository.deleteByUserEntityId(user.getId());
+
+        List<CloudPlatform> cloudAccounts = cloudPlatformRepository.findAllByUserEntityEmail(user.getEmail());
+        if (cloudAccounts != null) {
+            try {
+                cloudPlatformRepository.deleteAll(cloudAccounts);
+            } catch (Exception e) {
+                throw new RuntimeException("Error deleting cloud accounts");
+            }
+        }
+
+        userEntityRepository.delete(user);
+
     }
 
     public String getUserData(UserEntity user) {

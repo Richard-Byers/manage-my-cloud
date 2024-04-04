@@ -31,12 +31,14 @@ export const buildAxiosRequest = (method: string, url: string, data: any) => {
 }
 
 export const buildAxiosRequestWithHeaders = (method: string, url: string, headers: any, data: any) => {
-
     return axios({
         method: method,
         url: url,
         data: data,
-        headers: headers
+        headers: headers,
+        validateStatus: function (status) {
+            return status >= 200 && status < 500;
+        },
     });
 }
 

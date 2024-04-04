@@ -113,6 +113,41 @@
     transform: scale(1);
 }
 
+.gmail-islinked-container {
+    display: flex;
+    justify-content: center;
+    gap: 1em;
+    padding: 1em;
+    position: sticky;
+    top: 0;
+    background: white;
+    width: auto;
+}
+
+.gmail-islinked-container button {
+    display: flex;
+    align-items: center;
+    background: none;
+    border: none;
+    font-family: MontserratRegular, serif;
+    font-size: 1rem;
+    padding: 0.3em;
+    gap: 0.2em;
+    cursor: pointer;
+    background: rgb(0, 110, 255);
+    width: 8em;
+    border-radius: 0.1em;
+    transition: 0.1s ease-in-out;
+    color: white;
+    box-shadow: 6px 9px 5px 0px rgba(0, 0, 0, 0.18);
+    -webkit-box-shadow: 6px 9px 5px 0px rgba(0, 0, 0, 0.18);
+    -moz-box-shadow: 6px 9px 5px 0px rgba(0, 0, 0, 0.18);
+}
+
+.gmail-islinked-container button:hover {
+    transform: scale(1.1);
+}
+
 .svg-icon {
     width: 5em;
     height: 5em;

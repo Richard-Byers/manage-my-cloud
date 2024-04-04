@@ -16,10 +16,7 @@ import com.authorisation.mappers.UserPreferencesMapper;
 import com.authorisation.pojo.Account;
 import com.authorisation.registration.RegistrationRequest;
 import com.authorisation.registration.password.PasswordResetRequest;
-import com.authorisation.repositories.CloudPlatformRepository;
-import com.authorisation.repositories.RecommendationSettingsRepository;
-import com.authorisation.repositories.UserEntityRepository;
-import com.authorisation.repositories.VerificationTokenRepository;
+import com.authorisation.repositories.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mmc.pojo.UserPreferences;
@@ -60,6 +57,8 @@ class UserServiceTest {
     private VerificationTokenRepository verificationTokenRepository;
     @MockBean
     private RecommendationSettingsRepository recommendationSettingsRepository;
+    @MockBean
+    private RefreshTokenRepository refreshTokenRepository;
     @MockBean
     private CloudPlatformRepository cloudPlatformRepository;
     @Autowired

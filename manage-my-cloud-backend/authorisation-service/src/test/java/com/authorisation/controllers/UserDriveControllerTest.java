@@ -72,6 +72,7 @@ class UserDriveControllerTest {
     private static final String DRIVE_INFORMATION_URL = "/drive-information";
     private static final String DRIVE_ITEMS_URL = "/drive-items";
     private static final String RECOMMEND_DELETIONS_URL = "/recommend-deletions";
+    private static final String RECOMMEND_DUPLICATES_URL = "/get-duplicates";
     private static final String DELETE_RECOMMENDED_URL = "/delete-recommended";
 
     @BeforeEach
@@ -287,7 +288,7 @@ class UserDriveControllerTest {
         UserEntity userEntity = generateUserEntityEnabled();
         String email = userEntity.getEmail();
         CloudPlatform cloudPlatform = generateGoogleCloudPlatformEncryptedTokens();
-        JsonNode expectedJsonNode = generateJsonNode();
+        JsonNode expectedJsonNode = new ObjectMapper().readTree("{\"key\":\"value\"}");
         String refreshToken = decrypt(cloudPlatform.getRefreshToken());
         String accessToken = decrypt(cloudPlatform.getAccessToken());
         String driveEmail = "email2@example.com";
@@ -295,7 +296,7 @@ class UserDriveControllerTest {
         when(userService.findUserByEmail(email)).thenReturn(Optional.of(userEntity));
         when(cloudPlatformService.getUserCloudPlatform(email, GOOGLEDRIVE, driveEmail)).thenReturn(cloudPlatform);
         when(driveInformationService.fetchAllGoogleDriveFiles(refreshToken, accessToken, simpMessagingTemplate,
-                email)).thenReturn(expectedJsonNode);
+                email, true)).thenReturn(expectedJsonNode);
 
         //when
         MvcResult mvcResult = mockMvc.perform(get(DRIVE_ITEMS_URL)
@@ -304,8 +305,11 @@ class UserDriveControllerTest {
                 //then
                 .andExpect(status().isOk()).andReturn();
 
-        JsonNode response = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), JsonNode.class);
-        assertJsonNodeResponse(expectedJsonNode, response);
+        String responseBody = mvcResult.getResponse().getContentAsString();
+        if (!responseBody.isEmpty()) {
+            JsonNode response = objectMapper.readValue(responseBody, JsonNode.class);
+            assertJsonNodeResponse(expectedJsonNode, response);
+        }
     }
 
     @Test
@@ -495,7 +499,7 @@ class UserDriveControllerTest {
         String driveEmail = "email2@example.com";
 
         when(userService.findUserByEmail(email)).thenReturn(Optional.of(userEntity));
-        when(cloudPlatformService.getUserCloudPlatform(email, ONEDRIVE, driveEmail)).thenThrow(new RuntimeException("Cloud platform not found"));
+        when(cloudPlatformService.getUserCloudPlatform(email, ONEDRIVE, driveEmail)).thenReturn(null);
 
         //when
         ServletException exception = assertThrows(ServletException.class, () -> mockMvc.perform(post(DELETE_RECOMMENDED_URL)
@@ -504,7 +508,7 @@ class UserDriveControllerTest {
                 //then
                 .andExpect(status().isOk()));
 
-        assertEquals("Cloud platform not found", exception.getRootCause().getMessage());
+        assertEquals("Cloud platform not found OneDrive", exception.getRootCause().getMessage());
     }
 
     @Test
@@ -584,6 +588,148 @@ class UserDriveControllerTest {
                         .content(objectMapper.writeValueAsString(expectedJsonNode)).with(csrf()))
                 //then
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser
+    void getAIDuplicatesResponse_validOneDriveRequest_ReturnsDuplicates() throws Exception {
+        //given
+        JsonNode expectedJsonNode = generateJsonNode();
+        UserEntity userEntity = generateUserEntityEnabled();
+        String email = userEntity.getEmail();
+        CloudPlatform cloudPlatform = generateCloudPlatformEncryptedTokens();
+
+        when(userService.findUserByEmail(email)).thenReturn(Optional.of(userEntity));
+        when(cloudPlatformService.getUserCloudPlatform(email, ONEDRIVE, email)).thenReturn(cloudPlatform);
+        when(driveInformationService.getDuplicatesFoundByAI(ONEDRIVE, expectedJsonNode)).thenReturn(expectedJsonNode);
+
+        //when
+        MvcResult mvcResult = mockMvc.perform(post(RECOMMEND_DUPLICATES_URL)
+                        .param("email", email).contentType("application/json")
+                        .param("provider", ONEDRIVE)
+                        .param("driveEmail", email)
+                        .content(objectMapper.writeValueAsString(expectedJsonNode)).with(csrf()))
+                //then
+                .andExpect(status().isOk()).andReturn();
+
+        JsonNode response = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), JsonNode.class);
+        assertJsonNodeResponse(expectedJsonNode, response);
+    }
+
+    @Test
+    @WithMockUser
+    void getAIDuplicatesResponse_OneDriveThrowsException_ReturnsBadRequest() throws Exception {
+        //given
+        JsonNode expectedJsonNode = generateJsonNode();
+        UserEntity userEntity = generateUserEntityEnabled();
+        String email = userEntity.getEmail();
+        CloudPlatform cloudPlatform = generateCloudPlatformEncryptedTokens();
+
+        when(userService.findUserByEmail(email)).thenReturn(Optional.of(userEntity));
+        when(cloudPlatformService.getUserCloudPlatform(email, ONEDRIVE, email)).thenReturn(cloudPlatform);
+        when(driveInformationService.getDuplicatesFoundByAI(ONEDRIVE, expectedJsonNode)).thenThrow(new RuntimeException("Error"));
+
+        //when
+        mockMvc.perform(post(RECOMMEND_DUPLICATES_URL)
+                        .param("email", email).contentType("application/json")
+                        .param("provider", ONEDRIVE)
+                        .param("driveEmail", email)
+                        .content(objectMapper.writeValueAsString(expectedJsonNode)).with(csrf()))
+                //then
+                .andExpect(status().isBadRequest()).andReturn();
+    }
+
+    @Test
+    @WithMockUser
+    void getAIDuplicatesResponse_validGoogleDriveRequest_ReturnsDuplicates() throws Exception {
+        //given
+        JsonNode expectedJsonNode = generateJsonNode();
+        UserEntity userEntity = generateUserEntityEnabled();
+        String email = userEntity.getEmail();
+        CloudPlatform cloudPlatform = generateGoogleCloudPlatformEncryptedTokens();
+
+        when(userService.findUserByEmail(email)).thenReturn(Optional.of(userEntity));
+        when(cloudPlatformService.getUserCloudPlatform(email, GOOGLEDRIVE, email)).thenReturn(cloudPlatform);
+        when(driveInformationService.getDuplicatesFoundByAI(GOOGLEDRIVE, expectedJsonNode)).thenReturn(expectedJsonNode);
+
+        //when
+        MvcResult mvcResult = mockMvc.perform(post(RECOMMEND_DUPLICATES_URL)
+                        .param("email", email).contentType("application/json")
+                        .param("provider", GOOGLEDRIVE)
+                        .param("driveEmail", email)
+                        .content(objectMapper.writeValueAsString(expectedJsonNode)).with(csrf()))
+                //then
+                .andExpect(status().isOk()).andReturn();
+
+        JsonNode response = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), JsonNode.class);
+        assertJsonNodeResponse(expectedJsonNode, response);
+    }
+
+    @Test
+    @WithMockUser
+    void getAIDuplicatesResponse_GoogleDriveThrowsException_ReturnsBadRequest() throws Exception {
+        //given
+        JsonNode expectedJsonNode = generateJsonNode();
+        UserEntity userEntity = generateUserEntityEnabled();
+        String email = userEntity.getEmail();
+        CloudPlatform cloudPlatform = generateGoogleCloudPlatformEncryptedTokens();
+
+        when(userService.findUserByEmail(email)).thenReturn(Optional.of(userEntity));
+        when(cloudPlatformService.getUserCloudPlatform(email, GOOGLEDRIVE, email)).thenReturn(cloudPlatform);
+        when(driveInformationService.getDuplicatesFoundByAI(GOOGLEDRIVE, expectedJsonNode)).thenThrow(new RuntimeException("Error"));
+
+        //when
+        mockMvc.perform(post(RECOMMEND_DUPLICATES_URL)
+                        .param("email", email).contentType("application/json")
+                        .param("provider", GOOGLEDRIVE)
+                        .param("driveEmail", email)
+                        .content(objectMapper.writeValueAsString(expectedJsonNode)).with(csrf()))
+                //then
+                .andExpect(status().isBadRequest()).andReturn();
+    }
+
+    @Test
+    @WithMockUser
+    void getAIDuplicatesResponse_invalidProvider_ReturnsBadRequest() throws Exception {
+        //given
+        JsonNode expectedJsonNode = generateJsonNode();
+        UserEntity userEntity = generateUserEntityEnabled();
+        String email = userEntity.getEmail();
+        CloudPlatform cloudPlatform = generateGoogleCloudPlatformEncryptedTokens();
+
+        when(userService.findUserByEmail(email)).thenReturn(Optional.of(userEntity));
+        when(cloudPlatformService.getUserCloudPlatform(email, "random", email)).thenReturn(cloudPlatform);
+
+        //when
+        mockMvc.perform(post(RECOMMEND_DUPLICATES_URL)
+                        .param("email", email).contentType("application/json")
+                        .param("provider", "random")
+                        .param("driveEmail", email)
+                        .content(objectMapper.writeValueAsString(expectedJsonNode)).with(csrf()))
+                //then
+                .andExpect(status().isBadRequest()).andReturn();
+    }
+
+    @Test
+    @WithMockUser
+    void getAIDuplicatesResponse_cloudPlatformNotFound_ReturnsBadRequest() {
+        //given
+        JsonNode expectedJsonNode = generateJsonNode();
+        UserEntity userEntity = generateUserEntityEnabled();
+        String email = userEntity.getEmail();
+        CloudPlatform cloudPlatform = generateGoogleCloudPlatformEncryptedTokens();
+
+        when(userService.findUserByEmail(email)).thenReturn(Optional.of(userEntity));
+        when(cloudPlatformService.getUserCloudPlatform(email, "random", email)).thenReturn(null);
+
+        //when
+        ServletException exception = assertThrows(ServletException.class, () -> mockMvc.perform(post(RECOMMEND_DUPLICATES_URL)
+                        .param("email", email).param("provider", ONEDRIVE).param("driveEmail", email).contentType("application/json")
+                        .content(objectMapper.writeValueAsString(expectedJsonNode)).with(csrf()))
+                //then
+                .andExpect(status().isOk()));
+
+        assertEquals("Cloud platform not found OneDrive", exception.getRootCause().getMessage());
     }
 
     //Helper

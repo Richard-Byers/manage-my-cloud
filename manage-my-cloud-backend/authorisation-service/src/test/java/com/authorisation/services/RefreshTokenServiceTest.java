@@ -14,9 +14,13 @@ import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 
+import static com.authorisation.TestConstants.TESTER_EMAIL;
+import static com.authorisation.givens.RefreshTokenGivens.generateRefreshToken;
+import static com.authorisation.givens.UserEntityGivens.generateUserEntityTesterEmail;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class RefreshTokenServiceTest {
@@ -31,7 +35,7 @@ class RefreshTokenServiceTest {
     private RefreshTokenService refreshTokenService;
 
     @Test
-    void createRefreshtoken_existingToken_updatesToken() {
+    void createRefreshToken_existingToken_updatesToken() {
         // Given
         String email = "test@example.com";
         RefreshToken existingToken = new RefreshToken();
@@ -104,5 +108,34 @@ class RefreshTokenServiceTest {
 
         // When and Then
         assertThrows(RuntimeException.class, () -> refreshTokenService.verifyExpiration(token));
+    }
+
+    @Test
+    void findByUserEntityEmail_existingToken_returnsToken() {
+        // Given
+        UserEntity userEntity = generateUserEntityTesterEmail();
+        RefreshToken refreshToken = generateRefreshToken(userEntity);
+
+        // When
+        when(refreshTokenRepository.findByUserEntityEmail(TESTER_EMAIL)).thenReturn(Optional.of(refreshToken));
+        RefreshToken actualRefreshToken = refreshTokenService.findByUserEntityEmail(TESTER_EMAIL);
+
+        // Then
+        assertEquals(refreshToken, actualRefreshToken);
+    }
+
+    @Test
+    void findByUserEntityEmail_emptyToken_throwsRuntimeException() {
+        // Given
+        UserEntity userEntity = generateUserEntityTesterEmail();
+        RefreshToken refreshToken = generateRefreshToken(userEntity);
+        String expectedMessage = "Refresh token not found for user with email: " + TESTER_EMAIL;
+
+        // When
+        when(refreshTokenRepository.findByUserEntityEmail(TESTER_EMAIL)).thenReturn(Optional.empty());
+        RuntimeException actualException = assertThrows(RuntimeException.class, () -> refreshTokenService.findByUserEntityEmail(TESTER_EMAIL));
+
+        // Then
+        assertEquals(expectedMessage, actualException.getMessage());
     }
 }
