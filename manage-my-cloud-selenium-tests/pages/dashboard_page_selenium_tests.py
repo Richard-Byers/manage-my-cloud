@@ -3,6 +3,7 @@ import os
 import unittest
 
 from selenium.webdriver import ActionChains
+from selenium.webdriver.common import actions
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
@@ -91,6 +92,7 @@ profile_preferences_button = (By.ID, "user-preferences-button")
 # Preferences
 recommend_items_after = (By.ID, "drive-items-created-after-dropdown-button")
 update_profile_preferences_button = (By.ID, "update-profile-preferences-button")
+update_profile_preferences_success_modal = (By.CLASS_NAME, "success-modal-container")
 
 # Login
 modal_login_button = (By.ID, "modal-login-button")
@@ -194,6 +196,7 @@ class TestDashboardPage(unittest.TestCase):
         logger.info('Finished test: test_click_delete_recommended_default_preferences_item')
 
     def test_click_delete_recommended_changed_preferences_show_and_delete_recommended(self):
+        actions = ActionChains(self.driver)
         expected_success_message = "Successfully deleted 1 file(s) and 0 email(s) from your drive."
         WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable(profile_nav_link)).click()
         WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable(profile_preferences_button)).click()
@@ -202,6 +205,10 @@ class TestDashboardPage(unittest.TestCase):
         WebDriverWait(self.driver, 10).until(
             EC.presence_of_element_located((By.XPATH, "//div[@id='react-select-3-option-0']"))).click()
         WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable(update_profile_preferences_button)).click()
+        WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable(update_profile_preferences_success_modal))
+        update_profile_preferences_success_modal_element = self.driver.find_element(By.CLASS_NAME, "success-modal-container")
+        actions.move_to_element_with_offset(update_profile_preferences_success_modal_element, 0, 250).click().perform()
+        WebDriverWait(self.driver, 10).until(EC.invisibility_of_element_located((By.CLASS_NAME, "success-modal-container")))
         WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable(dashboard_nav_link)).click()
         WebDriverWait(self.driver, 15).until(EC.element_to_be_clickable(connected_onedrive_container_element)).click()
         WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located(connected_drive_modal))

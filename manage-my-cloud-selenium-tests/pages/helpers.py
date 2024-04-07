@@ -16,7 +16,7 @@ def assert_element(element, self, true_failure_message, none_failure_message):
 
 
 def login(driver, email, password):
-    driver.driver.find_element(By.ID, "modal-login-button").click()
+    driver.driver.find_element(By.CLASS_NAME, "modal-login-button").click()
     WebDriverWait(driver.driver, 10).until(EC.visibility_of_element_located((By.CLASS_NAME, "modal")))
 
     driver.driver.find_element(By.ID, "login-form-email").send_keys(email)
@@ -25,4 +25,4 @@ def login(driver, email, password):
     WebDriverWait(driver.driver, 10).until(EC.text_to_be_present_in_element_value((By.ID, 'login-form-password'), ''))
 
     driver.driver.find_element(By.CLASS_NAME, "modal-form-submit-button").click()
-    WebDriverWait(driver.driver, 10).until(EC.visibility_of_element_located((By.CLASS_NAME, "main-card-container")))
+    WebDriverWait(driver.driver, 10).until(EC.visibility_of_element_located((By.CLASS_NAME, "navbar-nav")))

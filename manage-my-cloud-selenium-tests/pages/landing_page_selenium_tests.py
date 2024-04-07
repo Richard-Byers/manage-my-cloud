@@ -111,7 +111,7 @@ class TestLandingPage(unittest.TestCase):
         logger.info('Finished test: test_get_started_button_displays_login')
 
     def test_modal_overlay_closes_login_modal_onclick(self):
-        self.driver.find_element(By.ID, "modal-login-button").click()
+        self.driver.find_element(By.CLASS_NAME, "modal-login-button").click()
         WebDriverWait(self.driver, 5).until(EC.visibility_of_element_located((By.CLASS_NAME, "modal")))
         login_modal_overlay_element = self.driver.find_element(By.CLASS_NAME, "modal-overlay")
         actions = ActionChains(self.driver)
@@ -128,7 +128,7 @@ class TestLandingPage(unittest.TestCase):
         logger.info('Finished test: test_modal_overlay_closes_login_modal_onclick')
 
     def test_signup_displays_signup_modal(self):
-        self.driver.find_element(By.ID, "modal-login-button").click()
+        self.driver.find_element(By.CLASS_NAME, "modal-login-button").click()
         WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.CLASS_NAME, "modal")))
 
         self.driver.find_element(By.ID, "signup-button").click()
@@ -168,11 +168,13 @@ class TestLandingPage(unittest.TestCase):
         actions = ActionChains(self.driver)
 
         actions.move_to_element_with_offset(login_modal_overlay_element, 0, 350).click().perform()
-        WebDriverWait(self.driver, 10).until(EC.invisibility_of_element_located((By.CLASS_NAME, "modal")))
+        WebDriverWait(self.driver, 10).until(EC.invisibility_of_element_located((By.ID, "signup-modal-submit-button")))
+        actions.move_to_element_with_offset(login_modal_overlay_element, 0, 350).click().perform()
+        WebDriverWait(self.driver, 10).until(EC.invisibility_of_element_located((By.CLASS_NAME, "modal-login-google-button")))
         logger.info('Finished test: test_signup_displays_signup_modal')
 
     def test_reset_password_displays_reset_password_modal(self):
-        self.driver.find_element(By.ID, "modal-login-button").click()
+        self.driver.find_element(By.CLASS_NAME, "modal-login-button").click()
         WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.CLASS_NAME, "modal")))
 
         self.driver.find_element(By.ID, "reset-password-button").click()
@@ -211,11 +213,13 @@ class TestLandingPage(unittest.TestCase):
         actions = ActionChains(self.driver)
 
         actions.move_to_element_with_offset(login_modal_overlay_element, 0, 250).click().perform()
-        WebDriverWait(self.driver, 10).until(EC.invisibility_of_element_located((By.CLASS_NAME, "modal")))
+        WebDriverWait(self.driver, 10).until(EC.invisibility_of_element_located((By.ID, "reset-password-modal-submit-button")))
+        actions.move_to_element_with_offset(login_modal_overlay_element, 0, 250).click().perform()
+        WebDriverWait(self.driver, 10).until(EC.invisibility_of_element_located((By.CLASS_NAME, "modal-login-google-button")))
         logger.info('Finished test: test_reset_password_displays_reset_password_modal')
 
     def test_login_invalid_credentials_shows_error(self):
-        self.driver.find_element(By.ID, "modal-login-button").click()
+        self.driver.find_element(By.CLASS_NAME, "modal-login-button").click()
         WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.CLASS_NAME, "modal")))
 
         self.driver.find_element(By.ID, "login-form-email").send_keys("invalidemail@gmail.com")
@@ -238,7 +242,7 @@ class TestLandingPage(unittest.TestCase):
         logger.info('Finished test: test_login_invalid_credentials_shows_error')
 
     def test_login_valid_credentials_navigates_to_profile(self):
-        self.driver.find_element(By.ID, "modal-login-button").click()
+        self.driver.find_element(By.CLASS_NAME, "modal-login-button").click()
         WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.CLASS_NAME, "modal")))
 
         self.driver.find_element(By.ID, "login-form-email").send_keys(test_suite_email)
@@ -247,7 +251,7 @@ class TestLandingPage(unittest.TestCase):
         WebDriverWait(self.driver, 10).until(EC.text_to_be_present_in_element_value((By.ID, 'login-form-password'), ''))
 
         self.driver.find_element(By.CLASS_NAME, "modal-form-submit-button").click()
-        WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.CLASS_NAME, "main-card-container")))
+        WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.ID, "profile-nav-link"))).click()
 
         profile_card_element = self.driver.find_element(By.CLASS_NAME, "main-card-container")
 

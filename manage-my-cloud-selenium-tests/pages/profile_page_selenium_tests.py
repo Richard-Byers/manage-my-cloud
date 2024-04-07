@@ -73,6 +73,8 @@ class TestProfilePage(unittest.TestCase):
         setup_driver(cls)
         # This part of the setup logs the user in and navigates to manage connections page
         login(cls, test_suite_email, test_email_password)
+        navbar_element = cls.driver.find_element(By.ID, "profile-nav-link")
+        WebDriverWait(cls.driver, 10).until(EC.element_to_be_clickable(navbar_element)).click()
 
     def test_navbar_present_profile_page(self):
         nav_element = self.driver.find_element(By.CLASS_NAME, "nav")
@@ -148,7 +150,6 @@ class TestProfilePage(unittest.TestCase):
         WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable(advanced_nav_button)).click()
         request_data = self.driver.find_element(By.ID, request_data_button)
         view_terms_of_service = self.driver.find_element(By.ID, view_terms_of_service_button)
-        contact_us = self.driver.find_element(By.ID, contact_us_button)
         delete_account = self.driver.find_element(By.ID, delete_account_button)
 
         # assertions
@@ -159,9 +160,6 @@ class TestProfilePage(unittest.TestCase):
                        "Request data button not found")
         assert_element(view_terms_of_service, self, "View terms of service button not displayed on profile page",
                        "View terms of service button not found")
-        assert_element(contact_us, self,
-                       "Contact us button not displayed on profile page",
-                       "Contact us button toggle not found")
         assert_element(delete_account, self, "Delete account button not displayed on profile page",
                        "Delete account button not found")
         logger.info('Finished test: test_profile_page_click_advanced')
