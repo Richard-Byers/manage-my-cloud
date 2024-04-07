@@ -22,7 +22,7 @@ npm install -g newman
 
 Before running the tests, you need to create an account on the ManageMyCloud service. Follow the steps below:
 
-1. Register an Account using the "managemycloudtester@gmail.com email",
+1. Register an Account using the "managemycloudtester@gmail.com" email,
 2. Link a cloud account using the same email as above,
 3. Replace the following environment variables in the `RegressionSuiteEnv.json` file with your account details.
 
