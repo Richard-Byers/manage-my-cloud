@@ -16,24 +16,19 @@ This guide will walk you through the process of setting up and running API tests
 npm install -g newman
 ```
 
-2. Clone the repository and navigate to the directory containing the Postman collection (`ManageMyCoudApiTests.postman_collection.json`) and the environment file (`RegressionSuiteEnv.json`).
+2. Clone the repository and navigate to the directory containing the Postman collection (`ManageMyCloudApiTests.json`) and the environment file (`RegressionSuiteEnv.json`).
 
 ## Creating an Account
 
 Before running the tests, you need to create an account on the ManageMyCloud service. Follow the steps below:
 
-1. Register an Account,
-2. Link a cloud account,
-3. Replace the environment variables in the `RegressionSuiteEnv.json` file with your account details.
+1. Register an Account using the "managemycloudtester@gmail.com email",
+2. Link a cloud account using the same email as above,
+3. Replace the following environment variables in the `RegressionSuiteEnv.json` file with your account details.
 
 ```json
 {
-    "email": "your-email@example.com",
-    "password": "your-password",
-
-    "image_path":  "path/to/image.jpg",
-    "driveEmail": "email for the cloud account"
-  
+    "password": "password for the tester account"
 }
 ``` 
 

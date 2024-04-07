@@ -24,12 +24,12 @@
     },
     {
       "key": "image_path",
-      "value": "images/1.jpg",
+      "value": "profile-picture.jpg",
       "enabled": true
     },
     {
       "key": "driveEmail",
-      "value": "exampledrive-email",
+      "value": "managemycloudtester@gmail.com",
       "enabled": true
     }
   ],

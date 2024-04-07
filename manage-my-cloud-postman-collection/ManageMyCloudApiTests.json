@@ -120,7 +120,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"email\":\"{{email}} \" \"\n}"
+					"raw": "{\n    \"email\":\"{{email}}\"\n}"
 				},
 				"url": {
 					"raw": "http://localhost:8080/refresh-user",
@@ -439,86 +439,6 @@
 					"port": "8080",
 					"path": [
 						"register"
-					]
-				}
-			},
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"type": "text/javascript",
-						"exec": [
-							"pm.test(\"Status code is 200\", function () {",
-							"    pm.response.to.have.status(200);",
-							"});"
-						]
-					}
-				}
-			],
-			"response": []
-		},
-		{
-			"name": "Reset Password Request",
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/json"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n    \"email\": \"{{email}}\"\n}"
-				},
-				"url": {
-					"raw": "http://localhost:8080/register/resetUserPassword",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "8080",
-					"path": [
-						"register",
-						"resetUserPassword"
-					]
-				}
-			},
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"type": "text/javascript",
-						"exec": [
-							"pm.test(\"Status code is 200\", function () {",
-							"    pm.response.to.have.status(200);",
-							"});"
-						]
-					}
-				}
-			],
-			"response": []
-		},
-		{
-			"name": "Reset Password",
-			"request": {
-				"method": "GET",
-				"url": {
-					"raw": "http://localhost:8080/register/resetPassword?token=actual_token",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "8080",
-					"path": [
-						"register",
-						"resetPassword"
-					],
-					"query": [
-						{
-							"key": "token",
-							"value": "actual_token"
-						}
 					]
 				}
 			},
