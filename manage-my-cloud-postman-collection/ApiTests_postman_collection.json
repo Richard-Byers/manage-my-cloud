@@ -1,0 +1,793 @@
+{
+	"info": {
+		"_postman_id": "963a0e18-310f-4e1b-8957-9d4c8e05417a",
+		"name": "ManageMyCoudApiTests",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "33566845"
+	},
+	"item": [
+		{
+			"name": "Login",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"email\": \"{{email}}\",\n    \"password\": \"{{password}}\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8080/login",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"login"
+					]
+				}
+			},
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"pm.test(\"Response has token\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.token).to.be.a('string');",
+							"    pm.environment.set(\"access_token\", jsonData.token);",
+							"    pm.environment.set(\"refresh_token\", jsonData.refreshToken);",
+							"});"
+						]
+					}
+				}
+			],
+			"response": []
+		},
+		{
+			"name": "Refresh Token",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"token\": \"{{refresh_token}}\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8080/refresh-token",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"refresh-token"
+					]
+				}
+			},
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"pm.test(\"Response has access token\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.accessToken).to.be.a('string');",
+							"    pm.environment.set(\"access_token\", jsonData.accessToken);",
+							"});",
+							"pm.test(\"Response has refresh token\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.refreshToken).to.be.a('string');",
+							"    pm.environment.set(\"refresh_token\", jsonData.refreshToken);",
+							"});"
+						]
+					}
+				}
+			],
+			"response": []
+		},
+		{
+			"name": "Refresh User",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{access_token}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"email\":\"{{email}} \" \"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8080/refresh-user",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"refresh-user"
+					]
+				}
+			},
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"pm.test(\"Response has token\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.token).to.be.a('string');",
+							"});"
+						]
+					}
+				}
+			],
+			"response": []
+		},
+		{
+			"name": "Update Profile Image",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "multipart/form-data"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{access_token}}"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "image",
+							"type": "file",
+							"src": "{{image_path}}"
+						},
+						{
+							"key": "email",
+							"value": "{{email}}"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:8080/update-profile-Img",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"update-profile-Img"
+					]
+				}
+			},
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						]
+					}
+				}
+			],
+			"response": []
+		},
+		{
+			"name": "Get User Data",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{access_token}}"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "email",
+							"value": "{{email}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:8080/data-request",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"data-request"
+					]
+				}
+			},
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"console.log('access_token:', pm.environment.get('access_token'));",
+							"console.log('Authorization header:', pm.request.headers.get('Authorization'));",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						]
+					}
+				}
+			],
+			"response": []
+		},
+		{
+			"name": "Update User Details",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{access_token}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"email\": \"{{email}}\",\n    \"firstName\": \"NewFirstName\",\n    \"lastName\": \"NewLastName\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8080/update-user-details",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"update-user-details"
+					]
+				}
+			},
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						]
+					}
+				}
+			],
+			"response": []
+		},
+
+		{
+			"name": "Get Recommendation Settings",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{access_token}}"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8080/get-preferences/{{email}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"get-preferences",
+						"{{email}}"
+					]
+				}
+			},
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"pm.test(\"Response has recommendation settings\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property('deleteVideos');",
+							"    pm.expect(jsonData).to.have.property('deleteImages');",
+							"    pm.expect(jsonData).to.have.property('deleteDocuments');",
+							"    pm.expect(jsonData).to.have.property('deleteEmails');",
+							"    pm.expect(jsonData).to.have.property('deleteEmailsAfterDays');",
+							"    pm.expect(jsonData).to.have.property('deleteItemsCreatedAfterDays');",
+							"    pm.expect(jsonData).to.have.property('deleteItemsNotChangedSinceDays');",
+							"});"
+						]
+					}
+				}
+			],
+			"response": []
+		},
+		{
+			"name": "Update Recommendation Settings",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{access_token}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"deleteVideos\": true,\n    \"deleteImages\": true,\n    \"deleteDocuments\": true,\n    \"deleteEmails\": true,\n    \"deleteEmailsAfterDays\": 7,\n    \"deleteItemsCreatedAfterDays\": 7,\n    \"deleteItemsNotChangedSinceDays\": 7\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8080/preference-update?email={{email}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"preference-update"
+					],
+					"query": [
+						{
+							"key": "email",
+							"value": "{{email}}"
+						}
+					]
+				}
+			},
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"pm.test(\"Response has updated recommendation settings\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property('deleteVideos');",
+							"    pm.expect(jsonData).to.have.property('deleteImages');",
+							"    pm.expect(jsonData).to.have.property('deleteDocuments');",
+							"    pm.expect(jsonData).to.have.property('deleteEmails');",
+							"    pm.expect(jsonData).to.have.property('deleteEmailsAfterDays');",
+							"    pm.expect(jsonData).to.have.property('deleteItemsCreatedAfterDays');",
+							"    pm.expect(jsonData).to.have.property('deleteItemsNotChangedSinceDays');",
+							"});"
+						]
+					}
+				}
+			],
+			"response": []
+		},
+		{
+			"name": "Register User",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"email\": \"test@example.com\",\n    \"password\": \"password\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8080/register",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"register"
+					]
+				}
+			},
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						]
+					}
+				}
+			],
+			"response": []
+		},
+		{
+			"name": "Reset Password Request",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"email\": \"{{email}}\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8080/register/resetUserPassword",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"register",
+						"resetUserPassword"
+					]
+				}
+			},
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						]
+					}
+				}
+			],
+			"response": []
+		},
+		{
+			"name": "Reset Password",
+			"request": {
+				"method": "GET",
+				"url": {
+					"raw": "http://localhost:8080/register/resetPassword?token=actual_token",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"register",
+						"resetPassword"
+					],
+					"query": [
+						{
+							"key": "token",
+							"value": "actual_token"
+						}
+					]
+				}
+			},
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						]
+					}
+				}
+			],
+			"response": []
+		},
+		{
+			"name": "Get User Drive Information",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{access_token}}"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8080/drive-information?email={{email}}&provider=OneDrive&driveEmail={{driveEmail}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"drive-information"
+					],
+					"query": [
+						{
+							"key": "email",
+							"value": "{{email}}"
+						},
+						{
+							"key": "provider",
+							"value": "OneDrive"
+						},
+						{
+							"key": "driveEmail",
+							"value": "{{driveEmail}}"
+						}
+					]
+				}
+			},
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"pm.test(\"Response has drive information\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property('displayName');",
+							"    pm.expect(jsonData).to.have.property('email');",
+							"    pm.expect(jsonData).to.have.property('total');",
+							"    pm.expect(jsonData).to.have.property('used');",
+							"});"
+						]
+					}
+				}
+			],
+			"response": []
+		},
+		{
+			"name": "Get User Drive Files",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{access_token}}"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8080/drive-items?email={{email}}&provider=OneDrive&driveEmail={{driveEmail}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"drive-items"
+					],
+					"query": [
+						{
+							"key": "email",
+							"value": "{{email}}"
+						},
+						{
+							"key": "provider",
+							"value": "OneDrive"
+						},
+						{
+							"key": "driveEmail",
+							"value": "{{driveEmail}}"
+						}
+					]
+				}
+			},
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"pm.test(\"Response has drive files\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.be.an('object');",
+							"    pm.expect(jsonData).to.have.property('name');",
+							"    pm.expect(jsonData).to.have.property('type');",
+							"    pm.expect(jsonData).to.have.property('id');",
+							"    pm.expect(jsonData).to.have.property('webUrl');",
+							"    pm.expect(jsonData).to.have.property('children').that.is.an('array');",
+							"    jsonData.children.forEach(function (child) {",
+							"        pm.expect(child).to.have.property('id');",
+							"        pm.expect(child).to.have.property('name');",
+							"        pm.expect(child).to.have.property('type');",
+							"        pm.expect(child).to.have.property('createdDateTime');",
+							"        pm.expect(child).to.have.property('lastModifiedDateTime');",
+							"        pm.expect(child).to.have.property('webUrl');",
+							"        pm.expect(child).to.have.property('children').that.is.an('array');",
+							"    });",
+							"});"
+						]
+					}
+				}
+			],
+			"response": []
+		},
+		{
+    "name": "Unlink Drive Test",
+    "event": [
+        {
+            "listen": "test",
+            "script": {
+                "exec": [
+                    "pm.test(\"Status code is 200\", function () {",
+                    "    pm.response.to.have.status(200);",
+                    "});",
+                    "pm.test(\"Response time is less than 500ms\", function () {",
+                    "    pm.expect(pm.response.responseTime).to.be.below(500);",
+                    "});"
+                ],
+                "type": "text/javascript"
+            }
+        }
+    ],
+    "request": {
+        "method": "DELETE",
+        "header": [
+            {
+                "key": "Content-Type",
+                "value": "application/json"
+            },
+            {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+            }
+        ],
+        "url": {
+            "raw": "http://localhost:8080/unlink-drive?email={{email}}&provider=OneDrive&driveEmail={{driveEmail}}",
+            "protocol": "http",
+            "host": [
+                "localhost"
+            ],
+            "port": "8080",
+            "path": [
+                "unlink-drive"
+            ],
+            "query": [
+                {
+                    "key": "email",
+                    "value": "{{email}}"
+                },
+                {
+                    "key": "provider",
+                    "value": "OneDrive"
+                },
+                {
+                    "key": "driveEmail",
+                    "value": "{{driveEmail}}"
+                }
+            ]
+        }
+    },
+    "response": []
+},
+		{
+			"name": "Delete User",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{access_token}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"email\": \"{{email}}\",\n    \"password\": \"{{password}}\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8080/delete-user",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"delete-user"
+					]
+				}
+			},
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						]
+					}
+				}
+			],
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}
